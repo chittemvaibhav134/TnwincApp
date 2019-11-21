@@ -22,8 +22,6 @@ services:
       DB_USER: keycloak
       DB_VENDOR: postgres
       KEYCLOAK_HOSTNAME: keycloak.devlocal.navex-pe.com
-      KEYCLOAK_PASSWORD_FILE: /service-secrets/keycloak-password-file.txt
-      KEYCLOAK_USER_FILE: /service-secrets/keycloak-user-file.txt
     ports:
       - '8080:8080'
     image: jboss/keycloak:8.0.0
@@ -34,6 +32,7 @@ services:
     restart: always
     volumes:
       - ./mounts/app/service-secrets:/service-secrets:ro
+      - ./import:/import:rw
 
   db:
     container_name: keycloak-db
