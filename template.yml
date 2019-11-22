@@ -60,13 +60,6 @@ Resources:
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
-          - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}*"
-            Effect: Allow
-            Action:
-              - ssm:GetParameterHistory
-              - ssm:GetParameter
-              - ssm:GetParameters
-              - ssm:GetParametersByPath
           - Resource: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm"
             Effect: Allow
             Action:
