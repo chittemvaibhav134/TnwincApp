@@ -31,7 +31,6 @@ services:
       keycloak:
     restart: always
     volumes:
-      - ./mounts/app/service-secrets:/service-secrets:ro
       - ./import:/import:rw
 
   db:
