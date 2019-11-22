@@ -22,38 +22,19 @@ Parameters:
     AllowedValues:
       - Production
       - Development
-    Description: Determins ASPNET_ENVIRONMENT and resource levels
+    Description: Determines ASPNET_ENVIRONMENT and resource levels
   UiContainerRepository:
     Type: String
   BuildHash:
     Type: String
     Default: 12345abcde
-  CoiApiUrl:
+  KeycloakSsmJwtSecretKeyPath:
     Type: String
-  CoiApiSsmJwtSecretKeyPath:
+  KeycloakAccessPolicyArn:
     Type: String
-  CoiApiAccessPolicyArn:
-    Type: String
-  GatewayUrl:
-    Type: String
-    Description: "Used in UI to link to GW"
-    Default: "None"
-  AuthServiceUrl:
-    Type: String
-    Description: "Used in UI to forward/create auth requests to appropriate auth stack. Expected to end in /api"
-  EggoScriptUrl:
-    Type: String
-    Description: "Acquire the script for the Eggo-waffle UI element"
-    Default: "None"
-  PolicyTechUiUrl:
-    Type: String
-    Description: "Used in the UI to link to PolicyTech"
-    Default: "None"
 
 Conditions:
   UniqueEcsCluster: !Equals [!Ref EcsClusterArn, "None"]
-  KnownEggoScriptUrl: !Not [!Equals [!Ref EggoScriptUrl, "None"]]
-  KnownPtUiUrl: !Not [!Equals [!Ref PolicyTechUiUrl, "None"]]
 
 Mappings:
   StageToSubnets:
@@ -70,28 +51,20 @@ Mappings:
       TaskMemory: 1024
       TaskCpu: 512
 
-  AccountIdToAlias:
-    "455920928861":
-      "Alias": "Integration"
-    "403172096194":
-      "Alias": "Stage"
-    "618036221923":
-      "Alias": "Prod"
-
 Resources:
   JwtSecretKey:
     Type: Custom::SsmGetParameter
     Properties:
-      Name: !Ref CoiApiSsmJwtSecretKeyPath
+      Name: !Ref KeycloakSsmJwtSecretKeyPath
       ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cloudformation-get-ssm-param
 
   SsmUiIamAccessKey:
     Type: Custom::SsmCreateParameter
     Properties:
       ParameterProperties:
-        Name: !Sub "/${AWS::StackName}/COI_Api__AwsAccessKey"
-        Description: "Access key for the coi ui to call out to other apis"
-        Value: !Ref CoiUiApiConsumerCreds
+        Name: !Sub "/${AWS::StackName}/Keycloak__AwsAccessKey"
+        Description: "Access key"
+        Value: !Ref KeycloakConsumerCreds
         Type: "String"
         Overwrite: True
       ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cloudformation-set-ssm-param
@@ -100,9 +73,9 @@ Resources:
     Type: Custom::SsmCreateParameter
     Properties:
       ParameterProperties:
-        Name: !Sub "/${AWS::StackName}/COI_Api__AwsSecretKey"
-        Description: "Secret key for the coi ui to call out to other apis"
-        Value: !GetAtt CoiUiApiConsumerCreds.SecretAccessKey
+        Name: !Sub "/${AWS::StackName}/Keycloak__AwsSecretKey"
+        Description: "Secret key"
+        Value: !GetAtt KeycloakConsumerCreds.SecretAccessKey
         Type: "SecureString"
         KeyId: "alias/aws/ssm"
         Overwrite: True
@@ -112,22 +85,13 @@ Resources:
     Type: Custom::SsmCreateParameter
     Properties:
       ParameterProperties:
-        Name: !Sub "/${AWS::StackName}/COI_JwtKey"
+        Name: !Sub "/${AWS::StackName}/Keycloak_JwtKey"
         Description: "Jwt key"
         Value: !GetAtt JwtSecretKey.Parameter.Value
         Type: "SecureString"
         KeyId: "alias/aws/ssm"
         Overwrite: True
       ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cloudformation-set-ssm-param
-
-  NewRelic:
-    Type: Custom::VariableHack
-    Properties:
-      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
-      AppName: !Sub
-        - "${AWS::StackName}::${AWS::Region} (${AccountAlias})"
-        - AccountAlias:
-            !FindInMap [AccountIdToAlias, !Ref "AWS::AccountId", Alias]
 
   ECSTaskRole:
     Type: AWS::IAM::Role
@@ -173,32 +137,25 @@ Resources:
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
 
-  Cluster:
-    Type: AWS::ECS::Cluster
-    Condition: UniqueEcsCluster
-    Properties:
-      ClusterName: !Ref AWS::StackName
-
   EcsCluster:
     Type: Custom::VariableHack
     Properties:
       ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
       Arn: !If
         - UniqueEcsCluster
-        - !GetAtt Cluster.Arn
         - !Ref EcsClusterArn
 
-  CoiUiApiConsumer:
+  KeycloakConsumer:
     Type: AWS::IAM::User
     Properties:
       ManagedPolicyArns:
-        - !Ref CoiApiAccessPolicyArn
+        - !Ref KeycloakAccessPolicyArn
 
-  CoiUiApiConsumerCreds:
+  KeycloakConsumerCreds:
     Type: AWS::IAM::AccessKey
     Properties:
       Serial: 1
-      UserName: !Ref CoiUiApiConsumer
+      UserName: !Ref KeycloakConsumer
 
   SecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
@@ -220,8 +177,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Subnets:
-        # - !Ref CoiUiSubnet1
-        # - !Ref CoiUiSubnet2
+        - !Ref KeycloakSubnet1
       SecurityGroups:
         - !Ref SecurityGroup
 
@@ -231,7 +187,7 @@ Resources:
       DomainName: !Sub "*.${Subdomain}.${DnsHostedZone}"
       ValidationMethod: DNS
 
-  LoadBalancerListener:
+  LoadBalancerListener: # Ask Weston about this
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn: !Ref LoadBalancer
@@ -287,8 +243,8 @@ Resources:
         - TargetGroupArn: !Ref TargetGroup
           Type: forward
 
-  CoiCidrs:
-    Type: Custom::CoiCidrFindr
+  KeycloakCidrs: # Ask Weston about this
+    Type: Custom::KeycloakCidrFindr
     Properties:
       ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnCidrFindr
       VpcId:
@@ -297,15 +253,15 @@ Resources:
         - !FindInMap [StageToSubnets, !Ref "Stage", UI]
         - !FindInMap [StageToSubnets, !Ref "Stage", UI]
 
-  Cidrs:
+  Cidrs: # Ask Weston about this
     Type: Custom::VariableHack
     Properties:
       ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
 
-      UIAZ1: !GetAtt CoiCidrs.CidrBlock1
-      UIAZ2: !GetAtt CoiCidrs.CidrBlock2
+      UIAZ1: !GetAtt KeycloakCidrs.CidrBlock1
+      UIAZ2: !GetAtt KeycloakCidrs.CidrBlock2
 
-  CoiUiSubnet1:
+  KeycloakSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId:
@@ -317,31 +273,12 @@ Resources:
         - Key: Name
           Value: !Sub ${AWS::StackName} [UI] (Public)
 
-  CoiUiSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
-      AvailabilityZone: !Select [1, !GetAZs ]
-      MapPublicIpOnLaunch: true
-      CidrBlock: !GetAtt Cidrs.UIAZ2
-      Tags:
-        - Key: Name
-          Value: !Sub ${AWS::StackName} [UI] (Public)
-
-  CoiUiSubnet1RouteTableAssociation:
+  KeycloakSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}-PublicRouteTable"
-      SubnetId: !Ref CoiUiSubnet1
-
-  CoiUiSubnet2RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}-PublicRouteTable"
-      SubnetId: !Ref CoiUiSubnet2
+      SubnetId: !Ref KeycloakSubnet1
 
   LogGroup:
     Type: AWS::Logs::LogGroup
@@ -366,10 +303,9 @@ Resources:
           SecurityGroups:
             - !Ref LBSecurityGroup
           Subnets:
-            - !Ref CoiUiSubnet1
-            - !Ref CoiUiSubnet2
+            - !Ref KeycloakSubnet1
       LoadBalancers:
-        - ContainerName: Navex-Coi-Ui
+        - ContainerName: Navex-Keycloak
           ContainerPort: 8443
           TargetGroupArn: !Ref TargetGroup
 
@@ -399,7 +335,7 @@ Resources:
       ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
       TaskRoleArn: !Ref ECSTaskRole
       ContainerDefinitions:
-        - Name: Navex-Coi-Ui
+        - Name: Navex-Keycloak
           Image: !Ref UiContainerRepository
           Environment:
             - Name: ASPNETCORE_ENVIRONMENT
@@ -408,26 +344,6 @@ Resources:
               Value: !Sub "/${AWS::StackName}/"
             - Name: AWS_REGION
               Value: !Ref AWS::Region
-            - Name: COI_Authentication__ServiceUrl
-              Value: !Ref AuthServiceUrl
-            - Name: COI_Api__Url
-              Value: !Ref CoiApiUrl
-            - Name: COI_GatewayUrl
-              Value: !Ref GatewayUrl
-            - Name: COI_Api__AwsRegion
-              Value: !Ref AWS::Region
-            - !If
-              - KnownEggoScriptUrl
-              - Name: COI_EggoScriptUrl
-                Value: !Ref EggoScriptUrl
-              - !Ref "AWS::NoValue"
-            - !If
-              - KnownPtUiUrl
-              - Name: COI_PolicyTechUiUrl
-                Value: !Ref PolicyTechUiUrl
-              - !Ref "AWS::NoValue"
-            - Name: NEW_RELIC_APP_NAME
-              Value: !GetAtt NewRelic.AppName
 
           Essential: true
           PortMappings:
@@ -462,9 +378,6 @@ Outputs:
     Value: !Sub "https://{0}.${Subdomain}.${DnsHostedZone}"
   UserArn:
     Description: IAM user the ui uses to authenticate with the api
-    Value: !GetAtt CoiUiApiConsumer.Arn
+    Value: !GetAtt KeycloakConsumer.Arn
   BuildHash:
     Value: !Ref BuildHash
-  NewRelicAppName:
-    Description: New Relic Agents connect metrics and logs to individual applications using your license key and the app name
-    Value: !GetAtt NewRelic.AppName
