@@ -7,9 +7,6 @@ Description: >
 Parameters:
   InfrastructureStackName:
     Type: String
-  EcsClusterArn:
-    Type: String
-    Default: "None"
   Subdomain:
     Type: String
   DnsHostedZone:
@@ -25,15 +22,12 @@ Parameters:
   KeyCloakImage:
     Type: String
 
-Conditions:
-  UniqueEcsCluster: !Equals [!Ref EcsClusterArn, "None"]
-
 Mappings:
   StageToSubnets:
     Development:
-      UI: 28
+      KC: 28
     Production:
-      UI: 28
+      KC: 28
 
   StageToContainerResources:
     Development:
@@ -87,14 +81,6 @@ Resources:
           IpProtocol: "-1"
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
-
-  EcsCluster:
-    Type: Custom::VariableHack
-    Properties:
-      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
-      Arn: !If
-        - UniqueEcsCluster
-        - !Ref EcsClusterArn
 
   SecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
@@ -190,16 +176,16 @@ Resources:
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
       Sizes:
-        - !FindInMap [StageToSubnets, !Ref "Stage", UI]
-        - !FindInMap [StageToSubnets, !Ref "Stage", UI]
+        - !FindInMap [StageToSubnets, !Ref "Stage", KC]
+        - !FindInMap [StageToSubnets, !Ref "Stage", KC]
 
   Cidrs:
     Type: Custom::VariableHack
     Properties:
       ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
 
-      UIAZ1: !GetAtt KeycloakCidrs.CidrBlock1
-      UIAZ2: !GetAtt KeycloakCidrs.CidrBlock2
+      KCAZ1: !GetAtt KeycloakCidrs.CidrBlock1
+      KCAZ2: !GetAtt KeycloakCidrs.CidrBlock2
 
   KeycloakSubnet1:
     Type: AWS::EC2::Subnet
@@ -208,10 +194,10 @@ Resources:
         Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
       AvailabilityZone: !Select [0, !GetAZs ]
       MapPublicIpOnLaunch: true
-      CidrBlock: !GetAtt Cidrs.UIAZ1
+      CidrBlock: !GetAtt Cidrs.KCAZ1
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName} [UI] (Public)
+          Value: !Sub ${AWS::StackName} [KC] (Public)
 
   KeycloakSubnet2:
     Type: AWS::EC2::Subnet
@@ -221,10 +207,10 @@ Resources:
           !Sub "${InfrastructureStackName}-VpcId"
       AvailabilityZone: !Select [ 1, !GetAZs ]
       MapPublicIpOnLaunch: true
-      CidrBlock: !GetAtt Cidrs.UIAZ2
+      CidrBlock: !GetAtt Cidrs.KCAZ2
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName} [UI] (Public)
+          Value: !Sub ${AWS::StackName} [KC] (Public)
 
   KeycloakSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -284,7 +270,7 @@ Resources:
   UiTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: !Sub ${AWS::StackName}-UI
+      Family: !Sub ${AWS::StackName}-KC
       RequiresCompatibilities:
         - FARGATE
       Memory: !FindInMap [StageToContainerResources, !Ref "Stage", TaskMemory]
@@ -319,8 +305,8 @@ Resources:
 
 Outputs:
   Domain:
-    Description: domain to UI service
+    Description: domain to KC service
     Value: !Ref UiDns
   RootDomain:
-    Description: domain to UI service without string substitution
+    Description: domain to KC service without string substitution
     Value: !Sub "${Subdomain}.${DnsHostedZone}"
