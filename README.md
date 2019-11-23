@@ -1,6 +1,6 @@
 # KeyCloak NAVEX developer install (manual edition)
 
-This processes allow a developer to manually install KeyCloak in a development environment. In the future, this process will be automated. Additionally, these processes allow for the sharing of KeyCloak configuration between developers.
+This process allows a developer to manually install KeyCloak in a development environment. In the future, this process will be automated. Additionally, these processes allow for the sharing of KeyCloak configuration between developers.
 
 ## Installation
 
@@ -32,15 +32,11 @@ KeyCloak has now been completely removed.
 
 PowerShell scripts have been created to help with import/export.
 
-1. From `userstore/keycloak`:
-```shell
-docker stop keycloak-app
-```
-2. From `userstore/keycloak`, in PowerShell. Unfortunately, this step is not fully automated (yet). After running the following command, observe the log output and wait for a line of output similar to `Keycloak 8.0.0 (WildFly Core 10.0.0.Final) started in 19087ms - Started 684 of 989 services`, and then hit CTRL-C.
+1. From `userstore/keycloak`, in PowerShell. Unfortunately, this step is not fully automated (yet). After running the following command, observe the log output and wait for a line of output similar to `Keycloak 8.0.0 (WildFly Core 10.0.0.Final) started in 19087ms - Started 684 of 989 services`, and then hit CTRL-C.
 ```powershell
 .\Export-KeyCloakConfig.ps1
 ```
-3. From `userstore/keycloak`:
+2. From `userstore/keycloak`:
 ```shell
 docker-compose up -d
 ```
@@ -52,15 +48,11 @@ The exported configuration is now in `userstore/keycloak/import`. It should be c
 
 PowerShell scripts have been created to help with import/export.
 
-1. From `userstore/keycloak`:
-```shell
-docker stop keycloak-app
-```
-2. From `userstore/keycloak`, in PowerShell. Unfortunately, this step is not fully automated (yet). After running the following command, observe the log output and wait for a line of output similar to `Keycloak 8.0.0 (WildFly Core 10.0.0.Final) started in 19087ms - Started 684 of 989 services`, and then hit CTRL-C.
+1. From `userstore/keycloak`, in PowerShell. Unfortunately, this step is not fully automated (yet). After running the following command, observe the log output and wait for a line of output similar to `Keycloak 8.0.0 (WildFly Core 10.0.0.Final) started in 19087ms - Started 684 of 989 services`, and then hit CTRL-C.
 ```powershell
 .\Import-KeyCloakConfig.ps1
 ```
-3. From `userstore/keycloak`:
+2. From `userstore/keycloak`:
 ```shell
 docker-compose up -d
 ```
