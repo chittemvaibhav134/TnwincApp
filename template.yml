@@ -7,9 +7,6 @@ Description: >
 Parameters:
   InfrastructureStackName:
     Type: String
-  EcsClusterArn:
-    Type: String
-    Default: "None"
   Subdomain:
     Type: String
   DnsHostedZone:
@@ -24,9 +21,6 @@ Parameters:
       - Development
   KeyCloakImage:
     Type: String
-
-Conditions:
-  UniqueEcsCluster: !Equals [ !Ref EcsClusterArn, "None" ]
 
 Mappings:
   StageToSubnets:
@@ -80,22 +74,6 @@ Resources:
           IpProtocol: "-1"
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
-
-  Cluster:
-    Type: AWS::ECS::Cluster
-    Condition: UniqueEcsCluster
-    Properties:
-      ClusterName: !Ref AWS::StackName
-
-  EcsCluster:
-    Type: Custom::VariableHack
-    Properties:
-      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
-      Arn:
-        !If
-          - UniqueEcsCluster
-          - !GetAtt Cluster.Arn
-          - !Ref EcsClusterArn
 
   SecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
@@ -224,7 +202,7 @@ Resources:
     DependsOn:
       - LoadBalancerListenerHttps
     Properties:
-      Cluster: !GetAtt EcsCluster.Arn
+      Cluster: !GetAtt Cluster.Arn
       DesiredCount: !Ref EcsDesiredCount
       TaskDefinition: !Ref UiTaskDefinition
       LaunchType: FARGATE
