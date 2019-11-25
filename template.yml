@@ -202,7 +202,6 @@ Resources:
     DependsOn:
       - LoadBalancerListenerHttps
     Properties:
-      Cluster: !GetAtt Cluster.Arn
       DesiredCount: !Ref EcsDesiredCount
       TaskDefinition: !Ref UiTaskDefinition
       LaunchType: FARGATE
