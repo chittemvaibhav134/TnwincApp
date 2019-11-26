@@ -21,6 +21,13 @@ Parameters:
       - Development
   KeyCloakImage:
     Type: String
+  InstanceCertificateArn:
+    Type: String
+    Default: None
+    Description: This is the existing certificate for this developer's stack. If 'None' is provided the certificate will be created
+
+Conditions:
+  CreateInstanceCert: !Equals [ !Ref InstanceCertificateArn, "None"]
 
 Mappings:
   StageToSubnets:
@@ -98,6 +105,7 @@ Resources:
 
   KcCertificate:
     Type: AWS::CertificateManager::Certificate
+    Condition: CreateInstanceCert
     Properties:
       DomainName: !Sub "*.${Subdomain}.${DnsHostedZone}"
       ValidationMethod: DNS
@@ -110,7 +118,7 @@ Resources:
       Protocol: HTTPS
       SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01
       Certificates:
-        - CertificateArn: !Ref KcCertificate
+        - CertificateArn: !If [CreateInstanceCert, !Ref KcCertificate, !Ref InstanceCertificateArn]
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref TargetGroup
