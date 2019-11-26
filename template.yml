@@ -223,7 +223,7 @@ Resources:
     Properties:
       Cluster: !GetAtt EcsCluster.Arn
       DesiredCount: !Ref EcsDesiredCount
-      TaskDefinition: !Ref UiTaskDefinition
+      TaskDefinition: !Ref TaskDefinition
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
@@ -252,7 +252,7 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
 
-  UiTaskDefinition:
+  TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Family: !Sub ${AWS::StackName}-KC
@@ -278,7 +278,7 @@ Resources:
               awslogs-group: !Ref LogGroup
               awslogs-stream-prefix: !Ref AWS::StackName
 
-  UiDns:
+  Dns:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneName: !Sub "${DnsHostedZone}."
@@ -291,7 +291,7 @@ Resources:
 Outputs:
   Domain:
     Description: domain to KC service
-    Value: !Ref UiDns
+    Value: !Ref Dns
   RootDomain:
     Description: domain to KC service without string substitution
     Value: !Sub "${Subdomain}.${DnsHostedZone}"
