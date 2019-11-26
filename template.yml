@@ -143,9 +143,9 @@ Resources:
       Port: 8443
       Protocol: HTTPS
       Matcher:
-        HttpCode: 200-499
+        HttpCode: 200-299
       HealthCheckIntervalSeconds: 300
-      HealthCheckPath: /health
+      HealthCheckPath: /auth
       HealthCheckProtocol: HTTPS
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
