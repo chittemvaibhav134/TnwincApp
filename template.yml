@@ -82,6 +82,17 @@ Resources:
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
 
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref AWS::StackName
+
+  EcsCluster:
+    Type: Custom::VariableHack
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
+      Arn: !GetAtt Cluster.Arn
+
   SecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
@@ -210,6 +221,7 @@ Resources:
     DependsOn:
       - LoadBalancerListenerHttps
     Properties:
+      Cluster: !GetAtt EcsCluster.Arn
       DesiredCount: !Ref EcsDesiredCount
       TaskDefinition: !Ref UiTaskDefinition
       LaunchType: FARGATE
