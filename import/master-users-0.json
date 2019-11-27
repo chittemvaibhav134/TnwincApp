@@ -10,6 +10,7 @@
     "credentials" : [ {
       "id" : "9d860796-6218-430b-97a6-e1995ded1d81",
       "type" : "password",
+      "createdDate" : 1574873777033,
       "secretData" : "{\"value\":\"+xPAQ1XLxxAyh2wT2TNqh8zaTbC8noITERdDAFD0QSSjANzfsHKSqlE4sq3kXYmfyC88e/hdQFQINfqKSmpwIQ==\",\"salt\":\"i6Gk3OP6ndDmxig7pc7zDA==\"}",
       "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\"}"
     } ],
