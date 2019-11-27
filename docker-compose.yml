@@ -21,7 +21,6 @@ services:
       DB_PORT: '5432'
       DB_USER: keycloak
       DB_VENDOR: postgres
-      KEYCLOAK_HOSTNAME: keycloak.devlocal.navex-pe.com
     ports:
       - '8080:8080'
     image: jboss/keycloak:8.0.0
