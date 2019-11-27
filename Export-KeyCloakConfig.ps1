@@ -3,6 +3,14 @@ param(
 )
 . ./Watch-Process.ps1
 
+try {
+    Get-Command -ErrorAction Stop jq > $null
+}
+catch [System.Management.Automation.CommandNotFoundException] {
+    Write-Error "jq (https://stedolan.github.io/jq/) is not on the path, but is required for proper operation. Please install with Chocolatey or Scoop and try again."
+    exit
+}
+
 $importDir = [System.IO.Path]::Combine($workingDir, "import")
 
 Write-Host "Cleaning export destination."
@@ -36,8 +44,10 @@ Write-Host "Sorting export files."
         $outputFilePath = [System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($inputFilePath), [System.IO.Path]::GetRandomFileName())
 
         # sort JSON
+        $originalOutFileEncoding = $PSDefaultParameterValues['Out-File:Encoding'] # so we can restore the original value when we're done
         $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
         Get-Content $inputFilePath | jq -S -f .\sortArrays.jq > $outputFilePath # UTF-8, but still has a BOM
+        $PSDefaultParameterValues['Out-File:Encoding'] = $originalOutFileEncoding
 
         # strip BOM
         $encoding = New-Object System.Text.UTF8Encoding $false
