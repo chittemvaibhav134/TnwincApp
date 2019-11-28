@@ -15,7 +15,6 @@ $importDir = [System.IO.Path]::Combine($workingDir, "import")
 
 Write-Host "Cleaning export destination."
 if(Test-Path $importDir) { Remove-Item -Recurse -Force $importDir }
-if(Test-Path .\export-stdout.log) { Remove-Item -Force .\export-stdout.log }
 New-Item -ItemType Directory $importDir > $null
 
 Write-Host "Restarting KeyCloak for a clean export."
