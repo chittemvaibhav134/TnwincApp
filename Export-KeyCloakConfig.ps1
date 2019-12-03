@@ -1,7 +1,7 @@
 param(
     $workingDir = (Get-Location).Path
 )
-. ./Watch-Process.ps1
+. ./KeyCloakUtils.ps1
 
 try {
     Get-Command -ErrorAction Stop jq > $null
@@ -17,24 +17,13 @@ Write-Host "Cleaning export destination."
 if(Test-Path $importDir) { Remove-Item -Recurse -Force $importDir }
 New-Item -ItemType Directory $importDir > $null
 
-Write-Host "Restarting KeyCloak for a clean export."
-docker-compose down
-docker-compose up -d
-$filePath = "docker"
-$argumentList = "logs", "-f", "keycloak-app"
-$watchForString = "Keycloak 8.0.0 (WildFly Core 10.0.0.Final) started"
-$watchCountLimit = 3
-Watch-Process $filePath $argumentList $watchForString $watchCountLimit "KeyCloak restart"
-Write-Host "Finished KeyCloak restart."
+Restart-KeyCloak
 
 Write-Host "Starting export."
-$argumentList = "exec", "-it", "keycloak-app", "/opt/jboss/tools/docker-entrypoint.sh", "`"-Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import`""
-Watch-Process $filePath $argumentList $watchForString $watchCountLimit "KeyCloak export"
+Watch-KeyCloak -argumentList "exec", "-it", "keycloak-app", "/opt/jboss/tools/docker-entrypoint.sh", "`"-Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import`""
 Write-Host "Finished export."
 
-Write-Host "Restarting KeyCloak without waiting."
-docker-compose down
-docker-compose up -d
+Restart-KeyCloak
 
 Write-Host "Sorting export files."
 [System.IO.Directory]::GetFiles($importDir) `

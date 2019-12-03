@@ -2,7 +2,7 @@ function Watch-Process {
     param (
         [string]$fileName,
         [string[]]$argumentList,
-        [string]$watchForString,
+        [string]$watchForRegex,
         [int]$watchCountLimit,
         [string]$description = "process",
         [bool]$showOutput = $false
@@ -28,7 +28,7 @@ function Watch-Process {
         while ($null -ne ($line = $process.StandardOutput.ReadLine()))
         {
             if ($showOutput) {Write-Host $line}
-            if ($line.Contains($watchForString))
+            if ($line -match $watchForRegex)
             {
                 $watchCount++
                 break
