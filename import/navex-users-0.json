@@ -11,8 +11,8 @@
     "lastName" : "GW Admin",
     "email" : "mheade@navexglobal.com",
     "attributes" : {
-      "locale" : [ "en-US" ],
-      "middle_name" : [ "CanUpdateMiddleName-1549420977" ]
+      "middle_name" : [ "CanUpdateMiddleName-1549420977" ],
+      "locale" : [ "en-US" ]
     },
     "credentials" : [ ],
     "disableableCredentialTypes" : [ ],

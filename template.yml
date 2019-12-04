@@ -1,0 +1,297 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: >
+  Creates/Manages a Keycloak instance
+
+Parameters:
+  InfrastructureStackName:
+    Type: String
+  Subdomain:
+    Type: String
+  DnsHostedZone:
+    Type: String
+  EcsDesiredCount:
+    Type: Number
+    Default: 1
+  Stage:
+    Type: String
+    AllowedValues:
+      - Production
+      - Development
+  KeyCloakImage:
+    Type: String
+  InstanceCertificateArn:
+    Type: String
+    Default: None
+    Description: This is the existing certificate for this developer's stack. If 'None' is provided the certificate will be created
+
+Conditions:
+  CreateInstanceCert: !Equals [ !Ref InstanceCertificateArn, "None"]
+
+Mappings:
+  StageToSubnets:
+    Development:
+      KC: 28
+    Production:
+      KC: 28
+
+  StageToContainerResources:
+    Development:
+      TaskMemory: 1024
+      TaskCpu: 512
+    Production:
+      TaskMemory: 1024
+      TaskCpu: 512
+
+Resources:
+  ECSTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+
+  ContainerTaskPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: root
+      Roles:
+        - !Ref ECSTaskRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Resource: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm"
+            Effect: Allow
+            Action:
+              - kms:Decrypt
+
+  LBSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: !Sub ${AWS::StackName}-hosts
+      SecurityGroupIngress:
+        - SourceSecurityGroupId: !Ref SecurityGroup
+          IpProtocol: "-1"
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
+
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref AWS::StackName
+
+  EcsCluster:
+    Type: Custom::VariableHack
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
+      Arn: !GetAtt Cluster.Arn
+
+  SecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: !Sub ${AWS::StackName}-alb
+      SecurityGroupIngress:
+        - CidrIp: "0.0.0.0/0"
+          IpProtocol: "TCP"
+          FromPort: 443
+          ToPort: 443
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Subnets:
+        - !Ref KeycloakSubnet1
+        - !Ref KeycloakSubnet2
+      SecurityGroups:
+        - !Ref SecurityGroup
+
+  KcCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Condition: CreateInstanceCert
+    Properties:
+      DomainName: !Sub "*.${Subdomain}.${DnsHostedZone}"
+      ValidationMethod: DNS
+
+  LoadBalancerListenerHttps:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-TLS-1-2-2017-01
+      Certificates:
+        - CertificateArn: !If [CreateInstanceCert, !Ref KcCertificate, !Ref InstanceCertificateArn]
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: LoadBalancer
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
+      Port: 8443
+      Protocol: HTTPS
+      Matcher:
+        HttpCode: 200-299
+      HealthCheckIntervalSeconds: 300
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTPS
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      TargetType: "ip"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: "30"
+
+  KeycloakCidrs:
+    Type: Custom::KeycloakCidrFindr
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnCidrFindr
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
+      Sizes:
+        - !FindInMap [StageToSubnets, !Ref "Stage", KC]
+        - !FindInMap [StageToSubnets, !Ref "Stage", KC]
+
+  Cidrs:
+    Type: Custom::VariableHack
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
+
+      KCAZ1: !GetAtt KeycloakCidrs.CidrBlock1
+      KCAZ2: !GetAtt KeycloakCidrs.CidrBlock2
+
+  KeycloakSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
+      AvailabilityZone: !Select [0, !GetAZs ]
+      MapPublicIpOnLaunch: true
+      CidrBlock: !GetAtt Cidrs.KCAZ1
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName} [KC] (Public)
+
+  KeycloakSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${InfrastructureStackName}-VpcId"
+      AvailabilityZone: !Select [ 1, !GetAZs ]
+      MapPublicIpOnLaunch: true
+      CidrBlock: !GetAtt Cidrs.KCAZ2
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName} [KC] (Public)
+
+  KeycloakSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}-PublicRouteTable"
+      SubnetId: !Ref KeycloakSubnet1
+
+  KeycloakSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}-PublicRouteTable"
+      SubnetId: !Ref KeycloakSubnet2
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/${AWS::StackName}
+
+  FargateService:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - LoadBalancerListenerHttps
+    Properties:
+      Cluster: !GetAtt EcsCluster.Arn
+      DesiredCount: !Ref EcsDesiredCount
+      TaskDefinition: !Ref TaskDefinition
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref LBSecurityGroup
+          Subnets:
+            - !Ref KeycloakSubnet1
+            - !Ref KeycloakSubnet2
+      LoadBalancers:
+        - ContainerName: Navex-Keycloak
+          ContainerPort: 8443
+          TargetGroupArn: !Ref TargetGroup
+
+  TaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub ${AWS::StackName}-KC
+      RequiresCompatibilities:
+        - FARGATE
+      Memory: !FindInMap [StageToContainerResources, !Ref "Stage", TaskMemory]
+      Cpu: !FindInMap [StageToContainerResources, !Ref "Stage", TaskCpu]
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
+      TaskRoleArn: !Ref ECSTaskRole
+      ContainerDefinitions:
+        - Name: Navex-Keycloak
+          Image: !Ref KeyCloakImage
+
+          Essential: true
+          PortMappings:
+            - ContainerPort: 8080
+            - ContainerPort: 8443
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: !Ref AWS::StackName
+
+  Dns:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Sub "${DnsHostedZone}."
+      Name: !Sub "*.${Subdomain}.${DnsHostedZone}."
+      TTL: "900"
+      Type: CNAME
+      ResourceRecords:
+        - !GetAtt LoadBalancer.DNSName
+
+Outputs:
+  Domain:
+    Description: domain to KC service
+    Value: !Ref Dns
+  RootDomain:
+    Description: domain to KC service without string substitution
+    Value: !Sub "${Subdomain}.${DnsHostedZone}"

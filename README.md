@@ -35,7 +35,7 @@ KeyCloak has now been completely removed.
 
 ## Configuration Import/export
 
-PowerShell scripts have been created to help with import/export.
+PowerShell scripts have been created to help with import/export. Unfortunately, this step is not fully automated (yet). After running either of the following commands, observe the log output and wait for a line of output similar to `Keycloak 8.0.0 (WildFly Core 10.0.0.Final) started in 19087ms - Started 684 of 989 services`, and then hit CTRL-C.
 
 ### Import
 

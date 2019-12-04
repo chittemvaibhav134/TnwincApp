@@ -356,7 +356,7 @@
     "enabled" : true,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "3d4ca889-bbdc-43e8-8092-6a2ce1f27782",
-    "redirectUris" : [ "http://admin.devlocal.navex-pe.com:3000/sign-in" ],
+    "redirectUris" : [ "http://navexadmin.devlocal.navex-pe.com:3000/*" ],
     "webOrigins" : [ "+" ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -502,7 +502,8 @@
       "config" : {
         "included.client.audience" : "appshell",
         "id.token.claim" : "true",
-        "access.token.claim" : "true"
+        "access.token.claim" : "true",
+        "userinfo.token.claim" : "true"
       }
     } ]
   }, {
@@ -615,6 +616,7 @@
       "consentRequired" : false,
       "config" : {
         "multivalued" : "true",
+        "userinfo.token.claim" : "true",
         "user.attribute" : "foo",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
@@ -1071,39 +1073,29 @@
       "wantAssertionsSigned" : "",
       "postBindingAuthnRequest" : "",
       "forceAuthn" : "",
-      "wantAuthnRequestsSigned" : "",
-      "singleSignOnServiceUrl" : "https://doorman.dev.gw.local/SamlRequest"
+      "singleSignOnServiceUrl" : "https://doorman.dev.gw.local/SamlRequest",
+      "wantAuthnRequestsSigned" : ""
     }
   } ],
   "identityProviderMappers" : [ {
-    "id" : "19316323-94b6-4367-b9ad-7c012fad4c8f",
-    "name" : "LastName",
+    "id" : "0d110242-ee4b-4817-b005-46afda5de52a",
+    "name" : "MiddleName",
     "identityProviderAlias" : "doorman",
     "identityProviderMapper" : "saml-user-attribute-idp-mapper",
     "config" : {
-      "user.attribute" : "lastName",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/LastName"
+      "user.attribute" : "middle_name",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/MiddleName"
     }
   }, {
-    "id" : "53a98525-2321-4aae-a439-2732797f8228",
-    "name" : "FirstName",
+    "id" : "226710a6-7561-44c5-b3b7-09236e20b1d0",
+    "name" : "UserName",
     "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "identityProviderMapper" : "saml-username-idp-mapper",
     "config" : {
-      "user.attribute" : "firstName",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/FirstName"
+      "template" : "${ATTRIBUTE.http://schemas.navexglobal.com/identity/claims/UserName}"
     }
   }, {
-    "id" : "18691ce4-bc7a-47da-a67e-b979c57f16ca",
-    "name" : "PreferredLanguageRegion",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
-    "config" : {
-      "user.attribute" : "locale",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/PreferredLanguageRegion"
-    }
-  }, {
-    "id" : "9a6009e5-2dc2-47df-a675-7830eb6adb18",
+    "id" : "f0746753-146f-4720-bae7-15f7781a4b58",
     "name" : "EmailAddress",
     "identityProviderAlias" : "doorman",
     "identityProviderMapper" : "saml-user-attribute-idp-mapper",
@@ -1112,34 +1104,35 @@
       "attribute.name" : "http://schemas.navexglobal.com/identity/claims/EmailAddress"
     }
   }, {
-    "id" : "c3fee224-f4b0-4231-9a02-e96e709b79f7",
-    "name" : "UserName",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-username-idp-mapper",
-    "config" : {
-      "template" : "${ATTRIBUTE.http://schemas.navexglobal.com/identity/claims/UserName}"
-    }
-  }, {
-    "id" : "98316b1f-8e7a-4009-86a7-438bb2c08b3f",
-    "name" : "MiddleName",
+    "id" : "f4ed2e35-6548-4150-8b7b-ff7c1c8e34b5",
+    "name" : "PreferredLanguageRegion",
     "identityProviderAlias" : "doorman",
     "identityProviderMapper" : "saml-user-attribute-idp-mapper",
     "config" : {
-      "user.attribute" : "middle_name",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/MiddleName"
+      "user.attribute" : "locale",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/PreferredLanguageRegion"
+    }
+  }, {
+    "id" : "15d09831-f092-4747-9255-673c2674e173",
+    "name" : "FirstName",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "user.attribute" : "firstName",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/FirstName"
+    }
+  }, {
+    "id" : "c7780740-147b-4991-8570-25cee26baf04",
+    "name" : "LastName",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "user.attribute" : "lastName",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/LastName"
     }
   } ],
   "components" : {
     "org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy" : [ {
-      "id" : "2eb51d17-8521-4dbc-83d9-7d996d4bc585",
-      "name" : "Allowed Protocol Mapper Types",
-      "providerId" : "allowed-protocol-mappers",
-      "subType" : "anonymous",
-      "subComponents" : { },
-      "config" : {
-        "allowed-protocol-mapper-types" : [ "saml-user-attribute-mapper", "saml-user-property-mapper", "oidc-address-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-property-mapper", "oidc-full-name-mapper", "oidc-usermodel-attribute-mapper", "saml-role-list-mapper" ]
-      }
-    }, {
       "id" : "d46510d3-b8e1-49fa-93e8-9fed98f17b6e",
       "name" : "Trusted Hosts",
       "providerId" : "trusted-hosts",
@@ -1150,6 +1143,22 @@
         "client-uris-must-match" : [ "true" ]
       }
     }, {
+      "id" : "2eb51d17-8521-4dbc-83d9-7d996d4bc585",
+      "name" : "Allowed Protocol Mapper Types",
+      "providerId" : "allowed-protocol-mappers",
+      "subType" : "anonymous",
+      "subComponents" : { },
+      "config" : {
+        "allowed-protocol-mapper-types" : [ "oidc-full-name-mapper", "saml-user-attribute-mapper", "oidc-usermodel-attribute-mapper", "oidc-usermodel-property-mapper", "saml-role-list-mapper", "saml-user-property-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-address-mapper" ]
+      }
+    }, {
+      "id" : "5f33add4-9112-4582-83d3-9f73abc0fde0",
+      "name" : "Full Scope Disabled",
+      "providerId" : "scope",
+      "subType" : "anonymous",
+      "subComponents" : { },
+      "config" : { }
+    }, {
       "id" : "c39dec49-fd86-4320-86f5-a86375958bf7",
       "name" : "Allowed Client Scopes",
       "providerId" : "allowed-client-templates",
@@ -1159,9 +1168,9 @@
         "allow-default-scopes" : [ "true" ]
       }
     }, {
-      "id" : "5f33add4-9112-4582-83d3-9f73abc0fde0",
-      "name" : "Full Scope Disabled",
-      "providerId" : "scope",
+      "id" : "a17b3c9d-44d4-4416-8d16-b66dd9f8ffb0",
+      "name" : "Consent Required",
+      "providerId" : "consent-required",
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : { }
@@ -1172,15 +1181,8 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "saml-user-attribute-mapper", "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "oidc-usermodel-property-mapper", "saml-user-property-mapper", "oidc-full-name-mapper", "saml-role-list-mapper" ]
+        "allowed-protocol-mapper-types" : [ "saml-user-property-mapper", "saml-user-attribute-mapper", "oidc-usermodel-attribute-mapper", "oidc-address-mapper", "oidc-usermodel-property-mapper", "saml-role-list-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-full-name-mapper" ]
       }
-    }, {
-      "id" : "a17b3c9d-44d4-4416-8d16-b66dd9f8ffb0",
-      "name" : "Consent Required",
-      "providerId" : "consent-required",
-      "subType" : "anonymous",
-      "subComponents" : { },
-      "config" : { }
     }, {
       "id" : "ede90a7c-1ea3-4798-923d-22f0b3494eed",
       "name" : "Allowed Client Scopes",
@@ -1201,6 +1203,16 @@
       }
     } ],
     "org.keycloak.keys.KeyProvider" : [ {
+      "id" : "d719114b-8436-4ba8-9111-e4e2cf4e9426",
+      "name" : "rsa-generated",
+      "providerId" : "rsa-generated",
+      "subComponents" : { },
+      "config" : {
+        "privateKey" : [ "MIIEpAIBAAKCAQEAgqN7Vl86lYXT+leqK+ldkEMY0xK/OcAiTxEwNgL8XYi0CyR9m/eu4brJukxqAfU7Pv7G0f3Ug2w6rfT6Ib0aRTiITX+qJOdKFECW1UfTucIaAjKJtz7AaQL6yFGkfWdBQgHzHn5hR4bRZkG+PcNh0Sii8jOZu0OWb0DwCHvLY02YAU+wIzSUGkbY66zmzeS3OvcuED9JV9/7h+/F5ybo0tVg4t7plfc0l6kaTXzILlP38phD/y9BAQX3ROKP/Hf6wMLJU9q2wbJNO6wtvUeXib71DfiLJjhTRtNPPoQYdNE3YotaxRnIo6eA4KMh/1S4WKA3UgWuQB52v7Ecpi9AnwIDAQABAoIBAGfwBftMPOIl3ee5w8y4GRbkK2YT7kzWTvW1aTQv3/XTA9wxpjZnM56o7ELq9RSltgOC1VDRsTj27SDmXfRl7fbQ6bEvN4Gw+0FtuhPq18tdYTAKYYOHy7JBCqJCQqr7cfJAdtv2FRPBcez3tZKSVssAl9Q3tcJGHfRaKB+3zrQsLN/Qrpvln63V+KgrspTOAbHzhkA6P/z4hif0/EGegx5gBrQFLPNxCxvOrDqtGwn/LP1o7fgACJhlFSk/jKsmjWMMLP00OwxaLRS0ok9vkIRcPeoDtAsEqKe+A00Ac63+/4VmjJ7N9P33eBCwWMWEQlGKUbFKmPQ9zN8uYLwwAmECgYEAzvJmQSDRPdsWxl0+OOtJDpw/JhzKgjsNWT2Bw3lRQmZnyIhHmkNT3BM4lQHKMpqkfkhuebNJeA1JB4eb/67GHCLuDUOagLg02oJMc0YkSBizHJqA8d5RriD1DZpBTZjYAXXIkocy+rgTSJUwxiKDhFk8i5f5Hq7Fv8KEIVPVbXkCgYEAoZqsNT1Dfq9+R/aLiNqfPYLG4H0AxWNhzeBdjR1K5jIgBF3K8esQTutvh1xnT4UzbDWWpAGdQaO2RXXnupoNxqZEmKr1Vl6KBQmrByTuWFQV1xrC2ph3FtWSebcEXhaXc6Cro037mkzi6XRXnRVSi1TxLlr3i9URG1Fy72Nu0NcCgYEAgeR1uCVQEGImnmVCO9m6plf97v8dQLat/zhy7W2FSocaVyzqvHHL/hN2bViNQEv+OWFfLjYRRDAaiYZdrRNXN6vY/SxUmryEOC6Wq7f35+TQ74AutSGU5RW8mkga+wiXc/so5IfFwMavG9zAm2xoXjbgoMHH1LFgX6dI5d5H1QkCgYAb/gbGUg5W618caABTfEsJBJYeXIi9qDFQ0ARkZSaMKTKSjwyQSv9QLEftUnwysgfuPnoRfpYWwJzZ+0pgcD7iofpP140XoNiXds1BN4xxkF8YG3KVGsPGGMh+fM0s3wzs4m/YobFrUNYdSiHC++aIa/Y66Vbnychkyv71qGuRkQKBgQC77OuA7SJ32MSiNXASB+ob9TUWvje/c1xzS3g/5qRQKxP1x1TmM1OmawYZDhutYd5Jaqg2oWhUK0C8bp/Evg5Cd9yS+I2meylxzkCjx29zkJoOPY57/usOnyDwOb0xg35GQjItM4maqcgAWwcfBNEDP6cAhhn2zbfbnNsj7mNfoA==" ],
+        "certificate" : [ "MIICmTCCAYECBgFuhIHI/DANBgkqhkiG9w0BAQsFADAQMQ4wDAYDVQQDDAVuYXZleDAeFw0xOTExMTkxNjMwMjhaFw0yOTExMTkxNjMyMDhaMBAxDjAMBgNVBAMMBW5hdmV4MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgqN7Vl86lYXT+leqK+ldkEMY0xK/OcAiTxEwNgL8XYi0CyR9m/eu4brJukxqAfU7Pv7G0f3Ug2w6rfT6Ib0aRTiITX+qJOdKFECW1UfTucIaAjKJtz7AaQL6yFGkfWdBQgHzHn5hR4bRZkG+PcNh0Sii8jOZu0OWb0DwCHvLY02YAU+wIzSUGkbY66zmzeS3OvcuED9JV9/7h+/F5ybo0tVg4t7plfc0l6kaTXzILlP38phD/y9BAQX3ROKP/Hf6wMLJU9q2wbJNO6wtvUeXib71DfiLJjhTRtNPPoQYdNE3YotaxRnIo6eA4KMh/1S4WKA3UgWuQB52v7Ecpi9AnwIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBSLq1BJ9NyKNtRVZvbaRrsNNQ7RmrBVAq78GRGEC7H3VYOgQtZP0K0M86SFOR2mUQpUmVAN8BWoXn/xcHg/GLRZNWJgkIOZi2md5O8VUogEAiLsulk+IzCYBG/i3HvjfyPMR9m82vkzTlv777CjH/rbis8YEakp3aqNPij48xB58Y1jdYipOUR4/5mCtSw3Fi/DnrtPjywohKWimR1+e1cxCQuMEuFS9t3nzwr/7S9V43XQFY25a7sY8Y3UcTH2N4wcwPNUaSOh5g9B6L0CzaBrk8+WiEFGZnbDMERMyohb5hpXZ6Ea9LyWoVdc2HIxYWysXUyxR3mjqKK6KZuVhHI" ],
+        "priority" : [ "100" ]
+      }
+    }, {
       "id" : "acc085b8-8957-4958-bc5c-8841477ecc3c",
       "name" : "hmac-generated",
       "providerId" : "hmac-generated",
@@ -1210,16 +1222,6 @@
         "secret" : [ "_QPADVIh-4tvX2u0ir0IWUAiFIjvs4LgGc_XjfGXgiRa1UV3PaaR02Ve8a0-CPpLPoe22yigZL1bfrtzyLHxgg" ],
         "priority" : [ "100" ],
         "algorithm" : [ "HS256" ]
-      }
-    }, {
-      "id" : "d719114b-8436-4ba8-9111-e4e2cf4e9426",
-      "name" : "rsa-generated",
-      "providerId" : "rsa-generated",
-      "subComponents" : { },
-      "config" : {
-        "privateKey" : [ "MIIEpAIBAAKCAQEAgqN7Vl86lYXT+leqK+ldkEMY0xK/OcAiTxEwNgL8XYi0CyR9m/eu4brJukxqAfU7Pv7G0f3Ug2w6rfT6Ib0aRTiITX+qJOdKFECW1UfTucIaAjKJtz7AaQL6yFGkfWdBQgHzHn5hR4bRZkG+PcNh0Sii8jOZu0OWb0DwCHvLY02YAU+wIzSUGkbY66zmzeS3OvcuED9JV9/7h+/F5ybo0tVg4t7plfc0l6kaTXzILlP38phD/y9BAQX3ROKP/Hf6wMLJU9q2wbJNO6wtvUeXib71DfiLJjhTRtNPPoQYdNE3YotaxRnIo6eA4KMh/1S4WKA3UgWuQB52v7Ecpi9AnwIDAQABAoIBAGfwBftMPOIl3ee5w8y4GRbkK2YT7kzWTvW1aTQv3/XTA9wxpjZnM56o7ELq9RSltgOC1VDRsTj27SDmXfRl7fbQ6bEvN4Gw+0FtuhPq18tdYTAKYYOHy7JBCqJCQqr7cfJAdtv2FRPBcez3tZKSVssAl9Q3tcJGHfRaKB+3zrQsLN/Qrpvln63V+KgrspTOAbHzhkA6P/z4hif0/EGegx5gBrQFLPNxCxvOrDqtGwn/LP1o7fgACJhlFSk/jKsmjWMMLP00OwxaLRS0ok9vkIRcPeoDtAsEqKe+A00Ac63+/4VmjJ7N9P33eBCwWMWEQlGKUbFKmPQ9zN8uYLwwAmECgYEAzvJmQSDRPdsWxl0+OOtJDpw/JhzKgjsNWT2Bw3lRQmZnyIhHmkNT3BM4lQHKMpqkfkhuebNJeA1JB4eb/67GHCLuDUOagLg02oJMc0YkSBizHJqA8d5RriD1DZpBTZjYAXXIkocy+rgTSJUwxiKDhFk8i5f5Hq7Fv8KEIVPVbXkCgYEAoZqsNT1Dfq9+R/aLiNqfPYLG4H0AxWNhzeBdjR1K5jIgBF3K8esQTutvh1xnT4UzbDWWpAGdQaO2RXXnupoNxqZEmKr1Vl6KBQmrByTuWFQV1xrC2ph3FtWSebcEXhaXc6Cro037mkzi6XRXnRVSi1TxLlr3i9URG1Fy72Nu0NcCgYEAgeR1uCVQEGImnmVCO9m6plf97v8dQLat/zhy7W2FSocaVyzqvHHL/hN2bViNQEv+OWFfLjYRRDAaiYZdrRNXN6vY/SxUmryEOC6Wq7f35+TQ74AutSGU5RW8mkga+wiXc/so5IfFwMavG9zAm2xoXjbgoMHH1LFgX6dI5d5H1QkCgYAb/gbGUg5W618caABTfEsJBJYeXIi9qDFQ0ARkZSaMKTKSjwyQSv9QLEftUnwysgfuPnoRfpYWwJzZ+0pgcD7iofpP140XoNiXds1BN4xxkF8YG3KVGsPGGMh+fM0s3wzs4m/YobFrUNYdSiHC++aIa/Y66Vbnychkyv71qGuRkQKBgQC77OuA7SJ32MSiNXASB+ob9TUWvje/c1xzS3g/5qRQKxP1x1TmM1OmawYZDhutYd5Jaqg2oWhUK0C8bp/Evg5Cd9yS+I2meylxzkCjx29zkJoOPY57/usOnyDwOb0xg35GQjItM4maqcgAWwcfBNEDP6cAhhn2zbfbnNsj7mNfoA==" ],
-        "certificate" : [ "MIICmTCCAYECBgFuhIHI/DANBgkqhkiG9w0BAQsFADAQMQ4wDAYDVQQDDAVuYXZleDAeFw0xOTExMTkxNjMwMjhaFw0yOTExMTkxNjMyMDhaMBAxDjAMBgNVBAMMBW5hdmV4MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgqN7Vl86lYXT+leqK+ldkEMY0xK/OcAiTxEwNgL8XYi0CyR9m/eu4brJukxqAfU7Pv7G0f3Ug2w6rfT6Ib0aRTiITX+qJOdKFECW1UfTucIaAjKJtz7AaQL6yFGkfWdBQgHzHn5hR4bRZkG+PcNh0Sii8jOZu0OWb0DwCHvLY02YAU+wIzSUGkbY66zmzeS3OvcuED9JV9/7h+/F5ybo0tVg4t7plfc0l6kaTXzILlP38phD/y9BAQX3ROKP/Hf6wMLJU9q2wbJNO6wtvUeXib71DfiLJjhTRtNPPoQYdNE3YotaxRnIo6eA4KMh/1S4WKA3UgWuQB52v7Ecpi9AnwIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBSLq1BJ9NyKNtRVZvbaRrsNNQ7RmrBVAq78GRGEC7H3VYOgQtZP0K0M86SFOR2mUQpUmVAN8BWoXn/xcHg/GLRZNWJgkIOZi2md5O8VUogEAiLsulk+IzCYBG/i3HvjfyPMR9m82vkzTlv777CjH/rbis8YEakp3aqNPij48xB58Y1jdYipOUR4/5mCtSw3Fi/DnrtPjywohKWimR1+e1cxCQuMEuFS9t3nzwr/7S9V43XQFY25a7sY8Y3UcTH2N4wcwPNUaSOh5g9B6L0CzaBrk8+WiEFGZnbDMERMyohb5hpXZ6Ea9LyWoVdc2HIxYWysXUyxR3mjqKK6KZuVhHI" ],
-        "priority" : [ "100" ]
       }
     }, {
       "id" : "27f03eca-449f-4441-bf11-c38c53a52c4c",
@@ -1236,7 +1238,7 @@
   "internationalizationEnabled" : false,
   "supportedLocales" : [ ],
   "authenticationFlows" : [ {
-    "id" : "925cbaf2-783e-4720-883c-c00d9cedabdb",
+    "id" : "0c1e1fa3-4683-4744-970c-6965c87a93ff",
     "alias" : "Handle Existing Account",
     "description" : "Handle what to do if there is existing account with same email/username like authenticated identity provider",
     "providerId" : "basic-flow",
@@ -1262,7 +1264,7 @@
       "autheticatorFlow" : true
     } ]
   }, {
-    "id" : "64d61248-7152-4a15-bd1f-e680f783faf8",
+    "id" : "545abf56-d5de-454b-b6eb-04d34f5ff5c5",
     "alias" : "Verify Existing Account by Re-authentication",
     "description" : "Reauthentication of existing account",
     "providerId" : "basic-flow",
@@ -1282,7 +1284,7 @@
       "autheticatorFlow" : true
     } ]
   }, {
-    "id" : "0a7198c2-f821-40d0-87e0-078f3b162258",
+    "id" : "22cd3421-a44f-44e0-93d9-8e0cb9b74007",
     "alias" : "Verify Existing Account by Re-authentication - auth-otp-form - Conditional",
     "description" : "Flow to determine if the auth-otp-form authenticator should be used or not.",
     "providerId" : "basic-flow",
@@ -1302,7 +1304,7 @@
       "autheticatorFlow" : false
     } ]
   }, {
-    "id" : "964724b1-bb52-40fe-987e-734be14e52e0",
+    "id" : "1a0e2007-d3d8-4808-87a0-4a80e01df6bd",
     "alias" : "browser",
     "description" : "browser based authentication",
     "providerId" : "basic-flow",
@@ -1335,7 +1337,7 @@
       "autheticatorFlow" : true
     } ]
   }, {
-    "id" : "d2ec28c9-03b5-498e-b6b9-48c52359a53b",
+    "id" : "64dcafcc-d46c-4f41-9fc4-d13751f98a34",
     "alias" : "clients",
     "description" : "Base authentication for clients",
     "providerId" : "client-flow",
@@ -1367,7 +1369,7 @@
       "autheticatorFlow" : false
     } ]
   }, {
-    "id" : "c529d2ca-25ac-4328-97d4-9c039c8cc34b",
+    "id" : "21e3419f-64fd-4d9e-933c-757b56f8c9f2",
     "alias" : "direct grant",
     "description" : "OpenID Connect Resource Owner Grant",
     "providerId" : "basic-flow",
@@ -1393,7 +1395,7 @@
       "autheticatorFlow" : true
     } ]
   }, {
-    "id" : "4d17eb29-1de0-4db4-b547-432abf66ae41",
+    "id" : "88025405-f53d-4e11-8020-f33d7696016f",
     "alias" : "direct grant - direct-grant-validate-otp - Conditional",
     "description" : "Flow to determine if the direct-grant-validate-otp authenticator should be used or not.",
     "providerId" : "basic-flow",
@@ -1413,7 +1415,7 @@
       "autheticatorFlow" : false
     } ]
   }, {
-    "id" : "d91fca11-d1d5-484d-8988-75d581b1789c",
+    "id" : "3992ddd3-6b7f-4150-86fa-bd928357207d",
     "alias" : "docker auth",
     "description" : "Used by Docker clients to authenticate against the IDP",
     "providerId" : "basic-flow",
@@ -1427,7 +1429,7 @@
       "autheticatorFlow" : false
     } ]
   }, {
-    "id" : "11b310a1-e4f9-424b-901c-fa4572c56608",
+    "id" : "4fdb464c-f6be-466d-8695-9955b243f627",
     "alias" : "first broker login",
     "description" : "Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account",
     "providerId" : "basic-flow",
@@ -1455,7 +1457,7 @@
       "autheticatorFlow" : true
     } ]
   }, {
-    "id" : "c7bf149b-c008-4f45-b3fd-c2795024a874",
+    "id" : "13fbd887-8063-471f-9817-a60c12dfd872",
     "alias" : "forms",
     "description" : "Username, password, otp and other auth forms.",
     "providerId" : "basic-flow",
@@ -1475,7 +1477,7 @@
       "autheticatorFlow" : true
     } ]
   }, {
-    "id" : "546ca5cb-3c94-433f-900d-b11243810c02",
+    "id" : "e71a7722-f048-4327-bd42-63e1d36941a6",
     "alias" : "forms - auth-otp-form - Conditional",
     "description" : "Flow to determine if the auth-otp-form authenticator should be used or not.",
     "providerId" : "basic-flow",
@@ -1495,7 +1497,7 @@
       "autheticatorFlow" : false
     } ]
   }, {
-    "id" : "6617d3dc-c813-4068-83ff-09e6d0f7091a",
+    "id" : "515c182e-1810-4959-8964-40000922dd2d",
     "alias" : "http challenge",
     "description" : "An authentication flow based on challenge-response HTTP Authentication Schemes",
     "providerId" : "basic-flow",
@@ -1527,7 +1529,7 @@
       "autheticatorFlow" : false
     } ]
   }, {
-    "id" : "76866af7-5ec3-4aab-bf28-7d49566eec33",
+    "id" : "764bdf1b-fe4f-4b58-9d4e-fcdaf264234a",
     "alias" : "registration",
     "description" : "registration flow",
     "providerId" : "basic-flow",
@@ -1542,7 +1544,7 @@
       "autheticatorFlow" : true
     } ]
   }, {
-    "id" : "6b6afe5f-a176-4090-aea7-4b01525dccbe",
+    "id" : "6dbc4d01-32e0-4bdc-9df6-59e1c281f350",
     "alias" : "registration form",
     "description" : "registration form",
     "providerId" : "form-flow",
@@ -1574,7 +1576,7 @@
       "autheticatorFlow" : false
     } ]
   }, {
-    "id" : "7b97f4c3-3355-4a06-b0db-47881d47c191",
+    "id" : "294d6f41-1c5e-46dc-bde0-2c24215a5164",
     "alias" : "reset credentials",
     "description" : "Reset credentials for a user if they forgot their password or something",
     "providerId" : "basic-flow",
@@ -1606,7 +1608,7 @@
       "autheticatorFlow" : true
     } ]
   }, {
-    "id" : "ee985ea8-6069-4fd5-81e1-646867f19ba8",
+    "id" : "852ac875-c30b-42c1-8e29-ee8f12f6e4ac",
     "alias" : "reset credentials - reset-otp - Conditional",
     "description" : "Flow to determine if the reset-otp authenticator should be used or not.",
     "providerId" : "basic-flow",
@@ -1626,7 +1628,7 @@
       "autheticatorFlow" : false
     } ]
   }, {
-    "id" : "bba62068-bd89-46ab-a2c5-794046b9cea0",
+    "id" : "28702fe4-2ee6-4564-957c-8c3fac5bcaa6",
     "alias" : "saml ecp",
     "description" : "SAML ECP Profile Authentication Flow",
     "providerId" : "basic-flow",
@@ -1641,19 +1643,19 @@
     } ]
   } ],
   "authenticatorConfig" : [ {
-    "id" : "2e6928e4-b031-4c4e-9ca8-67cefbf6a778",
+    "id" : "1c45e394-a8e3-45ea-959d-6593f77a7901",
     "alias" : "create unique user config",
     "config" : {
       "require.password.update.after.registration" : "false"
     }
   }, {
-    "id" : "6c395d40-06eb-4722-89d6-f4b8c4a11a05",
+    "id" : "b47e95d3-76c4-441d-8145-c3505e9d08ca",
     "alias" : "doorman-default",
     "config" : {
       "defaultProvider" : "doorman"
     }
   }, {
-    "id" : "a21c7d67-2edf-46ec-bb71-c8e07b7a85c9",
+    "id" : "5566acaf-c05f-4afb-8873-05ac9799ea27",
     "alias" : "review profile config",
     "config" : {
       "update.profile.on.first.login" : "missing"
@@ -1713,29 +1715,29 @@
     "failureFactor" : "30",
     "hostname" : "trial12.keycloak.devlocal.navex-pe.com",
     "actionTokenGeneratedByUserLifespan" : "300",
-    "webAuthnPolicySignatureAlgorithms" : "ES256",
     "maxDeltaTimeSeconds" : "43200",
+    "webAuthnPolicySignatureAlgorithms" : "ES256",
     "offlineSessionMaxLifespan" : "5184000",
     "_browser_header.contentSecurityPolicyReportOnly" : "",
     "bruteForceProtected" : "false",
     "_browser_header.contentSecurityPolicy" : "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
     "_browser_header.xXSSProtection" : "1; mode=block",
-    "webAuthnPolicyUserVerificationRequirement" : "not specified",
-    "_browser_header.strictTransportSecurity" : "max-age=31536000; includeSubDomains",
     "_browser_header.xFrameOptions" : "SAMEORIGIN",
-    "webAuthnPolicyCreateTimeout" : "0",
-    "quickLoginCheckMilliSeconds" : "1000",
+    "_browser_header.strictTransportSecurity" : "max-age=31536000; includeSubDomains",
+    "webAuthnPolicyUserVerificationRequirement" : "not specified",
     "permanentLockout" : "false",
+    "quickLoginCheckMilliSeconds" : "1000",
+    "webAuthnPolicyCreateTimeout" : "0",
     "webAuthnPolicyRequireResidentKey" : "not specified",
-    "webAuthnPolicyAttestationConveyancePreference" : "not specified",
     "webAuthnPolicyRpId" : "",
+    "webAuthnPolicyAttestationConveyancePreference" : "not specified",
     "maxFailureWaitSeconds" : "900",
     "minimumQuickLoginWaitSeconds" : "60",
     "webAuthnPolicyAvoidSameAuthenticatorRegister" : "false",
     "_browser_header.xContentTypeOptions" : "nosniff",
     "actionTokenGeneratedByAdminLifespan" : "43200",
-    "offlineSessionMaxLifespanEnabled" : "false",
-    "waitIncrementSeconds" : "60"
+    "waitIncrementSeconds" : "60",
+    "offlineSessionMaxLifespanEnabled" : "false"
   },
   "keycloakVersion" : "8.0.0",
   "userManagedAccessAllowed" : false
