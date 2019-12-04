@@ -1,0 +1,48 @@
+version: '2.0'
+
+volumes:
+
+  db:
+
+networks:
+
+  keycloak:
+
+services:
+
+  app:
+    container_name: keycloak-app
+    depends_on:
+      - db
+    environment:
+      DB_ADDR: db
+      DB_DATABASE: keycloak
+      DB_PASSWORD: keycloak
+      DB_PORT: '5432'
+      DB_USER: keycloak
+      DB_VENDOR: postgres
+    ports:
+      - '8080:8080'
+    image: jboss/keycloak:8.0.0
+    links:
+      - db
+    networks:
+      keycloak:
+    restart: always
+    volumes:
+      - ./import:/import:rw
+
+  db:
+    container_name: keycloak-db
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_PASSWORD: keycloak
+      POSTGRES_USER: keycloak
+    expose:
+      - '5432'
+    image: postgres:11.5
+    networks:
+      keycloak:
+    restart: always
+    volumes:
+      - db:/var/lib/postgresql/data:rw
