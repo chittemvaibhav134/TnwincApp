@@ -1,0 +1,44 @@
+version: 0.2
+
+env:
+  variables:
+    # contains the platform-auth-keycloak repo; not currently ref'd but this buildspec will end up there
+    APP_DIR: "app"
+    # contains json files with the name of the projects listed in deployspec DependsOn
+    DC_ART_DIR: "dc_art"
+    # Deployspec file with the generated Version tacked on
+    BUILD_INFO_FILE: "build_info/build-record.json"
+
+phases:
+  #install:
+    # runtime-versions:
+    #   nodejs: 12
+  pre_build:
+    commands:
+      - ProjectName=$(jq -r '.Project' $BUILD_INFO_FILE)
+      - ProjectVersion=$(jq -r '.Version' $BUILD_INFO_FILE)
+      - echo "loading values from deployment context artifacts $DC_ART_DIR/aws-inf"
+      - InfStackName=$(jq -r '.StackName' "$DC_ART_DIR/aws-inf")
+  build:
+    commands:
+      - |
+        jq --null-input \
+          --arg InfrastructureStackName "$InfStackName" \
+          --arg InsightsAPIAccessPolicy "$InsightsAPIAccessPolicy" \
+          --arg InsightsAPIRegion "$InsightsAPIRegion" \
+          --arg ProjectName "$ProjectName" \
+          --arg ProjectVersion "$ProjectVersion" \
+          '{
+            "Parameters": {
+              "InfrastructureStackName": $InfrastructureStackName
+            },
+            "Tags": {
+              "navex:project:name": $ProjectName,
+              "navex:project:version": $ProjectVersion,
+              "navex:project:owner": "cia"
+            }
+          }' > \
+          ./template-configuration.json
+artifacts:
+  files:
+    - "template-configuration.json"
