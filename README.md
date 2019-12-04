@@ -2,6 +2,14 @@
 
 This process allows a developer to manually install KeyCloak in a development environment. In the future, this process will be automated. Additionally, these processes allow for the sharing of KeyCloak configuration between developers.
 
+## Dependencies
+
+* Docker
+* Docker Compose
+* [jq](https://stedolan.github.io/jq/) (if you intend to export configuration)
+
+> In Windows, both Docker and Docker Compose are included with the Docker Desktop install.
+
 ## Installation
 
 This process should only need to be completed once, unless the KeyCloak shared configuration has changed. If KeyCloak has already been installed, [completely remove it](#removal) prior to reinstallation.
@@ -25,9 +33,7 @@ docker volume rm keycloak_db
 
 KeyCloak has now been completely removed.
 
-## Import/export configuration
-
-[Import/Export reference from the KeyCloak Manual](https://www.keycloak.org/docs/latest/server_admin/#_export_import)
+## Configuration Import/export
 
 PowerShell scripts have been created to help with import/export.
 

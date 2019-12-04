@@ -1,12 +1,8 @@
 param(
-    $workingDir = (Get-Location).Path
+    [string]$workingDir = $PSScriptRoot,
+    [string]$composeFilePath = (Join-Path $PSScriptRoot 'docker-compose.yml')
 )
-. ./KeyCloakUtils.ps1
+. (Join-Path $workingDir "KeyCloakUtils.ps1")
 
-Restart-KeyCloak
-
-Write-Host "Starting import."
-Watch-KeyCloak -argumentList "exec", "-it", "keycloak-app", "/opt/jboss/tools/docker-entrypoint.sh", "`"-Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import`""
-Write-Host "Finished import."
-
-Restart-KeyCloak
+Write-Host "Importing KeyCloak config from $(Join-Path $workingDir 'import')."
+Invoke-KeyCloakMigration -action "import" -composeFilePath $composeFilePath
