@@ -1,6 +1,6 @@
-# KeyCloak NAVEX developer install (manual edition)
+# platform-auth-keycloak
 
-This process allows a developer to manually install KeyCloak in a development environment. In the future, this process will be automated. Additionally, these processes allow for the sharing of KeyCloak configuration between developers.
+This process allows a developer to install KeyCloak in a development environment.
 
 ## Dependencies
 
@@ -35,7 +35,7 @@ KeyCloak has now been completely removed.
 
 ## Configuration Import/export
 
-PowerShell scripts have been created to help with import/export. Unfortunately, this step is not fully automated (yet). After running either of the following commands, observe the log output and wait for a line of output similar to `Keycloak 8.0.0 (WildFly Core 10.0.0.Final) started in 19087ms - Started 684 of 989 services`, and then hit CTRL-C.
+PowerShell scripts have been created to help with import/export.
 
 ### Import
 
