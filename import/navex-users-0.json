@@ -1,32 +1,46 @@
 {
-  "realm" : "navex",
-  "users" : [ {
-    "id" : "697e59c4-ac93-428f-a852-c03e3cca355e",
-    "createdTimestamp" : 1574267834546,
-    "username" : "shiva",
-    "enabled" : true,
-    "totp" : false,
-    "emailVerified" : false,
-    "firstName" : "Shiva",
-    "lastName" : "GW Admin",
-    "email" : "mheade@navexglobal.com",
-    "attributes" : {
-      "middle_name" : [ "CanUpdateMiddleName-1549420977" ],
-      "locale" : [ "en-US" ]
-    },
-    "credentials" : [ ],
-    "disableableCredentialTypes" : [ ],
-    "requiredActions" : [ ],
-    "federatedIdentities" : [ {
-      "identityProvider" : "doorman",
-      "userId" : "c785a0fb-8b1a-e511-af9f-00155d103480",
-      "userName" : "c785a0fb-8b1a-e511-af9f-00155d103480"
-    } ],
-    "realmRoles" : [ "offline_access", "uma_authorization" ],
-    "clientRoles" : {
-      "account" : [ "view-profile", "manage-account" ]
-    },
-    "notBefore" : 0,
-    "groups" : [ ]
-  } ]
+  "realm": "navex",
+  "users": [
+    {
+      "attributes": {
+        "locale": [
+          "en-US"
+        ],
+        "middle_name": [
+          "CanUpdateMiddleName-1549420977"
+        ]
+      },
+      "clientRoles": {
+        "account": [
+          "manage-account",
+          "view-profile"
+        ]
+      },
+      "createdTimestamp": 1574267834546,
+      "credentials": [],
+      "disableableCredentialTypes": [],
+      "email": "mheade@navexglobal.com",
+      "emailVerified": false,
+      "enabled": true,
+      "federatedIdentities": [
+        {
+          "identityProvider": "doorman",
+          "userId": "c785a0fb-8b1a-e511-af9f-00155d103480",
+          "userName": "c785a0fb-8b1a-e511-af9f-00155d103480"
+        }
+      ],
+      "firstName": "Shiva",
+      "groups": [],
+      "id": "697e59c4-ac93-428f-a852-c03e3cca355e",
+      "lastName": "GW Admin",
+      "notBefore": 0,
+      "realmRoles": [
+        "offline_access",
+        "uma_authorization"
+      ],
+      "requiredActions": [],
+      "totp": false,
+      "username": "shiva"
+    }
+  ]
 }
