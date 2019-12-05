@@ -1,0 +1,17 @@
+{
+    "Project": "keycloak",
+    "RegionWhiteList": [
+      "us-east-1",
+      "us-west-2",
+      "eu-central-1"
+    ],
+    "DependsOn": [
+      {
+        "Project": "aws-inf",
+        "Artifacts": [
+            {"Name":"StackName","Required": true}
+        ]
+      }
+    ],
+    "Exposes": ["Domain","RootDomain"]
+  }
