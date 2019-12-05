@@ -14,7 +14,7 @@ This process allows a developer to install KeyCloak in a development environment
 
 This process should only need to be completed once, unless the KeyCloak shared configuration has changed. If KeyCloak has already been installed, [completely remove it](#removal) prior to reinstallation.
 
-From `keycloak`:
+From the repo root:
 ```shell
 docker-compose up -d
 ```
@@ -25,7 +25,7 @@ KeyCloak is now installed and accessible at http://localhost:8080. It is not yet
 
 This process is destructive to any existing KeyCloak configuration. If you've made any local KeyCloak configuration changes that should be preserved, [export](#export-configuration) and commit them first.
 
-From `keycloak`:
+From the repo root:
 ```shell
 docker-compose down
 docker volume rm keycloak_db
@@ -39,7 +39,7 @@ PowerShell scripts have been created to help with import/export.
 
 ### Import
 
-From `keycloak`, in PowerShell:
+From the repo root, in PowerShell:
 ```powershell
 .\Import-KeyCloakConfig.ps1
 ```
@@ -47,11 +47,11 @@ After importing a fresh configuration, KC may throw an error message upon first 
 
 ### Export
 
-From `keycloak`, in PowerShell:
+From the repo root, in PowerShell:
 ```powershell
 .\Export-KeyCloakConfig.ps1
 ```
-The exported configuration is now in `keycloak/import`. It should be committed to source control if any important changes have been made.
+The exported configuration is now in the `import` directory. It should be committed to source control if any important changes have been made.
 
 ## Miscellaneous notes
 
