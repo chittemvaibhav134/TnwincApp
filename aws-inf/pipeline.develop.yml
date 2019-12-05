@@ -247,7 +247,7 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
-                      "BuildOutput::template-configuration.json" 
+                      "BuildOutput::template-configuration.json", 
                       "Transform_Wobbly::template-configuration.json" 
                     ],
                     "Json": {
@@ -255,7 +255,7 @@ Resources:
                         "Subdomain": "id3.wobbly",
                         "DnsHostedZone": "navex-int.com",
                         "Stage": "Development"
-                      }
+                      },
                       "Tags": {"navex:deploy:context": "wobbly"} 
                     },
                     "OutputFile": "template-configuration.json"
