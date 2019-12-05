@@ -10,9 +10,9 @@ env:
     BUILD_INFO_FILE: "build_info/build-record.json"
 
 phases:
-  #install:
-    # runtime-versions:
-    #   nodejs: 12
+  install:
+    runtime-versions:
+      nodejs: 12
   pre_build:
     commands:
       - ProjectName=$(jq -r '.Project' $BUILD_INFO_FILE)

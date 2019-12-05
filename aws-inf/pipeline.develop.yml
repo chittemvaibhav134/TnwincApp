@@ -210,7 +210,7 @@ Resources:
                   {
                     "ArtifactPrefixMap":{
                       "ProjectVersion": "build_info",
-                      "AutoValidationDcArt": "dc_art",
+                      "GetDcArt_Wobbly": "dc_art",
                       "App": "app"
                     }
                   }
