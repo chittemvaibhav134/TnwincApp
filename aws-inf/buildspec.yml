@@ -20,8 +20,8 @@ phases:
           --arg KeyCloakImage "jboss/keycloak:8.0.0" \
           '{
             "Parameters":{
-              "KeyCloakImage": "$KeyCloakImage"
-            } 
+              "KeyCloakImage": $KeyCloakImage
+            }
           }' > \
           ./template-configuration.json
 

@@ -24,8 +24,6 @@ phases:
       - |
         jq --null-input \
           --arg InfrastructureStackName "$InfStackName" \
-          --arg InsightsAPIAccessPolicy "$InsightsAPIAccessPolicy" \
-          --arg InsightsAPIRegion "$InsightsAPIRegion" \
           --arg ProjectName "$ProjectName" \
           --arg ProjectVersion "$ProjectVersion" \
           '{
