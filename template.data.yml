@@ -1,0 +1,290 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: >
+  Creates/Manages a data stack of conflict-of-interest
+
+Parameters:
+  InfrastructureStackName:
+    Type: String
+  Stage:
+    Type: String
+    AllowedValues:
+      - Production
+      - Development
+
+Conditions:
+  Development: !Equals [ !Ref Stage, "Development" ]
+  NotDevelopment: !Not [!Equals [ !Ref Stage, "Development" ] ]
+
+Mappings:
+  StageToSubnets:
+    Development:
+      DB: 28
+    Production:
+      DB: 28
+
+Resources:
+  DbUser:
+    Type: Custom::VariableHack
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
+      Name: postgres
+
+  DbPassword:
+    Type: Custom::GeneratedString
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnGenString
+      ExcludePunctuation: true
+      Length: 30
+
+  DbStrings:
+    Type: Custom::VariableHack
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
+      EndPoint:
+        !If
+          - Development
+          - !Sub ${DatabaseInstance.Endpoint.Address}
+          - !Sub ${DatabaseCluster.Endpoint.Address}
+      Port:
+        !If
+          - Development
+          - !Sub ${DatabaseInstance.Endpoint.Port}
+          - !Sub ${DatabaseCluster.Endpoint.Port}
+      ConnectionString:
+        !If
+          - Development
+          - !Sub "Server=${DatabaseInstance.Endpoint.Address};Port=${DatabaseInstance.Endpoint.Port};Database=keycloak;UserId=${DbUser.Name};Password=${DbPassword.Value}"
+          - !Sub "Server=${DatabaseCluster.Endpoint.Address};Port=${DatabaseCluster.Endpoint.Port};Database=keycloak;UserId=${DbUser.Name};Password=${DbPassword.Value}"
+      SsmPath:
+        !If 
+          - Development 
+          - !Sub /${AWS::StackName}/ConnectionString/${DatabaseInstance}
+          - !Sub /${AWS::StackName}/ConnectionString/${DatabasePrimaryInstance}
+
+
+  SsmConnectionString:
+    Type: Custom::SsmCreateParameter
+    Properties:
+      ParameterProperties:
+        Name: !GetAtt DbStrings.SsmPath
+        Description: "Connection string to keycloak db"
+        Value: !GetAtt DbStrings.ConnectionString
+        Type: "SecureString"
+        KeyId: "alias/aws/ssm"
+        Overwrite: True
+      ServiceToken:
+        !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cloudformation-set-ssm-param
+
+  DbClusterSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: !Sub ${AWS::StackName}-dbcluster
+      SecurityGroupIngress:
+        - CidrIp: !GetAtt Cidrs.DbAZ1
+          IpProtocol: "TCP"
+          FromPort: 5432
+          ToPort: 5432
+          Description: !Sub "KeyCloak DB AZ1 (${KeyCloakDbSubnet1})"
+        - CidrIp: !GetAtt Cidrs.DbAZ2
+          IpProtocol: "TCP"
+          FromPort: 5432
+          ToPort: 5432
+          Description: !Sub "KeyCloak DB AZ2 (${KeyCloakDbSubnet2})"
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${InfrastructureStackName}-VpcId"
+
+  DatabaseSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: CloudFormation managed DB subnet group.
+      SubnetIds:
+        - !Ref KeyCloakDbSubnet1
+        - !Ref KeyCloakDbSubnet2
+
+  DatabaseClusterParameterGroup:
+    Type: AWS::RDS::DBClusterParameterGroup
+    Properties:
+      Description: !Sub "Aurora PG Cluster Parameter Group for ${AWS::StackName}"
+      # need to verify that postgresql11 is valid at some point
+      Family: aurora-postgresql11
+      Parameters:
+        rds.force_ssl: 0
+
+  DatabaseInstanceParameterGroup:
+    Type: AWS::RDS::DBParameterGroup
+    Condition:  NotDevelopment
+    Properties:
+      Description: !Sub "Aurora PG DB Instance Parameter Group for ${AWS::StackName}"
+      Family: aurora-postgresql11
+      Parameters:
+        shared_preload_libraries: auto_explain,pg_stat_statements,pg_hint_plan,pgaudit
+        log_statement: "ddl"
+        log_connections: "1"
+        log_disconnections: "1"
+        log_lock_waits: "1"
+        log_min_duration_statement: "5000"
+        auto_explain.log_min_duration: "5000"
+        auto_explain.log_verbose: "1"
+        log_rotation_age: "1440"
+        log_rotation_size: "102400"
+        rds.log_retention_period: "10080"
+        random_page_cost: "1"
+        track_activity_query_size: "16384"
+        idle_in_transaction_session_timeout: "7200000"
+        statement_timeout: "7200000"
+        search_path: '"$user",public'
+
+  DatabaseMonitoringRole: 
+    Type: AWS::IAM::Role
+    Condition: NotDevelopment
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "monitoring.rds.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Path: "/"
+      ManagedPolicyArns: 
+        - arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole
+
+  DatabaseCluster:
+    Type: AWS::RDS::DBCluster
+    Condition:  NotDevelopment
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Properties:
+      Engine: aurora-postgresql
+      # double check this engine version too....
+      EngineVersion: "11.5"
+      BackupRetentionPeriod: 35
+      PreferredBackupWindow: 05:00-06:00
+      PreferredMaintenanceWindow: mon:03:00-mon:04:00
+      DBSubnetGroupName: !Ref DatabaseSubnetGroup
+      VpcSecurityGroupIds:
+        - !Ref DbClusterSecurityGroup
+      DBClusterParameterGroupName: !Ref DatabaseClusterParameterGroup
+      Port: 5432
+      Tags:
+        - Key: navex:backup
+          Value: yes-please
+
+  DatabasePrimaryInstance:
+    Type: AWS::RDS::DBInstance
+    Condition: NotDevelopment
+    Properties:
+      Engine: aurora-postgresql
+      DBClusterIdentifier:  !Ref DatabaseCluster
+      DBInstanceClass: db.r4.large
+      DBSubnetGroupName: !Ref DatabaseSubnetGroup
+      CopyTagsToSnapshot: true
+      DBParameterGroupName: !Ref DatabaseInstanceParameterGroup
+      MonitoringInterval: 1
+      MonitoringRoleArn: !GetAtt DatabaseMonitoringRole.Arn
+      AutoMinorVersionUpgrade: false
+      PubliclyAccessible: false
+      EnablePerformanceInsights: true
+      PerformanceInsightsRetentionPeriod: 731
+
+  DatabaseInstance:
+    Type: AWS::RDS::DBInstance
+    Condition: Development
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Properties:
+        Engine: postgres
+        # Encryption at rest is supported on db.t2.small and larger i think
+        # if we want to enable it for Dev stacks we need to up the instance class
+        StorageEncrypted: false
+        EngineVersion: "11.5"
+        # if specifying a version explicitly apparently you should nuke the auto-upgrade
+        # cause otherwise cfn can try to downgrade the db and blow up stack deployments
+        AutoMinorVersionUpgrade: false
+        AllocatedStorage: "5"
+        DBInstanceClass: db.t2.micro
+        DBSubnetGroupName: !Ref DatabaseSubnetGroup
+        MasterUsername: !GetAtt DbUser.Name
+        MasterUserPassword: !GetAtt DbPassword.Value
+        VPCSecurityGroups:
+          - !Ref DbClusterSecurityGroup
+        PubliclyAccessible: false
+        BackupRetentionPeriod: 7
+
+  KeyCloakCidrs:
+    Type: Custom::CoiCidrFindr
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnCidrFindr
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${InfrastructureStackName}-VpcId"
+      Sizes:
+        - !FindInMap [ StageToSubnets, !Ref "Stage", DB ]
+        - !FindInMap [ StageToSubnets, !Ref "Stage", DB ]
+
+  Cidrs:
+    Type: Custom::VariableHack
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
+      DbAZ1: !GetAtt KeyCloakCidrs.CidrBlock1
+      DbAZ2: !GetAtt KeyCloakCidrs.CidrBlock2
+
+  # I'm not sure why i mapped a public ip on these subnets :/
+  # Probably worth playing with that some.. i suspect it might have something 
+  # to do with supporting the dbup task at the time and not having a NAT gateway 
+  # attached to the private route table, but i'm not sure...
+
+  KeyCloakDbSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${InfrastructureStackName}-VpcId"
+      AvailabilityZone: !Select [ 0, !GetAZs ]
+      MapPublicIpOnLaunch: true
+      CidrBlock: !GetAtt Cidrs.DbAZ1
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName} [DB] (Public)
+
+  KeyCloakDbSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${InfrastructureStackName}-VpcId"
+      AvailabilityZone: !Select [ 1, !GetAZs ]
+      MapPublicIpOnLaunch: true
+      CidrBlock: !GetAtt Cidrs.DbAZ2
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName} [DB] (Public)
+
+  KeyCloakDbSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Fn::ImportValue:
+          !Sub "${InfrastructureStackName}-PublicRouteTable"
+      SubnetId: !Ref KeyCloakDbSubnet1
+
+  KeyCloakDbSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Fn::ImportValue:
+          !Sub "${InfrastructureStackName}-PublicRouteTable"
+      SubnetId: !Ref KeyCloakDbSubnet2
+  ####################
+
+Outputs:
+  SecurityGroupId:
+    Value: !Ref DbClusterSecurityGroup
+  ConnectionStringSsmPath:
+    Value: !GetAtt DbStrings.SsmPath

@@ -1,36 +1,59 @@
 version: '2.0'
 
 volumes:
-
   db:
+  config:
 
 networks:
-
   keycloak:
 
 services:
-
   app:
+    #image: keycloak:latest-dev
+    image: jboss/keycloak:8.0.0
     container_name: keycloak-app
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    entrypoint:
+      - /opt/jboss/tools/docker-entrypoint.sh
+      - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import"
     depends_on:
       - db
+      - configloader
     environment:
       DB_ADDR: db
       DB_DATABASE: keycloak
       DB_PASSWORD: keycloak
       DB_PORT: '5432'
       DB_USER: keycloak
-      DB_VENDOR: postgres
+      DB_VENDOR: postgres   
     ports:
       - '8080:8080'
-    image: jboss/keycloak:8.0.0
     links:
       - db
     networks:
       keycloak:
     restart: always
     volumes:
-      - ./import:/import:rw
+      - config:/import
+
+  configloader:
+    build:
+      context: .
+      dockerfile: Sidecar.Dockerfile
+    image: configloader:latest-dev
+    container_name: configloader
+    volumes:
+      - config:/import:rw
+    networks:
+      keycloak:
+    environment:
+      S3_CONFIG_BUCKET: <legit bucket name>
+      AWS_REGION: <relevant region>
+      AWS_ACCESS_KEY_ID: <real access>
+      AWS_SECRET_ACCESS_KEY: <real secret>
+      AWS_SESSION_TOKEN: <real token>
 
   db:
     container_name: keycloak-db
