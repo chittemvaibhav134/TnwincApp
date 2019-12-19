@@ -473,6 +473,8 @@ Resources:
   DatabasePrimaryInstance:
     Type: AWS::RDS::DBInstance
     Condition: NotDevelopment
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
     Properties:
       Engine: aurora-postgresql
       DBClusterIdentifier:  !Ref DatabaseCluster
