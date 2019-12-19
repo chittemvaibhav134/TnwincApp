@@ -19,7 +19,7 @@ From the repo root:
 docker-compose up -d
 ```
 
-KeyCloak is now installed and accessible at http://localhost:8080. It is not yet configured. To configure, [import the configuration](#import-configuration).
+KeyCloak is now installed and accessible at https://localhost:8443. It is not yet configured. To configure, [import the configuration](#import-configuration).
 
 ## Removal
 
