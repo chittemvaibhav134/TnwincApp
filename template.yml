@@ -522,7 +522,7 @@ Resources:
       CidrBlock: !GetAtt Cidrs.KCDBAZ1
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName} [DB] (Public)
+          Value: !Sub ${AWS::StackName} [DB] (Private)
 
   KeyCloakDbSubnet2:
     Type: AWS::EC2::Subnet
@@ -535,7 +535,7 @@ Resources:
       CidrBlock: !GetAtt Cidrs.KCDBAZ2
       Tags:
         - Key: Name
-          Value: !Sub ${AWS::StackName} [DB] (Public)
+          Value: !Sub ${AWS::StackName} [DB] (Private)
 
   KeyCloakDbSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
