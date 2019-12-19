@@ -22,7 +22,7 @@ services:
       DB_USER: keycloak
       DB_VENDOR: postgres
     ports:
-      - '8080:8080'
+      - '8443:8443'
     image: jboss/keycloak:8.0.0
     links:
       - db
