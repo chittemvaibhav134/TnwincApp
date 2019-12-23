@@ -14,11 +14,12 @@ try:
 except Exception as e:
     helper.init_failure(e)
 
-def get_task_logs_location(task_definition: str, task_arn: str) -> Tuple[str,str]:
-    task_definition = ecs_client.describe_task_definition(taskDefinition=task_arn)
+def get_task_logs_location(task_definition_arn: str, task_arn: str) -> Tuple[str,str]:
+    task_definition = ecs_client.describe_task_definition(taskDefinition=task_definition_arn)
     log_options = task_definition['taskDefinition']['containerDefinitions'][0]['logConfiguration']['options']
+    container_name = task_definition['taskDefinition']['containerDefinitions'][0]['name']
     task_id = task_arn.split('/')[-1]
-    return (log_options['awslogs-group'], f"{log_options['awslogs-stream-prefix']}/{task_id}")
+    return (log_options['awslogs-group'], f"{log_options['awslogs-stream-prefix']}/{container_name}/{task_id}")
 
 def run_task(cluster: str, task_subnets: List[str], task_definition: str) -> dict:
     # public ip is needed for fargate so that it can pull the container image.
