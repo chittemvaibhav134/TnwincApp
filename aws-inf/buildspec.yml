@@ -9,7 +9,6 @@ phases:
   pre_build:
     commands:
       - cfn-lint --version
-      - cd lambdas/kc-config-import && pip install -r ./requirements.txt -t . && cd -
   build:
     commands:
       - echo Build started on `date`      
