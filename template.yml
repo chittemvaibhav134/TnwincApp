@@ -88,6 +88,7 @@ Resources:
             Action:
               - s3:GetObject
               - s3:GetObjectVersion
+              - s3:ListBucket
 
   LBSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
@@ -364,7 +365,7 @@ Resources:
               ContainerName: KC-Config-Importer
         -
           Name: KC-Config-Importer
-          Image: amazonlinux:latest
+          Image: mikesir87/aws-cli:latest
           Essential: false
           LogConfiguration:
             LogDriver: awslogs
@@ -379,8 +380,10 @@ Resources:
             - ContainerPath: /import
               ReadOnly: false
               SourceVolume: config
-          EntryPoint:
-            - yum install awscli -y && aws s3 sync s3://$S3_CONFIG_BUCKET /import
+          Command:
+            - /bin/sh
+            - -c
+            - aws s3 sync s3://$S3_CONFIG_BUCKET /import
 
   S3ConfigBucket:
     Type: AWS::S3::Bucket
