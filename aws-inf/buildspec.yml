@@ -9,18 +9,22 @@ phases:
   pre_build:
     commands:
       - cfn-lint --version
+      - cd lambdas/kc-config-import && pip install -r ./requirements.txt -t . && cd -
   build:
     commands:
       - echo Build started on `date`      
       - cfn-lint --include-checks I -t template.yml
+      - CONFIG_CHECKSUM=$(find import -type f -exec md5sum {} \; | sort -k 2 | md5sum | cut -d' ' -f1)
   post_build:
     commands:
       - |
         jq --null-input \
           --arg KeyCloakImage "jboss/keycloak:8.0.0" \
+          --arg ConfigChecksum "$CONFIG_CHECKSUM" \
           '{
             "Parameters":{
-              "KeyCloakImage": $KeyCloakImage
+              "KeyCloakImage": $KeyCloakImage,
+              "ConfigChecksum": $ConfigChecksum
             }
           }' > \
           ./template-configuration.json
