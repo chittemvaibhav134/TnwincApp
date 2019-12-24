@@ -81,6 +81,13 @@ Resources:
             Effect: Allow
             Action:
               - kms:Decrypt
+          - Resource: 
+            - !GetAtt S3ConfigBucket.Arn
+            - !Sub "${S3ConfigBucket.Arn}/*"
+            Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:GetObjectVersion
 
   LBSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
@@ -291,7 +298,6 @@ Resources:
             Options:
               awslogs-region: !Ref AWS::Region
               awslogs-group: !Ref LogGroup
-              #awslogs-stream-prefix: !Ref AWS::StackName
               awslogs-stream-prefix: kc-app
           Environment:
             - Name: DB_ADDR
@@ -307,6 +313,79 @@ Resources:
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
+
+  ImportConfigTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub ${AWS::StackName}-KCCONFIG
+      RequiresCompatibilities:
+        - FARGATE
+      Memory: !FindInMap [StageToContainerResources, !Ref "Stage", TaskMemory]
+      Cpu: !FindInMap [StageToContainerResources, !Ref "Stage", TaskCpu]
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
+      TaskRoleArn: !Ref ECSTaskRole
+      Volumes:
+        - Name: config
+      ContainerDefinitions:
+        - 
+          Name: Navex-Keycloak-Config
+          Image: !Ref KeyCloakImage
+          Essential: true
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: kc-config
+          Environment:
+            - Name: DB_ADDR
+              Value: !GetAtt DbStrings.EndPoint
+            - Name: DB_PORT
+              Value: !GetAtt DbStrings.Port
+            - Name: DB_USER
+              Value: !GetAtt DbUser.Name
+            - Name: DB_VENDOR
+              Value: postgres
+            - Name: DB_DATABASE
+              Value: postgres
+          Secrets:
+            - Name: DB_PASSWORD
+              ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
+          MountPoints:
+            - ContainerPath: /import
+              ReadOnly: true
+              SourceVolume: config
+          EntryPoint:
+            - /opt/jboss/tools/docker-entrypoint.sh
+            - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import"
+          DependsOn:
+            - Condition: SUCCESS
+              ContainerName: KC-Config-Importer
+        -
+          Name: KC-Config-Importer
+          Image: amazonlinux:latest
+          Essential: false
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: kc-config
+          Environment:
+            - Name: S3_CONFIG_BUCKET
+              Value: !Ref S3ConfigBucket
+          MountPoints:
+            - ContainerPath: /import
+              ReadOnly: false
+              SourceVolume: config
+          EntryPoint:
+            - yum install awscli -y && aws s3 sync s3://$S3_CONFIG_BUCKET /import
+
+  S3ConfigBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
 
   Dns:
     Type: AWS::Route53::RecordSet
