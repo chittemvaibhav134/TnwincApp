@@ -4,6 +4,12 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: >
   Creates/Manages a Keycloak instance
 
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - W3002
+
 Parameters:
   InfrastructureStackName:
     Type: String
