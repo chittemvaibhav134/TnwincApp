@@ -807,3 +807,5 @@ Outputs:
     Value: !Sub "${Subdomain}.${DnsHostedZone}"
   ConfigBucket:
     Value: !GetAtt S3ConfigBucket.Arn
+  CpConfigImportLambdaArn:
+    Value: !GetAtt CpRunImportConfigTaskLambda.Arn

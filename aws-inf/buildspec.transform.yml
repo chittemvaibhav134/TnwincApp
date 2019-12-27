@@ -19,8 +19,8 @@ phases:
       - ProjectVersion=$(jq -r '.Version' $BUILD_INFO_FILE)
       - echo "loading values from deployment context artifacts $DC_ART_DIR/aws-inf"
       - InfStackName=$(jq -r '.StackName' "$DC_ART_DIR/aws-inf")
-      - DoormanMetadataUrl=$(jq -r '.MetadataPublicMirrorUrl' "$DC_ART_DIR/doorman)
-      - AppshellUrl=$(jq -r '.RootUiAdminUrl' "$DC_ART_DIR/appshell-infra)
+      - DoormanMetadataUrl=$(jq -r '.MetadataPublicMirrorUrl' "$DC_ART_DIR/doorman")
+      - AppshellUrl=$(jq -r '.RootUiAdminUrl' "$DC_ART_DIR/appshell-infra")
       - mkdir transformed-import
   build:
     commands:
