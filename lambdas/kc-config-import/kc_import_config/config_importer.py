@@ -6,9 +6,11 @@ logger = logging.getLogger(__name__)
 
 def get_running_task(ecs_client, cluster: str, task_family: str, task_definition: str) -> dict:
     task_arns = ecs_client.list_tasks(cluster=cluster, family=task_family, desiredStatus='RUNNING')['taskArns']
+    if not task_arns:
+        return
     tasks = ecs_client.describe_tasks(cluster=cluster, tasks=task_arns)['tasks']
     try:
-        task = next(task for task in tasks if task['taskDefinition'] == task_definition)
+        task = next(task for task in tasks if task['taskDefinitionArn'] == task_definition)
     except StopIteration:
         task = None
         pass
@@ -44,7 +46,7 @@ def stop_task(ecs_client, cluster: str, task_arn: str, reason: str):
     ecs_client.stop_task(cluster=cluster, task=task_arn, reason=reason)
 
 def get_timestamp(datetime_obj: datetime) -> int:
-    return int(datetime.timestamp())
+    return int(datetime_obj.timestamp())
 
 def get_timestamp_now() -> int:
     return get_timestamp(datetime.utcnow())

@@ -5,6 +5,7 @@ from .config_importer import (
     run_task,
     kc_finished_starting,
     get_timestamp,
+    get_timestamp_now,
     get_task,
     get_task_logs_location,
     get_running_task,
@@ -39,7 +40,7 @@ def handler(event, context):
     if not running_task:
         task = run_task(ecs_client, cluster, task_subnets, task_definition)
         return CodePipelineHelperResponse(**{'InProgress': True, 'Message': f'{task["taskArn"]} has been started'}).to_dict()
-    start_time = get_timestamp(running_task['startedAt'])
+    start_time =  get_timestamp(running_task['startedAt']) if 'startedAt' in running_task else get_timestamp_now()
     task_status = running_task['lastStatus']
     task_arn = running_task['taskArn']
     task_timed_out = taken_too_long(start_time)

@@ -27,8 +27,6 @@ Parameters:
       - Development
   KeyCloakImage:
     Type: String
-  ConfigChecksum:
-    Type: String
   InstanceCertificateArn:
     Type: String
     Default: None
@@ -457,6 +455,55 @@ Resources:
                 Action:
                   - iam:PassRole
 
+  CpRunImportConfigTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: EcsTaskCtl
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Resource:
+                  - !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/${AWS::StackName}-KCCONFIG:*"
+                  - !GetAtt EcsCluster.Arn
+                Effect: Allow
+                Action:
+                  - ecs:RunTask
+                  - ecs:StartTask
+              - Resource: "*"
+                Effect: Allow
+                Action: 
+                  - ecs:StopTask
+                  - ecs:ListTasks
+                Condition:
+                  ArnEquals:
+                    "ecs:cluster": !GetAtt EcsCluster.Arn
+              - Resource: "*"
+                Effect: Allow
+                Action: 
+                  - ecs:DescribeTaskDefinition
+                  - ecs:DescribeTasks
+              - Resource: !GetAtt LogGroup.Arn
+                Action: logs:FilterLogEvents
+                Effect: Allow
+              - Resource:
+                  - !GetAtt TaskExecutionRole.Arn
+                  - !GetAtt ECSTaskRole.Arn
+                Effect: Allow
+                Action:
+                  - iam:PassRole
+
   CfnRunImportConfigTaskLambda:
     Type: AWS::Lambda::Function
     Properties:
@@ -469,22 +516,40 @@ Resources:
       Timeout: 20
       Handler: kc_import_config.cfn_handler
 
+  CpRunImportConfigTaskLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      # Explicit name to get around circular dep with role privs
+      FunctionName: !Sub ${AWS::StackName}-CpRunImportTask
+      Code: ./lambdas/kc-config-import/
+      Runtime: python3.7
+      Role: !GetAtt CpRunImportConfigTaskRole.Arn
+      MemorySize: 256
+      Timeout: 20
+      Handler: kc_import_config.cp_handler
+      Environment:
+        Variables:
+          Cluster: !GetAtt EcsCluster.Arn
+          TaskDefinition: !Ref ImportConfigTaskDefinition
+          TaskFamily: !Sub ${AWS::StackName}-KCCONFIG
+          TaskSubnets: !Sub ${KeycloakSubnet1},${KeycloakSubnet2}
+
   S3ConfigBucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
 
-  ImportConfig:
-    Type: Custom::CfnRunImportConfigTask
-    Properties:
-      ServiceToken: !GetAtt CfnRunImportConfigTaskLambda.Arn
-      DependsOnHack: !If [ Development, !Ref DatabaseInstance, !Ref DatabaseCluster ]
-      Cluster: !GetAtt EcsCluster.Arn
-      TaskSubnets:
-        - !Ref KeycloakSubnet1
-        - !Ref KeycloakSubnet2
-      TaskDefinition: !Ref ImportConfigTaskDefinition
-      ConfigChecksum: !Ref ConfigChecksum
+  # ImportConfig:
+  #   Type: Custom::CfnRunImportConfigTask
+  #   Properties:
+  #     ServiceToken: !GetAtt CfnRunImportConfigTaskLambda.Arn
+  #     DependsOnHack: !If [ Development, !Ref DatabaseInstance, !Ref DatabaseCluster ]
+  #     Cluster: !GetAtt EcsCluster.Arn
+  #     TaskSubnets:
+  #       - !Ref KeycloakSubnet1
+  #       - !Ref KeycloakSubnet2
+  #     TaskDefinition: !Ref ImportConfigTaskDefinition
+  #     ConfigChecksum: !Ref ConfigChecksum
 
   Dns:
     Type: AWS::Route53::RecordSet
