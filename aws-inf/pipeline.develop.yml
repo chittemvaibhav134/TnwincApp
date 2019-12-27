@@ -366,4 +366,4 @@ Resources:
               InputArtifacts:
                 - Name: ProjectVersion
                 - Name: CfnDeploy_Wobbly              
-              RunOrder: 6
+              RunOrder: 8

@@ -24,8 +24,8 @@ phases:
       - mkdir transformed-import
   build:
     commands:
-      - cp import/master-realm.json transformed-import/
-      - cp import/master-users-0.json transformed-import/
+      - cp $APP_DIR/import/master-realm.json transformed-import/
+      - cp $APP_DIR/import/master-users-0.json transformed-import/
       - |
         # TODO: Learn how to actually use either sed or xml with namespaces...
         curl -k $DoormanMetadataUrl | sed 's/xmlns="urn:oasis:names:tc:SAML:2.0:metadata"//g' | sed 's/xmlns="http:\/\/www.w3.org\/2000\/09\/xmldsig#"//g' > doorman-metadata.xml
@@ -33,7 +33,7 @@ phases:
         LOGOUT_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleLogoutService/@Location)' doorman-metadata.xml )
         LOGIN_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleSignOnService /@Location)' doorman-metadata.xml )
       - |  
-        jq --arg CERT "$CERT" '(.identityProviders[] | select(.alias == "doorman") | .config.signingCertificate) |= $CERT' import/navex-realm.json |
+        jq --arg CERT "$CERT" '(.identityProviders[] | select(.alias == "doorman") | .config.signingCertificate) |= $CERT' $APP_DIR/import/navex-realm.json |
           jq --arg LOGOUT_URL "$LOGOUT_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleLogoutServiceUrl) |= $LOGOUT_URL' |
           jq --arg LOGIN_URL "$LOGIN_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleSignOnServiceUrl) |= $LOGIN_URL' | 
           jq --arg APPSHELL "$AppshellUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL' > transformed-import/navex-realm.json
