@@ -806,6 +806,6 @@ Outputs:
     Description: domain to KC service without string substitution
     Value: !Sub "${Subdomain}.${DnsHostedZone}"
   ConfigBucket:
-    Value: !GetAtt S3ConfigBucket.Arn
+    Value: !Ref S3ConfigBucket
   CpConfigImportLambdaArn:
     Value: !GetAtt CpRunImportConfigTaskLambda.Arn
