@@ -467,7 +467,7 @@ Resources:
       Role: !GetAtt CfnRunImportConfigTaskRole.Arn
       MemorySize: 256
       Timeout: 20
-      Handler: kc_import_config.handler
+      Handler: kc_import_config.cfn_handler
 
   S3ConfigBucket:
     Type: AWS::S3::Bucket
@@ -740,3 +740,5 @@ Outputs:
   RootDomain:
     Description: domain to KC service without string substitution
     Value: !Sub "${Subdomain}.${DnsHostedZone}"
+  ConfigBucket:
+    Value: !GetAtt S3ConfigBucket.Arn
