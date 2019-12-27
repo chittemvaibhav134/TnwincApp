@@ -320,7 +320,7 @@ Resources:
                 FunctionName: CPS3Deploy
                 UserParameters: !Sub |
                   {
-                    "S3BucketName": "CfnDeploy_Wobbly::stack-outputs.json::ConfigBucket",
+                    "S3BucketName": "CfnDeploy_Wobbly::stack-outputs.json:ConfigBucket",
                     "BaseDirectory": "transformed-import",
                     "ExcludeArtifactsFromUpload": ["CfnDeploy_Wobbly"],
                     "AccountId": "${IntegrationAccountId}",
