@@ -339,7 +339,7 @@ Resources:
                 FunctionName: CPInvokeLambda2
                 UserParameters: !Sub |
                   {
-                    "FunctionName": "CfnDeploy_Wobbly::stack-outputs.json:CpConfigImportLambdaArn",
+                    "TargetFunctionName": "CfnDeploy_Wobbly::stack-outputs.json:CpConfigImportLambdaArn",
                     "Payload": "{}",
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
