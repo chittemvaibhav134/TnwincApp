@@ -3,7 +3,7 @@ from . import logger
 from .config_importer import (
     stop_task,
     run_task,
-    kc_finished_starting,
+    kc_finished_importing,
     get_timestamp,
     get_timestamp_now,
     get_task,
@@ -35,8 +35,8 @@ def handler(event, context):
     cluster = os.environ['Cluster']
     task_definition = os.environ['TaskDefinition']
     task_subnets = os.environ['TaskSubnets'].split(',')
-    logger.info(f"KC Config import lamba called with ImportId: {event['ImportId']}")
-    # hashing and truncating to 35 chars to avoid hitting possible validation issues
+    logger.info(f"KC Config import lamba called with event: {event}")
+    
     # might be worth a regex check and only hashing if it violates
     # > Up to 36 letters (uppercase and lowercase), numbers, hyphens, and underscores are allowed.
     import_id = str(hash(event['ImportId']))[-35:]
@@ -52,13 +52,22 @@ def handler(event, context):
     logger.info(f"Found task {task_arn} previously started with import id {import_id} in cluster {cluster}")
     log_group, log_stream = get_task_logs_location(ecs_client, task['taskDefinitionArn'], task_arn)
     
-    # Since this lambda is expecting to manage the running task 
-    if task_status  == 'STOPPED':
+    successful_stop_reason = "Successfully imported config to kc"
+
+    if task_status  == 'STOPPED' and task.get('stoppedReason') != successful_stop_reason:
         message = f"{task_arn} was found in unexpected stop state. Check {log_group}/{log_stream} for logs"
         logger.warning(message)
         return CodePipelineHelperResponse(**{
             'InProgress': False, 
             'Success': False, 
+            'Message': message
+        }).to_dict()
+    elif task_status  == 'STOPPED' and task.get('stoppedReason') == successful_stop_reason:
+        message = f"{task_arn} was stopped after successful import. Returning success since this is most likely a retry that should no-op"
+        logger.warning(message)
+        return CodePipelineHelperResponse(**{
+            'InProgress': False, 
+            'Success': True, 
             'Message': message
         }).to_dict()
     elif task_status != 'RUNNING':
@@ -71,7 +80,7 @@ def handler(event, context):
 
     start_time =  get_timestamp(task['startedAt'])
     task_timed_out = taken_too_long(start_time)
-    if not kc_finished_starting(logs_client, log_group, log_stream) and task_timed_out:
+    if not kc_finished_importing(logs_client, log_group, log_stream) and task_timed_out:
         message = f"KC Import config task ({task_arn}) still not done starting and we are done waiting"
         logger.warning(message)
         stop_task(ecs_client, cluster, task_arn, "Import took longer than we want to wait")
@@ -81,7 +90,7 @@ def handler(event, context):
             'Message': message
         }).to_dict()
     logger.info(f"{task_arn} has successfully finished importing config; stopping it...")
-    stop_task(ecs_client, cluster, task_arn, "Sucessfully imported config to kc")
+    stop_task(ecs_client, cluster, task_arn, successful_stop_reason )
     return CodePipelineHelperResponse(**{
         'InProgress': False, 
         'Success': True, 

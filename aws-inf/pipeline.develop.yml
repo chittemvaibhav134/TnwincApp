@@ -340,7 +340,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_Wobbly::stack-outputs.json:CpConfigImportLambdaArn",
-                    "Payload": "{\"ImportId\":\"#{codepipeline.PipelineExecutionId}\"}",
+                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
                     "ParseResponse": true

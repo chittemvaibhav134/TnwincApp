@@ -50,12 +50,13 @@ def get_timestamp(datetime_obj: datetime) -> int:
 def get_timestamp_now() -> int:
     return get_timestamp(datetime.utcnow())
     
-def kc_finished_starting(logs_client, group: str, stream: str) -> bool:
+def kc_finished_importing(logs_client, group: str, stream: str) -> bool:
     regex_match = r".*Import finished successfully"
-    logger.info(f"Checking log group {group} and stream {stream} for logs that match 'started'")
+    filter_pattern = '"KC-SERVICES0032"'
+    logger.info(f"Checking log group {group} and stream {stream} for logs that match '{filter_pattern}'")
     paginator = logs_client.get_paginator("filter_log_events")
     messages = []
-    for logs in paginator.paginate(logGroupName=group, logStreamNames=[stream], filterPattern='"KC-SERVICES0032"'):
+    for logs in paginator.paginate(logGroupName=group, logStreamNames=[stream], filterPattern=filter_pattern):
         messages += [ event['message'] for event in logs['events'] if re.match(regex_match, event['message']) ]
     return len(messages) >= 1
 

@@ -4,7 +4,7 @@ from . import logger
 from .config_importer import (
     stop_task,
     run_task,
-    kc_finished_starting,
+    kc_finished_importing,
     get_timestamp_now,
     get_task,
     get_task_logs_location,
@@ -56,7 +56,7 @@ def poll_create_update(event, context):
     elif task_status != 'RUNNING' and not task_timed_out:
         logger.info(f"{task_arn} status {task_status} not in stable state; checking again later")
         return
-    if task_status == 'RUNNING' and not kc_finished_starting(logs_client, log_group, log_stream) and task_timed_out:
+    if task_status == 'RUNNING' and not kc_finished_importing(logs_client, log_group, log_stream) and task_timed_out:
         stop_task(ecs_client, cluster, task_arn, "Import took longer than we want to wait")
         raise RuntimeError(f"KC Import config task ({task_arn}) still not done starting and we are done waiting")
     stop_task(ecs_client, cluster, task_arn, "Sucessfully imported config to kc")
