@@ -339,6 +339,7 @@ Resources:
           Name: Navex-Keycloak-Config
           Image: !Ref KeyCloakImage
           Essential: true
+          StartTimeout: 300
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -531,7 +532,7 @@ Resources:
         Variables:
           Cluster: !GetAtt EcsCluster.Arn
           TaskDefinition: !Ref ImportConfigTaskDefinition
-          TaskFamily: !Sub ${AWS::StackName}-KCCONFIG
+          #TaskFamily: !Sub ${AWS::StackName}-KCCONFIG
           TaskSubnets: !Sub ${KeycloakSubnet1},${KeycloakSubnet2}
 
   S3ConfigBucket:

@@ -8,7 +8,7 @@ from .config_importer import (
     get_timestamp_now,
     get_task,
     get_task_logs_location,
-    get_running_task,
+    find_task,
     taken_too_long
 )
 
@@ -34,36 +34,53 @@ class CodePipelineHelperResponse(object):
 def handler(event, context):
     cluster = os.environ['Cluster']
     task_definition = os.environ['TaskDefinition']
-    task_family = os.environ['TaskFamily']
     task_subnets = os.environ['TaskSubnets'].split(',')
-    running_task = get_running_task(ecs_client, cluster, task_family, task_definition)
-    if not running_task:
-        task = run_task(ecs_client, cluster, task_subnets, task_definition)
+    logger.info(f"KC Config import lamba called with ImportId: {event['ImportId']}")
+    # hashing and truncating to 35 chars to avoid hitting possible validation issues
+    # might be worth a regex check and only hashing if it violates
+    # > Up to 36 letters (uppercase and lowercase), numbers, hyphens, and underscores are allowed.
+    import_id = str(hash(event['ImportId']))[-35:]
+    task = find_task(ecs_client, cluster, import_id)
+    if not task:
+        logger.info(f"Unable to find previously started task with import id: {import_id} in cluster: {cluster}... starting one now")
+        task = run_task(ecs_client, cluster, task_subnets, task_definition, import_id)
+        logger.info(f"Started {task['taskArn']} in cluster {cluster}")
         return CodePipelineHelperResponse(**{'InProgress': True, 'Message': f'{task["taskArn"]} has been started'}).to_dict()
-    start_time =  get_timestamp(running_task['startedAt']) if 'startedAt' in running_task else get_timestamp_now()
-    task_status = running_task['lastStatus']
-    task_arn = running_task['taskArn']
-    task_timed_out = taken_too_long(start_time)
-    log_group, log_stream = get_task_logs_location(ecs_client, running_task['taskDefinitionArn'], task_arn)
-
+    
+    task_status = task['lastStatus']
+    task_arn = task['taskArn']
+    logger.info(f"Found task {task_arn} previously started with import id {import_id} in cluster {cluster}")
+    log_group, log_stream = get_task_logs_location(ecs_client, task['taskDefinitionArn'], task_arn)
+    
+    # Since this lambda is expecting to manage the running task 
     if task_status  == 'STOPPED':
+        message = f"{task_arn} was found in unexpected stop state. Check {log_group}/{log_stream} for logs"
+        logger.warning(message)
         return CodePipelineHelperResponse(**{
             'InProgress': False, 
             'Success': False, 
-            'Message': f"{task_arn} was found in unexpected stop state. Check {log_group}/{log_stream} for logs"
+            'Message': message
         }).to_dict()
-    elif task_status != 'RUNNING' and not task_timed_out:
+    elif task_status != 'RUNNING':
+        message = f"{task_arn} status {task_status} not in stable state; checking again later"
+        logger.info(message)
         return CodePipelineHelperResponse(**{
             'InProgress': True, 
-            'Message': f"{task_arn} status {task_status} not in stable state; checking again later"
+            'Message': message
         }).to_dict()
-    if task_status == 'RUNNING' and not kc_finished_starting(logs_client, log_group, log_stream) and task_timed_out:
+
+    start_time =  get_timestamp(task['startedAt'])
+    task_timed_out = taken_too_long(start_time)
+    if not kc_finished_starting(logs_client, log_group, log_stream) and task_timed_out:
+        message = f"KC Import config task ({task_arn}) still not done starting and we are done waiting"
+        logger.warning(message)
         stop_task(ecs_client, cluster, task_arn, "Import took longer than we want to wait")
         return CodePipelineHelperResponse(**{
             'InProgress': False, 
             'Success': False, 
-            'Message': f"KC Import config task ({task_arn}) still not done starting and we are done waiting"
+            'Message': message
         }).to_dict()
+    logger.info(f"{task_arn} has successfully finished importing config; stopping it...")
     stop_task(ecs_client, cluster, task_arn, "Sucessfully imported config to kc")
     return CodePipelineHelperResponse(**{
         'InProgress': False, 
