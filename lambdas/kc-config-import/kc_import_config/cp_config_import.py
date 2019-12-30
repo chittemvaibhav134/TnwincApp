@@ -19,15 +19,17 @@ logger.info("Container initialization completed")
 # This really isn't doing anything useful at all.. but i wanted to explicitly give it a type
 # since i'm considering having the generic cp invoke lambda helper consume the return value
 class CodePipelineHelperResponse(object):
-    def __init__(self, InProgress: bool, Success: bool = True, Message: str = ""):
+    def __init__(self, InProgress: bool, Success: bool = True, Message: str = "", OutputVariables: dict = None):
         self.InProgress = InProgress
         self.Success = Success
         self.Message = Message
+        self.OutputVariables = OutputVariables
     def to_dict(self):
         return {
             'InProgress': self.InProgress,
             'Success': self.Success,
-            'Message': self.Message
+            'Message': self.Message,
+            'OutputVariables': self.OutputVariables
         }
     @classmethod
     def in_progress(cls, Message: str="") -> dict:
@@ -36,7 +38,7 @@ class CodePipelineHelperResponse(object):
     def failed(cls, Message: str) -> dict:
         return cls(False, False, Message).to_dict()
     @classmethod
-    def succeeded(cls, Message: str="") -> dict:
+    def succeeded(cls, Message: str="", OutputVariables: dict = None) -> dict:
         return cls(False, True, Message).to_dict() 
 
 def handler(event, context):
@@ -84,4 +86,4 @@ def handler(event, context):
         return CodePipelineHelperResponse.failed(message)
     logger.info(f"{task_arn} has successfully finished importing config; stopping it...")
     stop_task(ecs_client, cluster, task_arn, successful_stop_reason )
-    return CodePipelineHelperResponse.succeeded(message)
+    return CodePipelineHelperResponse.succeeded(message, OutputVariables={'TaskArn': task_arn})
