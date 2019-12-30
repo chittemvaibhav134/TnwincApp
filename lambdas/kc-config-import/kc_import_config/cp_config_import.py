@@ -39,7 +39,7 @@ class CodePipelineHelperResponse(object):
         return cls(False, False, Message).to_dict()
     @classmethod
     def succeeded(cls, Message: str="", OutputVariables: dict = None) -> dict:
-        return cls(False, True, Message).to_dict() 
+        return cls(False, True, Message, OutputVariables).to_dict() 
 
 def handler(event, context):
     cluster = os.environ['Cluster']
