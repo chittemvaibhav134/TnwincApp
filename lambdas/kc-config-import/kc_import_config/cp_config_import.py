@@ -85,6 +85,7 @@ def handler(event, context):
         logger.warning(message)
         stop_task(ecs_client, cluster, task_arn, "Import took longer than we want to wait")
         return CodePipelineHelperResponse.failed(message)
-    logger.info(f"{task_arn} has successfully finished importing config; stopping it...")
+    message = f"{task_arn} has successfully finished importing config; stopping it..."
+    logger.info(message)
     stop_task(ecs_client, cluster, task_arn, successful_stop_reason )
     return CodePipelineHelperResponse.succeeded(message, OutputVariables={'TaskArn': task_arn})
