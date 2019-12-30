@@ -23,13 +23,21 @@ class CodePipelineHelperResponse(object):
         self.InProgress = InProgress
         self.Success = Success
         self.Message = Message
-
     def to_dict(self):
         return {
             'InProgress': self.InProgress,
             'Success': self.Success,
             'Message': self.Message
         }
+    @classmethod
+    def in_progress(cls: CodePipelineHelperResponse, Message: str="") -> dict:
+        return cls(True, True, Message).to_dict()
+    @classmethod
+    def failed(cls: CodePipelineHelperResponse, Message: str) -> dict:
+        return cls(False, False, Message).to_dict()
+    @classmethod
+    def succeeded(cls: CodePipelineHelperResponse, Message: str="") -> dict:
+        return cls(False, True, Message).to_dict() 
 
 def handler(event, context):
     cluster = os.environ['Cluster']
@@ -45,7 +53,7 @@ def handler(event, context):
         logger.info(f"Unable to find previously started task with import id: {import_id} in cluster: {cluster}... starting one now")
         task = run_task(ecs_client, cluster, task_subnets, task_definition, import_id)
         logger.info(f"Started {task['taskArn']} in cluster {cluster}")
-        return CodePipelineHelperResponse(**{'InProgress': True, 'Message': f'{task["taskArn"]} has been started'}).to_dict()
+        return CodePipelineHelperResponse.in_progress(f'{task["taskArn"]} has been started')
     
     task_status = task['lastStatus']
     task_arn = task['taskArn']
@@ -57,42 +65,23 @@ def handler(event, context):
     if task_status  == 'STOPPED' and task.get('stoppedReason') != successful_stop_reason:
         message = f"{task_arn} was found in unexpected stop state. Check {log_group}/{log_stream} for logs"
         logger.warning(message)
-        return CodePipelineHelperResponse(**{
-            'InProgress': False, 
-            'Success': False, 
-            'Message': message
-        }).to_dict()
+        return CodePipelineHelperResponse.failed(message)
     elif task_status  == 'STOPPED' and task.get('stoppedReason') == successful_stop_reason:
         message = f"{task_arn} was stopped after successful import. Returning success since this is most likely a retry that should no-op"
         logger.warning(message)
-        return CodePipelineHelperResponse(**{
-            'InProgress': False, 
-            'Success': True, 
-            'Message': message
-        }).to_dict()
+        return CodePipelineHelperResponse.succeeded(message)
     elif task_status != 'RUNNING':
         message = f"{task_arn} status {task_status} not in stable state; checking again later"
         logger.info(message)
-        return CodePipelineHelperResponse(**{
-            'InProgress': True, 
-            'Message': message
-        }).to_dict()
-
+        return CodePipelineHelperResponse.in_progress(message)
+    # since we know the task is RUNNING it should be safe to snag the startedAt prop now
     start_time =  get_timestamp(task['startedAt'])
     task_timed_out = taken_too_long(start_time)
     if not kc_finished_importing(logs_client, log_group, log_stream) and task_timed_out:
         message = f"KC Import config task ({task_arn}) still not done starting and we are done waiting"
         logger.warning(message)
         stop_task(ecs_client, cluster, task_arn, "Import took longer than we want to wait")
-        return CodePipelineHelperResponse(**{
-            'InProgress': False, 
-            'Success': False, 
-            'Message': message
-        }).to_dict()
+        return CodePipelineHelperResponse.failed(message)
     logger.info(f"{task_arn} has successfully finished importing config; stopping it...")
     stop_task(ecs_client, cluster, task_arn, successful_stop_reason )
-    return CodePipelineHelperResponse(**{
-        'InProgress': False, 
-        'Success': True, 
-        'Message': f"{log_group}/{log_stream}"
-    }).to_dict()
+    return CodePipelineHelperResponse.succeeded(message)
