@@ -8,6 +8,8 @@ env:
     DC_ART_DIR: "dc_art"
     # Deployspec file with the generated Version tacked on
     BUILD_INFO_FILE: "build_info/build-record.json"
+    # determines if master-users-0.json is included in the transformed input 
+    INCLUDE_ADMIN_USER_IMPORT: "false"
 
 phases:
   install:
@@ -25,7 +27,10 @@ phases:
   build:
     commands:
       - cp $APP_DIR/import/master-realm.json transformed-import/
-      - cp $APP_DIR/import/master-users-0.json transformed-import/
+      - |
+        if $INCLUDE_ADMIN_USER_IMPORT ; then
+          cp $APP_DIR/import/master-users-0.json transformed-import/
+        fi
       - |
         # TODO: Learn how to actually use either sed or xml with namespaces...
         curl -k $DoormanMetadataUrl | sed 's/xmlns="urn:oasis:names:tc:SAML:2.0:metadata"//g' | sed 's/xmlns="http:\/\/www.w3.org\/2000\/09\/xmldsig#"//g' > doorman-metadata.xml

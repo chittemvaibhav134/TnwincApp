@@ -49,7 +49,8 @@ def handler(event, context):
     
     # might be worth a regex check and only hashing if it violates
     # > Up to 36 letters (uppercase and lowercase), numbers, hyphens, and underscores are allowed.
-    import_id = str(hash(event['ImportId']))[-35:]
+    #import_id = str(hash(event['ImportId']))[-35:]
+    import_id = event['ImportId'][-36:]
     task = find_task(ecs_client, cluster, import_id)
     if not task:
         logger.info(f"Unable to find previously started task with import id: {import_id} in cluster: {cluster}... starting one now")
