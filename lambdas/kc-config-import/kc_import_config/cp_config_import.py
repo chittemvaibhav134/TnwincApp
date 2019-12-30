@@ -30,13 +30,13 @@ class CodePipelineHelperResponse(object):
             'Message': self.Message
         }
     @classmethod
-    def in_progress(cls: CodePipelineHelperResponse, Message: str="") -> dict:
+    def in_progress(cls, Message: str="") -> dict:
         return cls(True, True, Message).to_dict()
     @classmethod
-    def failed(cls: CodePipelineHelperResponse, Message: str) -> dict:
+    def failed(cls, Message: str) -> dict:
         return cls(False, False, Message).to_dict()
     @classmethod
-    def succeeded(cls: CodePipelineHelperResponse, Message: str="") -> dict:
+    def succeeded(cls, Message: str="") -> dict:
         return cls(False, True, Message).to_dict() 
 
 def handler(event, context):
