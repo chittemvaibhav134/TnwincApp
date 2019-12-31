@@ -1,4 +1,4 @@
-import boto3, os
+import boto3, os, re
 from . import logger
 from .config_importer import (
     stop_task,
@@ -41,16 +41,24 @@ class CodePipelineHelperResponse(object):
     def succeeded(cls, Message: str="", OutputVariables: dict = None) -> dict:
         return cls(False, True, Message, OutputVariables).to_dict() 
 
+def get_startedby_id(import_id: str):
+    processed_id = import_id[-36:]
+    # Constraint on ecs startedBy property:
+    #   Up to 36 letters (uppercase and lowercase), numbers, hyphens, and underscores are allowed.
+    regex = "^[a-zA-Z0-9_-]+$"
+    if not re.search(regex, processed_id):
+        logger.info(f"{import_id} violated regex filter; hashing id into something safe")
+        processed_id = str(hash(processed_id))[-36:]
+    logger.info(f"Import id {import_id} specified; using {processed_id} as startedBy id for task")
+    return processed_id
+
 def handler(event, context):
     cluster = os.environ['Cluster']
     task_definition = os.environ['TaskDefinition']
     task_subnets = os.environ['TaskSubnets'].split(',')
     logger.info(f"KC Config import lamba called with event: {event}")
     
-    # might be worth a regex check and only hashing if it violates
-    # > Up to 36 letters (uppercase and lowercase), numbers, hyphens, and underscores are allowed.
-    #import_id = str(hash(event['ImportId']))[-35:]
-    import_id = event['ImportId'][-36:]
+    import_id = get_startedby_id(event['ImportId'])
     task = find_task(ecs_client, cluster, import_id)
     if not task:
         logger.info(f"Unable to find previously started task with import id: {import_id} in cluster: {cluster}... starting one now")
