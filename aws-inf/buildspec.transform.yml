@@ -39,7 +39,7 @@ phases:
         curl -k $DoormanMetadataUrl | sed 's/xmlns="urn:oasis:names:tc:SAML:2.0:metadata"//g' | sed 's/xmlns="http:\/\/www.w3.org\/2000\/09\/xmldsig#"//g' > doorman-metadata.xml
         CERT=$(xmllint --xpath '/EntityDescriptor/IDPSSODescriptor/KeyDescriptor/KeyInfo/X509Data/X509Certificate/text()' doorman-metadata.xml )
         LOGOUT_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleLogoutService/@Location)' doorman-metadata.xml )
-        LOGIN_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleSignOnService /@Location)' doorman-metadata.xml )
+        LOGIN_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleSignOnService/@Location)' doorman-metadata.xml )
       - |
         # TODO: Figure out a less dumb way to update the json file  
         jq --arg CERT "$CERT" '(.identityProviders[] | select(.alias == "doorman") | .config.signingCertificate) |= $CERT' $APP_DIR/import/navex-realm.json |
