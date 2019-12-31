@@ -247,6 +247,10 @@ Resources:
                 Provider: CodeBuild
               Configuration:
                 ProjectName: !Ref TransformCodeBuildProject
+                EnvironmentVariables: |
+                  [
+                    {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "true", "type": "PLAINTEXT"}
+                  ]
               InputArtifacts:
                 - Name: MergeArtifacts_Wobbly
               OutputArtifacts:
