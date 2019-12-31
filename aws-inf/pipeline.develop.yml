@@ -18,6 +18,8 @@ Parameters:
   GitHubToken:
     Type: String
     NoEcho: true
+  RegionalPackageStackName:
+    Type: String
   # DevAccountId:
   #   Type: String
   #   Default: "552242929734"
@@ -155,6 +157,21 @@ Resources:
               OutputArtifacts:
                 - Name: BuildOutput
               RunOrder: 1
+            - 
+              Name: PackageUsWest2
+              Region: us-west-2
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Sub ${RegionalPackageStackName}-${ProjectName}
+              InputArtifacts:
+                - Name: App
+              OutputArtifacts:
+                - Name: PackageUsWest2
+              RunOrder: 1
             -
               Name: PutProjVersion
               ActionTypeId:
@@ -230,6 +247,10 @@ Resources:
                 Provider: CodeBuild
               Configuration:
                 ProjectName: !Ref TransformCodeBuildProject
+                EnvironmentVariables: |
+                  [
+                    {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "true", "type": "PLAINTEXT"}
+                  ]
               InputArtifacts:
                 - Name: MergeArtifacts_Wobbly
               OutputArtifacts:
@@ -280,15 +301,56 @@ Resources:
                 Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
                 RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
                 StackName: !Sub ${ProjectName}-wobbly
-                TemplatePath: "App::template.yml"
+                TemplatePath: "PackageUsWest2::app.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnConfig_Wobbly::template-configuration.json"
                 OutputFileName: stack-outputs.json
               InputArtifacts:
-                - Name: App
+                - Name: PackageUsWest2
                 - Name: FinalizedCfnConfig_Wobbly
               OutputArtifacts:
                 - Name: CfnDeploy_Wobbly
               RunOrder: 5
+            -
+              Name: ConfigUpload_Wobbly          
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              InputArtifacts:
+                - Name: Transform_Wobbly
+                - Name: CfnDeploy_Wobbly
+              Configuration:
+                FunctionName: CPS3Deploy
+                UserParameters: !Sub |
+                  {
+                    "S3BucketName": "CfnDeploy_Wobbly::stack-outputs.json:ConfigBucket",
+                    "BaseDirectory": "transformed-import",
+                    "ExcludeArtifactsFromUpload": ["CfnDeploy_Wobbly"],
+                    "AccountId": "${IntegrationAccountId}",
+                    "Region": "us-west-2"
+                  }
+              RunOrder: 6
+            -
+              Name: ImportConfig_Wobbly
+              RunOrder: 7
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: 1
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda2
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_Wobbly::stack-outputs.json:CpConfigImportLambdaArn",
+                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "AccountId": "${IntegrationAccountId}",
+                    "Region": "us-west-2",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_Wobbly
             - 
               Name: PublishDeployment_Wobbly
               ActionTypeId:
@@ -308,4 +370,4 @@ Resources:
               InputArtifacts:
                 - Name: ProjectVersion
                 - Name: CfnDeploy_Wobbly              
-              RunOrder: 6
+              RunOrder: 8

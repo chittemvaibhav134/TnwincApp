@@ -11,6 +11,18 @@
         "Artifacts": [
             {"Name":"StackName","Required": true}
         ]
+      },
+      {
+        "Project": "doorman",
+        "Artifacts": [
+            {"Name":"MetadataPublicMirrorUrl","Required": true}
+        ]
+      },
+      {
+        "Project": "appshell-infra",
+        "Artifacts": [
+            {"Name":"RootUiAdminUrl","Required": false}
+        ]
       }
     ],
     "Exposes": ["Domain","RootDomain"]

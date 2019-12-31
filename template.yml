@@ -4,6 +4,12 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: >
   Creates/Manages a Keycloak instance
 
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - W3002
+
 Parameters:
   InfrastructureStackName:
     Type: String
@@ -81,6 +87,14 @@ Resources:
             Effect: Allow
             Action:
               - kms:Decrypt
+          - Resource: 
+            - !GetAtt S3ConfigBucket.Arn
+            - !Sub "${S3ConfigBucket.Arn}/*"
+            Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:GetObjectVersion
+              - s3:ListBucket
 
   LBSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
@@ -291,7 +305,7 @@ Resources:
             Options:
               awslogs-region: !Ref AWS::Region
               awslogs-group: !Ref LogGroup
-              awslogs-stream-prefix: !Ref AWS::StackName
+              awslogs-stream-prefix: kc-app
           Environment:
             - Name: DB_ADDR
               Value: !GetAtt DbStrings.EndPoint
@@ -306,6 +320,149 @@ Resources:
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
+
+  ImportConfigTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub ${AWS::StackName}-KCCONFIG
+      RequiresCompatibilities:
+        - FARGATE
+      Memory: !FindInMap [StageToContainerResources, !Ref "Stage", TaskMemory]
+      Cpu: !FindInMap [StageToContainerResources, !Ref "Stage", TaskCpu]
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
+      TaskRoleArn: !Ref ECSTaskRole
+      Volumes:
+        - Name: config
+      ContainerDefinitions:
+        - 
+          Name: Navex-Keycloak-Config
+          Image: !Ref KeyCloakImage
+          Essential: true
+          StartTimeout: 300
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: kc-config
+          Environment:
+            - Name: DB_ADDR
+              Value: !GetAtt DbStrings.EndPoint
+            - Name: DB_PORT
+              Value: !GetAtt DbStrings.Port
+            - Name: DB_USER
+              Value: !GetAtt DbUser.Name
+            - Name: DB_VENDOR
+              Value: postgres
+            - Name: DB_DATABASE
+              Value: postgres
+          Secrets:
+            - Name: DB_PASSWORD
+              ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
+          MountPoints:
+            - ContainerPath: /import
+              ReadOnly: true
+              SourceVolume: config
+          EntryPoint:
+            - /opt/jboss/tools/docker-entrypoint.sh
+            - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import"
+          DependsOn:
+            - Condition: SUCCESS
+              ContainerName: KC-Config-Importer
+        -
+          Name: KC-Config-Importer
+          Image: mikesir87/aws-cli:latest
+          Essential: false
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: kc-config
+          Environment:
+            - Name: S3_CONFIG_BUCKET
+              Value: !Ref S3ConfigBucket
+          MountPoints:
+            - ContainerPath: /import
+              ReadOnly: false
+              SourceVolume: config
+          Command:
+            - /bin/sh
+            - -c
+            - aws s3 sync s3://$S3_CONFIG_BUCKET /import
+
+  CpRunImportConfigTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: EcsTaskCtl
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Resource:
+                  - !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/${AWS::StackName}-KCCONFIG:*"
+                  - !GetAtt EcsCluster.Arn
+                Effect: Allow
+                Action:
+                  - ecs:RunTask
+                  - ecs:StartTask
+              - Resource: "*"
+                Effect: Allow
+                Action: 
+                  - ecs:StopTask
+                  - ecs:ListTasks
+                Condition:
+                  ArnEquals:
+                    "ecs:cluster": !GetAtt EcsCluster.Arn
+              - Resource: "*"
+                Effect: Allow
+                Action: 
+                  - ecs:DescribeTaskDefinition
+                  - ecs:DescribeTasks
+              - Resource: !GetAtt LogGroup.Arn
+                Action: logs:FilterLogEvents
+                Effect: Allow
+              - Resource:
+                  - !GetAtt TaskExecutionRole.Arn
+                  - !GetAtt ECSTaskRole.Arn
+                Effect: Allow
+                Action:
+                  - iam:PassRole
+
+  CpRunImportConfigTaskLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      # Explicit name to get around circular dep with role privs
+      FunctionName: !Sub ${AWS::StackName}-CpRunImportTask
+      Code: ./lambdas/kc-config-import/
+      Runtime: python3.7
+      Role: !GetAtt CpRunImportConfigTaskRole.Arn
+      MemorySize: 256
+      Timeout: 20
+      Handler: kc_import_config.cp_handler
+      Environment:
+        Variables:
+          Cluster: !GetAtt EcsCluster.Arn
+          TaskDefinition: !Ref ImportConfigTaskDefinition
+          #TaskFamily: !Sub ${AWS::StackName}-KCCONFIG
+          TaskSubnets: !Sub ${KeycloakSubnet1},${KeycloakSubnet2}
+
+  S3ConfigBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
 
   Dns:
     Type: AWS::Route53::RecordSet
@@ -561,3 +718,7 @@ Outputs:
   RootDomain:
     Description: domain to KC service without string substitution
     Value: !Sub "${Subdomain}.${DnsHostedZone}"
+  ConfigBucket:
+    Value: !Ref S3ConfigBucket
+  CpConfigImportLambdaArn:
+    Value: !GetAtt CpRunImportConfigTaskLambda.Arn

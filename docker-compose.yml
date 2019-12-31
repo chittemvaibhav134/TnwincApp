@@ -31,6 +31,9 @@ services:
     restart: always
     volumes:
       - ./import:/import:rw
+    entrypoint:
+      - /opt/jboss/tools/docker-entrypoint.sh
+      - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import"
 
   db:
     container_name: keycloak-db
