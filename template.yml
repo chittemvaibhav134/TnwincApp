@@ -392,70 +392,6 @@ Resources:
             - -c
             - aws s3 sync s3://$S3_CONFIG_BUCKET /import
 
-  CfnRunImportConfigTaskRole:
-    Type: AWS::IAM::Role
-    Properties:
-      Path: /
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-      Policies:
-        - PolicyName: CfnCrPolling
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: "Allow"
-                Action:
-                  - "events:PutRule"
-                  - "events:DeleteRule"
-                  - "events:PutTargets"
-                  - "events:RemoveTargets"
-                Resource: "*"
-              - Effect: Allow
-                Action:
-                  - "lambda:AddPermission"
-                  - "lambda:RemovePermission"
-                # Not using a Ref/GetAtt because of circular dep
-                Resource: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-CfnRunImportTask
-        - PolicyName: EcsTaskCtl
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Resource:
-                  - !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/${AWS::StackName}-KCCONFIG:*"
-                  - !GetAtt EcsCluster.Arn
-                Effect: Allow
-                Action:
-                  - ecs:RunTask
-                  - ecs:StartTask
-              - Resource: "*"
-                Effect: Allow
-                Action: ecs:StopTask
-                Condition:
-                  ArnEquals:
-                    "ecs:cluster": !GetAtt EcsCluster.Arn
-              - Resource: "*"
-                Effect: Allow
-                Action: 
-                  - ecs:DescribeTaskDefinition
-                  - ecs:DescribeTasks
-              - Resource: !GetAtt LogGroup.Arn
-                Action: logs:FilterLogEvents
-                Effect: Allow
-              - Resource:
-                  - !GetAtt TaskExecutionRole.Arn
-                  - !GetAtt ECSTaskRole.Arn
-                Effect: Allow
-                Action:
-                  - iam:PassRole
-
   CpRunImportConfigTaskRole:
     Type: AWS::IAM::Role
     Properties:
@@ -505,18 +441,6 @@ Resources:
                 Action:
                   - iam:PassRole
 
-  CfnRunImportConfigTaskLambda:
-    Type: AWS::Lambda::Function
-    Properties:
-      # Explicit name to get around circular dep with role privs
-      FunctionName: !Sub ${AWS::StackName}-CfnRunImportTask
-      Code: ./lambdas/kc-config-import/
-      Runtime: python3.7
-      Role: !GetAtt CfnRunImportConfigTaskRole.Arn
-      MemorySize: 256
-      Timeout: 20
-      Handler: kc_import_config.cfn_handler
-
   CpRunImportConfigTaskLambda:
     Type: AWS::Lambda::Function
     Properties:
@@ -539,18 +463,6 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
-
-  # ImportConfig:
-  #   Type: Custom::CfnRunImportConfigTask
-  #   Properties:
-  #     ServiceToken: !GetAtt CfnRunImportConfigTaskLambda.Arn
-  #     DependsOnHack: !If [ Development, !Ref DatabaseInstance, !Ref DatabaseCluster ]
-  #     Cluster: !GetAtt EcsCluster.Arn
-  #     TaskSubnets:
-  #       - !Ref KeycloakSubnet1
-  #       - !Ref KeycloakSubnet2
-  #     TaskDefinition: !Ref ImportConfigTaskDefinition
-  #     ConfigChecksum: !Ref ConfigChecksum
 
   Dns:
     Type: AWS::Route53::RecordSet
