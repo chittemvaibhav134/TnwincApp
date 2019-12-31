@@ -7,7 +7,7 @@ Parameters:
     Default: keycloak
 
 Resources:  
-  CoiApiPackageCodeBuildProject:
+  PackageCodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: !Sub ${AWS::StackName}-${ProjectName}
