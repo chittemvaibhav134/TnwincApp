@@ -15,7 +15,7 @@
       {
         "Project": "doorman",
         "Artifacts": [
-            {"Name":"MetadataPublicMirrorUrl","Required": false}
+            {"Name":"MetadataPublicMirrorUrl","Required": true}
         ]
       },
       {
