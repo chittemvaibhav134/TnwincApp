@@ -340,7 +340,7 @@ Resources:
                 Version: 1
                 Provider: Lambda
               Configuration:
-                FunctionName: CPInvokeLambda2
+                FunctionName: CPInvokeLambda
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_Wobbly::stack-outputs.json:CpConfigImportLambdaArn",
