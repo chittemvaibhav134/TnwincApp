@@ -8,6 +8,9 @@
         ],
         "middle_name": [
           "CanUpdateMiddleName-1549420977"
+        ],
+        "userStoreRole": [
+          "UserStoreAdministrator"
         ]
       },
       "clientRoles": {
