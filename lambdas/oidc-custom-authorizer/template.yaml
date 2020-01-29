@@ -4,7 +4,7 @@ Description: Lambda Authorizer for securing APIs.
 Parameters:
   ProjectName:
     Type: String
-    Default: mobile
+    Default: Custom Oidc Authorizer
   JWKSURI:
     Type: String
     Default: https://*.keycloak.devlocal.navex-pe.com:8443/auth/realms/navex/protocol/openid-connect/certs
@@ -34,11 +34,7 @@ Resources:
             !Ref JWKSURI
           USER_INFO_URI:
             !Ref USERINFOURI
-      FunctionName: String
-      KmsKeyArn: String
-      Layers:
-        - String
-      MemorySize: 1024
+      MemorySize: 256
       Runtime: nodejs10.x
       Timeout: 30
   
