@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Lambda Authorizer for securing APIs.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: mobile
+  JWKSURI:
+    Type: String
+    Default: https://*.keycloak.devlocal.navex-pe.com:8443/auth/realms/navex/protocol/openid-connect/certs
+  USERINFOURI:
+    Type: String
+    Default: https://*.keycloak.devlocal.navex-pe.com:8443/auth/realms/navex/protocol/openid-connect/userinfo
+
+Outputs:
+  ProjectName:
+    Value: !Ref ProjectName
+
+Resources:
+  CustomAuthorizer:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code: ./index.js
+      Handler: index.handler
+      Description: Authorize Endpoints for KeyCloak
+      Environment:
+        Variables:
+          JWKS_URI:
+            !Ref JWKSURI
+          USER_INFO_URI:
+            !Ref USERINFOURI
+      FunctionName: String
+      KmsKeyArn: String
+      Layers:
+        - String
+      MemorySize: 1024
+      Runtime: nodejs10.x
+      Timeout: 30
+  
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
