@@ -15,9 +15,13 @@ Parameters:
 Outputs:
   ProjectName:
     Value: !Ref ProjectName
+  CustomOidcAuthorizerLambdaName:
+    Value: !Ref CustomOidcAuthorizerLambda
+  CustomAuthRole:
+    Value: !Ref LambdaExecutionRole
 
 Resources:
-  CustomAuthorizer:
+  CustomOidcAuthorizerLambda:
     Type: AWS::Lambda::Function
     Properties:
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -51,3 +55,4 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  
