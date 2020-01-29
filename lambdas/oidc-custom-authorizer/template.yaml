@@ -5,12 +5,9 @@ Parameters:
   ProjectName:
     Type: String
     Default: Custom Oidc Authorizer
-  JWKSURI:
+  KCBaseUrl:
     Type: String
-    Default: https://*.keycloak.devlocal.navex-pe.com:8443/auth/realms/navex/protocol/openid-connect/certs
-  USERINFOURI:
-    Type: String
-    Default: https://*.keycloak.devlocal.navex-pe.com:8443/auth/realms/navex/protocol/openid-connect/userinfo
+    Default: "*.keycloak.devlocal.navex-pe.com:8443"
 
 Outputs:
   ProjectName:
@@ -31,9 +28,13 @@ Resources:
       Environment:
         Variables:
           JWKS_URI:
-            !Ref JWKSURI
+            !Sub 
+              - https://${KCDomain}/auth/realms/navex/protocol/openid-connect/certs
+              - {KCDomain: !Ref KCBaseUrl}
           USER_INFO_URI:
-            !Ref USERINFOURI
+            !Sub 
+              - https://${KCDomain}/auth/realms/navex/protocol/openid-connect/userinfo
+              - {KCDomain: !Ref KCBaseUrl}
       MemorySize: 256
       Runtime: nodejs10.x
       Timeout: 30
