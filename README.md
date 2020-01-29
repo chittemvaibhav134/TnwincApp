@@ -28,7 +28,7 @@ This process is destructive to any existing KeyCloak configuration. If you've ma
 From the repo root:
 ```shell
 docker-compose down
-docker volume rm keycloak_db
+docker volume rm platform-auth-keycloak_db
 ```
 
 KeyCloak has now been completely removed.
@@ -61,10 +61,10 @@ HOSTS changes may be necessary. In general, any URL at which KC may need to be a
 
 ```text
 # KeyCloak Admin
-keycloak.devlocal.navex-pe.com             127.0.0.1
+127.0.0.1             keycloak.devlocal.navex-pe.com
 
 # Client-specific KeyCloak URLs
-trial12.keycloak.devlocal.navex-pe.com     127.0.0.1
+127.0.0.1             trial12.keycloak.devlocal.navex-pe.com
 ```
 
 Your configuration may differ depending on which local client keys you typically work with.
