@@ -67,7 +67,6 @@ module.exports.authenticate = async (params) => {
         rateLimit: true,
         jwksRequestsPerMinute: 10, // Default value
         jwksUri: process.env.JWKS_URI.replace('*', clientkey),
-        strictSsl: false
     });
 
     const getSigningKey = util.promisify(client.getSigningKey);
