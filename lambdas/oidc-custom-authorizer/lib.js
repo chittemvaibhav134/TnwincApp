@@ -105,16 +105,7 @@ const getUserRole = async (params) => {
             Authorization: `Bearer ${token}`
         }
     }
-    if (process.env.LOCAL) {
-        options.headers = {
-            ...options.headers,
-            Host: options.host
-        }
-        options.port = '8443'
-        options.host = 'trial12.keycloak.devlocal.navex-pe.com'
-
-        options.rejectUnauthorized = false
-    }
+    
     return new Promise((resolve, reject) => {
         const req = https.request(options, (res) => {
             const { statusCode, statusMessage, headers } = res
