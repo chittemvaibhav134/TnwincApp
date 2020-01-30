@@ -428,5 +428,6 @@ Resources:
                   }
               InputArtifacts:
                 - Name: ProjectVersion
-                - Name: CfnDeploy_Wobbly              
+                - Name: CfnDeploy_Wobbly
+                - Name: CfnAuthDeploy_Wobbly_UsWest2                 
               RunOrder: 8
