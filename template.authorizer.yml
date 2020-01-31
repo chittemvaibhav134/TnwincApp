@@ -29,7 +29,6 @@ Resources:
       Environment:
         Variables:
           JWKS_URI: !Sub https://${KCBaseUrl}/auth/realms/navex/protocol/openid-connect/certs
-          USER_INFO_URI: !Sub https://${KCBaseUrl}/auth/realms/navex/protocol/openid-connect/userinfo
       MemorySize: 256
       Runtime: nodejs10.x
       Timeout: 30

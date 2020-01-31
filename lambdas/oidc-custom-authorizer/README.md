@@ -19,7 +19,6 @@ This package gives you the code for a custom authorizer that will, with a little
 * It confirms that an OAuth2 bearer token has been passed via the `Authorization` header.
 * It confirms that the token is a JWT that has been signed using the RS256 algorithm with a specific public key
 * It obtains the public key by inspecting the configuration returned by a configured JWKS endpoint
-* It checks to see if the users is a gateway admin or navex admin
 
 ## Setup
 
@@ -42,7 +41,6 @@ cp .env.sample .env
 ### Environment Variables
 
 Modify the `.env`:
-* `USER_INFO_URI`: This is the URL to get user information at the /userinfo endpoint in keycloak. Set this URL to your local keycloak endpoint. The sample file has an example.
 * `JWKS_URI`: This is the URL of the associated JWKS endpoint in keycloak. The sample file as an example.
 
 You can test the custom authorizer locally. You just need to obtain a valid JWT access token to perform the test. If you're using Auth0, see [these instructions](https://auth0.com/docs/tokens/access-token#how-to-get-an-access-token) on how to obtain one.
