@@ -48,8 +48,8 @@ phases:
           jq --arg LOGOUT_URL "$LOGOUT_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleLogoutServiceUrl) |= $LOGOUT_URL' |
           jq --arg LOGIN_URL "$LOGIN_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleSignOnServiceUrl) |= $LOGIN_URL' | 
           jq --arg APPSHELL_REDIRECT "$AppshellUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[0]) |= $APPSHELL_REDIRECT' |
-          jq --arg APPSHELL "$AppshellUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL' > transformed-import/navex-realm.json |
-          jq --arg CSP_HEADER "$CSP_HEADER" '(.browserSecurityHeaders.contentSecurityPolicy) |= $CSP_HEADER' > transformed-import/navex-realm.json |
+          jq --arg APPSHELL "$AppshellUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL' |
+          jq --arg CSP_HEADER "$CSP_HEADER" '(.browserSecurityHeaders.contentSecurityPolicy) |= $CSP_HEADER' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.attributes."_browser_header.contentSecurityPolicy") |= $CSP_HEADER' > transformed-import/navex-realm.json
       - |
         jq --null-input \
