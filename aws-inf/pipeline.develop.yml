@@ -172,6 +172,36 @@ Resources:
               OutputArtifacts:
                 - Name: PackageUsWest2
               RunOrder: 1
+            - 
+              Name: AuthPackageUsWest2
+              Region: us-west-2
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Sub ${RegionalPackageStackName}-${ProjectName}-auth
+              InputArtifacts:
+                - Name: App
+              OutputArtifacts:
+                - Name: AuthPackageUsWest2
+              RunOrder: 1
+            - 
+              Name: AuthPackageUsEast1
+              Region: us-east-1
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Sub ${RegionalPackageStackName}-${ProjectName}-auth
+              InputArtifacts:
+                - Name: App
+              OutputArtifacts:
+                - Name: AuthPackageUsEast1
+              RunOrder: 1
             -
               Name: PutProjVersion
               ActionTypeId:
@@ -331,13 +361,39 @@ Resources:
                     "Region": "us-west-2"
                   }
               RunOrder: 6
+            - 
+              Name: CfnAuthDeploy_Wobbly_UsWest2
+              Region: us-west-2
+              RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-auth-wobbly
+                TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
+                OutputFileName: stack-outputs.json
+                ParameterOverrides: |
+                  {
+                    "KCBaseUrl": {"Fn::GetParam" : [ "CfnDeploy_Wobbly", "stack-outputs.json", "Domain" ] }
+                  }
+              InputArtifacts:
+                - Name: AuthPackageUsWest2
+                - Name: CfnDeploy_Wobbly
+              OutputArtifacts:
+                - Name: CfnAuthDeploy_Wobbly_UsWest2
+              RunOrder: 7
             -
               Name: ImportConfig_Wobbly
               RunOrder: 7
               ActionTypeId:
                 Category: Invoke
                 Owner: AWS
-                Version: 1
+                Version: "1"
                 Provider: Lambda
               Configuration:
                 FunctionName: CPInvokeLambda
@@ -365,9 +421,13 @@ Resources:
                     "ProjectId": "${ProjectName}_navexint_us-west-2",
                     "BuildInfoFile": "ProjectVersion::build-record.json",
                     "DeploymentContext": "wobbly",
-                    "JsonArtifactFiles": ["CfnDeploy_Wobbly::stack-outputs.json"]
+                    "JsonArtifactFiles": [
+                      "CfnDeploy_Wobbly::stack-outputs.json",
+                      "CfnAuthDeploy_Wobbly_UsWest2::stack-outputs.json"
+                    ]
                   }
               InputArtifacts:
                 - Name: ProjectVersion
-                - Name: CfnDeploy_Wobbly              
+                - Name: CfnDeploy_Wobbly
+                - Name: CfnAuthDeploy_Wobbly_UsWest2                 
               RunOrder: 8
