@@ -22,6 +22,7 @@ phases:
       - echo "loading values from deployment context artifacts $DC_ART_DIR/aws-inf"
       - InfStackName=$(jq -r '.StackName' "$DC_ART_DIR/aws-inf")
       - DoormanMetadataUrl=$(jq -r '.MetadataPublicMirrorUrl' "$DC_ART_DIR/doorman")
+      - DoormanBaseUrl=$(jq -r '.BaseUrl' "$DC_ART_DIR/doorman")
       - |
           # I think this handles a default value if the artifact is missing or if the entire json file is
           AppShellUrlDefault="http://admin.devlocal.navex-pe.com:3000"
@@ -40,13 +41,16 @@ phases:
         CERT=$(xmllint --xpath '/EntityDescriptor/IDPSSODescriptor/KeyDescriptor/KeyInfo/X509Data/X509Certificate/text()' doorman-metadata.xml )
         LOGOUT_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleLogoutService/@Location)' doorman-metadata.xml )
         LOGIN_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleSignOnService/@Location)' doorman-metadata.xml )
+        CSP_HEADER="frame-src 'self'; frame-ancestors 'self' $DoormanBaseUrl; object-src 'none';"
       - |
         # TODO: Figure out a less dumb way to update the json file  
         jq --arg CERT "$CERT" '(.identityProviders[] | select(.alias == "doorman") | .config.signingCertificate) |= $CERT' $APP_DIR/import/navex-realm.json |
           jq --arg LOGOUT_URL "$LOGOUT_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleLogoutServiceUrl) |= $LOGOUT_URL' |
           jq --arg LOGIN_URL "$LOGIN_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleSignOnServiceUrl) |= $LOGIN_URL' | 
           jq --arg APPSHELL_REDIRECT "$AppshellUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[0]) |= $APPSHELL_REDIRECT' |
-          jq --arg APPSHELL "$AppshellUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL' > transformed-import/navex-realm.json
+          jq --arg APPSHELL "$AppshellUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL' |
+          jq --arg CSP_HEADER "$CSP_HEADER" '(.browserSecurityHeaders.contentSecurityPolicy) |= $CSP_HEADER' |
+          jq --arg CSP_HEADER "$CSP_HEADER" '(.attributes."_browser_header.contentSecurityPolicy") |= $CSP_HEADER' > transformed-import/navex-realm.json
       - |
         jq --null-input \
           --arg InfrastructureStackName "$InfStackName" \
