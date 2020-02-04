@@ -19,11 +19,11 @@ const getPolicyDocument = (effect, resource) => {
 
 // extract and return the Bearer Token from the Lambda event parameters
 const getToken = (params) => {
-    if (!params.type || params.type !== 'REQUEST') {
-        throw new Error('Expected "event.type" parameter to have value "REQUEST"');
+    if (!params.type || params.type !== 'TOKEN') {
+        throw new Error('Expected "event.type" parameter to have value "TOKEN"');
     }
 
-    const tokenString = params.headers.Authorization;
+    const tokenString = params.authorizationToken;
     if (!tokenString) {
         throw new Error('Expected "event.headers.Authorization" parameter to be set');
     }
@@ -35,13 +35,11 @@ const getToken = (params) => {
     return match[1];
 }
 
-const getClientKey = (refererUrl) => {
-    const parsedUrl = new url.URL(refererUrl)
-    if (parsedUrl.host.startsWith('navexadmin')) {
-        return 'navex'
-    } else {
-        return parsedUrl.pathname.split('/')[1]
+const getClientKey = (decodedToken) => {
+    if(!decodedToken.payload || !decodedToken.payload.clientkey) {
+        throw new Error('token does not have clientkey')
     }
+    return decodedToken.payload.clientkey
 }
 
 module.exports.authenticate = (params) => {
@@ -52,7 +50,7 @@ module.exports.authenticate = (params) => {
         throw new Error('invalid token');
     }
 
-    var clientkey = getClientKey(params.headers.Referer)
+    var clientkey = getClientKey(decoded)
 
     const client = jwksClient({
         cache: true,
