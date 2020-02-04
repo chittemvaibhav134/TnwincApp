@@ -51,9 +51,7 @@ With a valid token, now you just need to create a local `event.json` file that c
 cp event.json.sample event.json
 ```
 
-Then replace the `Authorization` text in that file with the JWT you obtained in the previous step.
-
-You will also to replace the `Referer` text with a url that looks like `https://{baseurl}/{clientKey}`. This is how the code gets the client key from your request.
+Then replace the `authorizationToken` text in that file with the JWT you obtained in the previous step.
 
 Finally, perform the test:
 
@@ -69,11 +67,9 @@ This uses the [lambda-local](https://www.npmjs.com/package/lambda-local) package
 Logs
 ----
 START RequestId: fe210d1c-12de-0bff-dd0a-c3ac3e959520
-{ type: 'REQUEST',
-    headers:{ 'Authorization': 'Bearer eyJ0eXA...M2pdKi79742x4xtkLm6qNSdDYDEub37AI2h_86ifdIimY4dAOQ',
-    'Referer' : 'https://admin.develop.navex-int.com/trial12/usermanager/import/manual/'
-    }
-    methodArn: 'arn:aws:execute-api:us-east-1:1234567890:apiId/stage/method/resourcePath' }
+{ type: 'TOKEN',
+  authorizationToken: 'Bearer eyJ0eXA...M2pdKi79742x4xtkLm6qNSdDYDEub37AI2h_86ifdIimY4dAOQ',
+  methodArn: 'arn:aws:execute-api:us-east-1:1234567890:apiId/stage/method/resourcePath' }
 END
 
 
@@ -135,8 +131,8 @@ You should see similar output to what you observed when [testing the lambda loca
    * Lambda region: (same as lambda function created above)
    * Lambda function: `{Your Lambda funciton name or Arn}`
    * Authorizer name: `jwt-rsa-custom-authorizer`
-   * Lambda Event Payload: `Request`
-   * Identity Sources: `Authorization`, `Referer`
+   * Lambda Event Payload: `TOKEN`
+   * Token validation expression: `^Bearer [-0-9a-zA-Z\._]*$`
    * Result TTL in seconds: `3600`
 
 5. Click **Create**
