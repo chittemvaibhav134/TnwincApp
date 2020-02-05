@@ -1,5 +1,4 @@
 require('dotenv').config({ silent: true });
-const url = require('url')
 const jwksClient = require('jwks-rsa');
 const jwt = require('jsonwebtoken');
 const util = require('util');
@@ -57,7 +56,6 @@ module.exports.authenticate = (params) => {
         rateLimit: true,
         jwksRequestsPerMinute: 10, // Default value
         jwksUri: process.env.JWKS_URI.replace('*', clientkey),
-        strictSsl: false
     });
 
     const getSigningKey = util.promisify(client.getSigningKey);
@@ -68,7 +66,7 @@ module.exports.authenticate = (params) => {
         })
         .then((decoded)=> ({
             principalId: decoded.sub,
-            policyDocument: getPolicyDocument('Allow', params.methodArn),
+            policyDocument: getPolicyDocument('Allow','*'),
             context: { scope: decoded.scope }
         }));
 }
