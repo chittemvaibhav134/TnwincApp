@@ -1,0 +1,30 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+    commands:
+      - pip install --upgrade cfn-lint
+  pre_build:
+    commands:
+      - cfn-lint --version
+  build:
+    commands:
+      - echo Build started on `date`      
+      - cfn-lint --include-checks I -t template.yml
+  post_build:
+    commands:
+      - |
+        jq --null-input \
+          --arg KeyCloakImage "jboss/keycloak:8.0.0" \
+          '{
+            "Parameters":{
+              "KeyCloakImage": $KeyCloakImage
+            }
+          }' > \
+          ./template-configuration.json
+
+artifacts:
+  files:
+    - "template-configuration.json"

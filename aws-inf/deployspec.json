@@ -1,0 +1,45 @@
+{
+  "Project": "keycloak",
+  "RegionWhiteList": [
+    "us-east-1",
+    "us-west-2",
+    "eu-central-1"
+  ],
+  "DependsOn": [
+    {
+      "Project": "aws-inf",
+      "Artifacts": [
+        {
+          "Name": "StackName",
+          "Required": true
+        }
+      ]
+    },
+    {
+      "Project": "doorman",
+      "Artifacts": [
+        {
+          "Name": "MetadataPublicMirrorUrl",
+          "Required": true
+        },
+        {
+          "Name": "BaseUrl",
+          "Required": true
+        }
+      ]
+    },
+    {
+      "Project": "appshell-infra",
+      "Artifacts": [
+        {
+          "Name": "RootUiAdminUrl",
+          "Required": false
+        }
+      ]
+    }
+  ],
+  "Exposes": [
+    "Domain",
+    "RootDomain"
+  ]
+}

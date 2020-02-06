@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Lambda Authorizer for securing APIs.
+
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - W3002
+
+Parameters:
+  KCBaseUrl:
+    Type: String
+    Default: "*.keycloak.devlocal.navex-pe.com:8443"
+
+Outputs:
+  CustomOidcAuthorizerLambdaName:
+    Value: !Ref CustomOidcAuthorizerLambda
+  ApiGatewayAuthorizerRole:
+    Value: !Ref ApiGatewayAuthorizerRole
+
+Resources:
+  CustomOidcAuthorizerLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code: ./lambdas/oidc-custom-authorizer/
+      Handler: index.handler
+      Description: Authorize Endpoints for KeyCloak
+      Environment:
+        Variables:
+          JWKS_URI: !Sub https://${KCBaseUrl}/auth/realms/navex/protocol/openid-connect/certs
+      MemorySize: 256
+      Runtime: nodejs10.x
+      Timeout: 30
+
+  CustomOidcAuthorizerLambdaPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref CustomOidcAuthorizerLambda
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*"
+  
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  ApiGatewayAuthorizerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - Effect: "Allow"
+            Principal: 
+              Service: "apigateway.amazonaws.com"
+            Action: sts:AssumeRole
+      Policies: 
+        - PolicyName: "InvokeAuthorizerFunction"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: "Allow"
+                Action:
+                  - lambda:InvokeAsync
+                  - lambda:InvokeFunction
+                Resource: !GetAtt CustomOidcAuthorizerLambda.Arn
+  

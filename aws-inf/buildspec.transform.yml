@@ -1,0 +1,73 @@
+version: 0.2
+
+env:
+  variables:
+    # contains the platform-auth-keycloak repo; not currently ref'd but this buildspec will end up there
+    APP_DIR: "app"
+    # contains json files with the name of the projects listed in deployspec DependsOn
+    DC_ART_DIR: "dc_art"
+    # Deployspec file with the generated Version tacked on
+    BUILD_INFO_FILE: "build_info/build-record.json"
+    # determines if master-users-0.json is included in the transformed input 
+    INCLUDE_ADMIN_USER_IMPORT: "false"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+  pre_build:
+    commands:
+      - ProjectName=$(jq -r '.Project' $BUILD_INFO_FILE)
+      - ProjectVersion=$(jq -r '.Version' $BUILD_INFO_FILE)
+      - echo "loading values from deployment context artifacts $DC_ART_DIR/aws-inf"
+      - InfStackName=$(jq -r '.StackName' "$DC_ART_DIR/aws-inf")
+      - DoormanMetadataUrl=$(jq -r '.MetadataPublicMirrorUrl' "$DC_ART_DIR/doorman")
+      - DoormanBaseUrl=$(jq -r '.BaseUrl' "$DC_ART_DIR/doorman")
+      - |
+          # I think this handles a default value if the artifact is missing or if the entire json file is
+          AppShellUrlDefault="http://admin.devlocal.navex-pe.com:3000"
+          AppshellUrl=$(jq --arg DEFAULT "$AppShellUrlDefault" -r '.RootUiAdminUrl // $DEFAULT' "$DC_ART_DIR/appshell-infra" || echo "$AppShellUrlDefault")
+      - mkdir transformed-import
+  build:
+    commands:
+      - cp $APP_DIR/import/master-realm.json transformed-import/
+      - |
+        if $INCLUDE_ADMIN_USER_IMPORT ; then
+          cp $APP_DIR/import/master-users-0.json transformed-import/
+        fi
+      - |
+        # TODO: Learn how to actually use either sed or xml with namespaces...
+        curl -k $DoormanMetadataUrl | sed 's/xmlns="urn:oasis:names:tc:SAML:2.0:metadata"//g' | sed 's/xmlns="http:\/\/www.w3.org\/2000\/09\/xmldsig#"//g' > doorman-metadata.xml
+        CERT=$(xmllint --xpath '/EntityDescriptor/IDPSSODescriptor/KeyDescriptor/KeyInfo/X509Data/X509Certificate/text()' doorman-metadata.xml )
+        LOGOUT_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleLogoutService/@Location)' doorman-metadata.xml )
+        LOGIN_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleSignOnService/@Location)' doorman-metadata.xml )
+        CSP_HEADER="frame-src 'self'; frame-ancestors 'self' $DoormanBaseUrl; object-src 'none';"
+      - |
+        # TODO: Figure out a less dumb way to update the json file  
+        jq --arg CERT "$CERT" '(.identityProviders[] | select(.alias == "doorman") | .config.signingCertificate) |= $CERT' $APP_DIR/import/navex-realm.json |
+          jq --arg LOGOUT_URL "$LOGOUT_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleLogoutServiceUrl) |= $LOGOUT_URL' |
+          jq --arg LOGIN_URL "$LOGIN_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleSignOnServiceUrl) |= $LOGIN_URL' | 
+          jq --arg APPSHELL_REDIRECT "$AppshellUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[0]) |= $APPSHELL_REDIRECT' |
+          jq --arg APPSHELL "$AppshellUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL' |
+          jq --arg CSP_HEADER "$CSP_HEADER" '(.browserSecurityHeaders.contentSecurityPolicy) |= $CSP_HEADER' |
+          jq --arg CSP_HEADER "$CSP_HEADER" '(.attributes."_browser_header.contentSecurityPolicy") |= $CSP_HEADER' > transformed-import/navex-realm.json
+      - |
+        jq --null-input \
+          --arg InfrastructureStackName "$InfStackName" \
+          --arg ProjectName "$ProjectName" \
+          --arg ProjectVersion "$ProjectVersion" \
+          '{
+            "Parameters": {
+              "InfrastructureStackName": $InfrastructureStackName
+            },
+            "Tags": {
+              "navex:project:name": $ProjectName,
+              "navex:project:version": $ProjectVersion,
+              "navex:project:owner": "cia"
+            }
+          }' > \
+          ./template-configuration.json
+artifacts:
+  files:
+    - "template-configuration.json"
+    - "transformed-import/*.json"

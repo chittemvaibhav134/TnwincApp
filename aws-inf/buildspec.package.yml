@@ -1,0 +1,14 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+    commands:
+      - pip install --upgrade awscli
+  build:
+    commands:
+      - aws cloudformation package --template template.yml --s3-bucket $S3_BUCKET --s3-prefix $S3_PREFIX --output-template app.packaged.yml
+artifacts:
+  type: zip
+  files:
+    - app.packaged.yml

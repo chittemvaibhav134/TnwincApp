@@ -22,7 +22,7 @@ services:
       DB_USER: keycloak
       DB_VENDOR: postgres
     ports:
-      - '8080:8080'
+      - '8443:8443'
     image: jboss/keycloak:8.0.0
     links:
       - db
@@ -31,6 +31,9 @@ services:
     restart: always
     volumes:
       - ./import:/import:rw
+    entrypoint:
+      - /opt/jboss/tools/docker-entrypoint.sh
+      - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import"
 
   db:
     container_name: keycloak-db

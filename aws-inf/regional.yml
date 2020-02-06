@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create package codebuild per region
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: keycloak
+
+Resources:  
+  PackageCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub ${AWS::StackName}-${ProjectName}
+      ServiceRole: "navex-codebuild"
+      EncryptionKey: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/navex-pipeline"
+      Description: Packages keycloak lambdas
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: aws-inf/buildspec.package.yml    
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:3.0
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: S3_BUCKET
+            Value: !Sub navex-artifacts-${AWS::AccountId}-${AWS::Region}
+          - Name: S3_PREFIX
+            Value: !Ref AWS::StackName
+
+  AuthPackageCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub ${AWS::StackName}-${ProjectName}-auth
+      ServiceRole: "navex-codebuild"
+      EncryptionKey: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/navex-pipeline"
+      Description: Packages keycloak lambdas
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: aws-inf/buildspec.auth.package.yml    
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:3.0
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: S3_BUCKET
+            Value: !Sub navex-artifacts-${AWS::AccountId}-${AWS::Region}
+          - Name: S3_PREFIX
+            Value: !Ref AWS::StackName
