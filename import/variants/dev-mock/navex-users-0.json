@@ -8,6 +8,9 @@
         ],
         "user_store_role": [
           "1"
+        ],
+        "clientkey": [
+          "navex"
         ]
       },
       "clientRoles": {
@@ -47,6 +50,9 @@
         ],
         "user_store_role": [
           "3"
+        ],
+        "clientkey": [
+          "trial12"
         ]
       },
       "clientRoles": {
@@ -86,6 +92,9 @@
         ],
         "user_store_role": [
           "2"
+        ],
+        "clientkey": [
+          "trial12"
         ]
       },
       "clientRoles": {
