@@ -1,0 +1,141 @@
+@realm = trial12
+@host = {{hostname}}:{{port}}
+@accessToken = {{login.response.body.$.access_token}}
+
+# @name login
+POST /auth/realms/master/protocol/openid-connect/token HTTP/1.1
+Host: {{host}}
+Content-Type: application/x-www-form-urlencoded
+
+username={{adminUsername}}&password={{adminPassword}}&client_id=admin-cli&grant_type=password
+
+###
+
+# @name postClientScope
+POST /auth/admin/realms/{{realm}}/client-scopes HTTP/1.1
+Host: {{host}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "name": "doorman-mappings",
+    "description": "Mappers for user attributes sent by Doorman",
+    "protocol": "openid-connect",
+    "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+    },
+    "protocolMappers": [
+        {
+            "name": "ClientKey",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-attribute-mapper",
+            "consentRequired": false,
+            "config": {
+                "userinfo.token.claim": "true",
+                "user.attribute": "clientkey",
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "claim.name": "clientkey",
+                "jsonType.label": "String"
+            }
+        },
+        {
+            "name": "Puid",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-attribute-mapper",
+            "consentRequired": false,
+            "config": {
+                "userinfo.token.claim": "true",
+                "user.attribute": "puid",
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "claim.name": "puid",
+                "jsonType.label": "String"
+            }
+        },
+        {
+            "name": "lastName",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-property-mapper",
+            "consentRequired": false,
+            "config": {
+                "userinfo.token.claim": "true",
+                "user.attribute": "lastName",
+                "id.token.claim": "true",
+                "access.token.claim": "false",
+                "claim.name": "family_name",
+                "jsonType.label": "String"
+            }
+        },
+        {
+            "name": "PreferredLanguageVersion",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-attribute-mapper",
+            "consentRequired": false,
+            "config": {
+                "userinfo.token.claim": "true",
+                "user.attribute": "locale",
+                "id.token.claim": "true",
+                "access.token.claim": "false",
+                "claim.name": "locale",
+                "jsonType.label": "String"
+            }
+        },
+        {
+            "name": "firstName",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-property-mapper",
+            "consentRequired": false,
+            "config": {
+                "userinfo.token.claim": "true",
+                "user.attribute": "firstName",
+                "id.token.claim": "true",
+                "access.token.claim": "false",
+                "claim.name": "given_name",
+                "jsonType.label": "String"
+            }
+        },
+        {
+            "name": "email",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-property-mapper",
+            "consentRequired": false,
+            "config": {
+                "userinfo.token.claim": "true",
+                "user.attribute": "email",
+                "id.token.claim": "true",
+                "access.token.claim": "false",
+                "claim.name": "email",
+                "jsonType.label": "String"
+            }
+        },
+        {
+            "name": "MiddleName",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-attribute-mapper",
+            "consentRequired": false,
+            "config": {
+                "user.attribute": "middle_name",
+                "id.token.claim": "true",
+                "access.token.claim": "false",
+                "claim.name": "middle_name",
+                "userinfo.token.claim": "true"
+            }
+        },
+        {
+            "name": "UserStoreRole",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usermodel-attribute-mapper",
+            "consentRequired": false,
+            "config": {
+                "userinfo.token.claim": "true",
+                "user.attribute": "user_store_role",
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "claim.name": "user_store_role",
+                "jsonType.label": "String"
+            }
+        }
+    ]
+}
