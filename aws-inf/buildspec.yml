@@ -5,7 +5,7 @@ phases:
     runtime-versions:
       python: 3.8
     commands:
-      - pip install cfn-lint==0.27.5
+      - pip install --upgrade cfn-lint
   pre_build:
     commands:
       - cfn-lint --version
