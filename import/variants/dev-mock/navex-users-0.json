@@ -1,0 +1,131 @@
+{
+  "realm": "navex",
+  "users": [
+    {
+      "attributes": {
+        "puid": [
+          "00000000-0000-0000-0000-000000000006"
+        ],
+        "user_store_role": [
+          "1"
+        ],
+        "clientkey": [
+          "navex"
+        ]
+      },
+      "clientRoles": {
+        "account": [
+          "manage-account",
+          "view-profile"
+        ]
+      },
+      "createdTimestamp": 1581369258770,
+      "credentials": [
+        {
+          "createdDate": 1581369322373,
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\"}",
+          "id": "f5edd1f2-ef70-4a5b-88e3-189a00b08641",
+          "secretData": "{\"value\":\"2uVkKLbsEWRO0EWb8a5iKUZvxu8WVtEavDcvNwWSJObLPRH2rLk3AMcZOpQFNVOGl+ycoMv5fVF//1FWt/5dOQ==\",\"salt\":\"9+/4x0DOYexPKKYz9ToqOg==\"}",
+          "type": "password"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "emailVerified": false,
+      "enabled": true,
+      "groups": [],
+      "id": "94c0fc31-c8b7-46ff-8fda-52beeabdf9fc",
+      "notBefore": 0,
+      "realmRoles": [
+        "offline_access",
+        "uma_authorization"
+      ],
+      "requiredActions": [],
+      "totp": false,
+      "username": "dvader"
+    },
+    {
+      "attributes": {
+        "puid": [
+          "00000000-0000-0000-0000-000000000066"
+        ],
+        "user_store_role": [
+          "3"
+        ],
+        "clientkey": [
+          "trial12"
+        ]
+      },
+      "clientRoles": {
+        "account": [
+          "manage-account",
+          "view-profile"
+        ]
+      },
+      "createdTimestamp": 1581369277040,
+      "credentials": [
+        {
+          "createdDate": 1581369300223,
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\"}",
+          "id": "dc7d8e71-1132-4932-a8c1-f709ffb732ff",
+          "secretData": "{\"value\":\"ZTy0A+uPKd+yPHt7ksl4Y+kDDA5UqtsRMmOUt5iUP7BjbwXywGD4wOfkVQe7z03Al5ppGQKI7JT9AY3Gn2rDwA==\",\"salt\":\"08CnGZYbbmdqQhB57Hyodw==\"}",
+          "type": "password"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "emailVerified": false,
+      "enabled": true,
+      "groups": [],
+      "id": "47f576dc-e7b4-48b2-ae4b-3f374bf7d57f",
+      "notBefore": 0,
+      "realmRoles": [
+        "offline_access",
+        "uma_authorization"
+      ],
+      "requiredActions": [],
+      "totp": false,
+      "username": "okenobi"
+    },
+    {
+      "attributes": {
+        "puid": [
+          "C785A0FB-8B1A-E511-AF9F-00155D103480"
+        ],
+        "user_store_role": [
+          "2"
+        ],
+        "clientkey": [
+          "trial12"
+        ]
+      },
+      "clientRoles": {
+        "account": [
+          "manage-account",
+          "view-profile"
+        ]
+      },
+      "createdTimestamp": 1581369268275,
+      "credentials": [
+        {
+          "createdDate": 1581369311080,
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\"}",
+          "id": "69343963-66d1-4dac-a9f6-30338922af57",
+          "secretData": "{\"value\":\"x3d1NU0SfhP1EYqMWHe2RHgYZs/+8RKrlMdiCOMflqtGWvUp3SIq9zQKZfHr4AfJBOC7cagmVwqnvDP5+zgUrA==\",\"salt\":\"gQKm0a5YpffkcJ8LUYjvBQ==\"}",
+          "type": "password"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "emailVerified": false,
+      "enabled": true,
+      "groups": [],
+      "id": "20864144-35c5-4ecc-817d-7da2eefad5e3",
+      "notBefore": 0,
+      "realmRoles": [
+        "offline_access",
+        "uma_authorization"
+      ],
+      "requiredActions": [],
+      "totp": false,
+      "username": "shiva"
+    }
+  ]
+}
