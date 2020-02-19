@@ -7,7 +7,7 @@
           "00000000-0000-0000-0000-000000000006"
         ],
         "user_store_role": [
-          "1"
+          "NavexAdministrator"
         ],
         "clientkey": [
           "navex"
@@ -49,7 +49,7 @@
           "00000000-0000-0000-0000-000000000066"
         ],
         "user_store_role": [
-          "3"
+          "GatewayUser"
         ],
         "clientkey": [
           "trial12"
@@ -91,7 +91,7 @@
           "C785A0FB-8B1A-E511-AF9F-00155D103480"
         ],
         "user_store_role": [
-          "2"
+          "UserStoreAdministrator"
         ],
         "clientkey": [
           "trial12"
