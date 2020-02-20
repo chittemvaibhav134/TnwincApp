@@ -11,7 +11,7 @@ username={{adminUsername}}&password={{adminPassword}}&client_id=admin-cli&grant_
 
 ###
 
-# @name postClientScope
+# @name postClientScopes
 POST /auth/admin/realms/{{realm}}/client-scopes HTTP/1.1
 Host: {{host}}
 Content-Type: application/json

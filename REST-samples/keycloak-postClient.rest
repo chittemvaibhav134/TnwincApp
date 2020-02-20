@@ -1,6 +1,6 @@
 @realm = trial12
-@client_id = gateway
-@baseUri = https://{{realm}}.dev.gw.local/
+@client_id = appshell
+@baseUri = http://admin.devlocal.navex-pe.com:3000/
 @host = {{hostname}}:{{port}}
 @accessToken = {{login.response.body.$.access_token}}
 

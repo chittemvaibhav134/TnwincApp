@@ -1,0 +1,74 @@
+@realm = trial12
+@flowAlias = browser
+@host = {{hostname}}:{{port}}
+@accessToken = {{login.response.body.$.access_token}}
+
+# @name login
+POST /auth/realms/master/protocol/openid-connect/token HTTP/1.1
+Host: {{host}}
+Content-Type: application/x-www-form-urlencoded
+
+username={{adminUsername}}&password={{adminPassword}}&client_id=admin-cli&grant_type=password
+
+###
+
+# @name getAuthenticationFlows
+GET /auth/admin/realms/{{realm}}/authentication/flows HTTP/1.1
+Host: {{host}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+@flowId = {{getAuthenticationFlows.response.body.$[?(@.alias == 'browser')].id}}
+
+###
+
+# @name getAuthenticationFlowExecutions
+GET /auth/admin/realms/{{realm}}/authentication/flows/{{flowAlias}}/executions HTTP/1.1
+Host: {{host}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+@formsExecutionId = {{getAuthenticationFlowExecutions.response.body.$[?(@.displayName == 'forms')].id}}
+@idpExecutionId = {{getAuthenticationFlowExecutions.response.body.$[?(@.providerId == 'identity-provider-redirector')].id}}
+
+###
+
+# @name putFormsAuthenticationFlowExecution
+PUT /auth/admin/realms/{{realm}}/authentication/flows/{{flowAlias}}/executions HTTP/1.1
+Host: {{host}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "id": "{{formsExecutionId}}",
+    "requirement": "DISABLED",
+    "displayName": "forms",
+    "requirementChoices": [
+        "REQUIRED",
+        "ALTERNATIVE",
+        "DISABLED",
+        "CONDITIONAL"
+    ],
+    "configurable": false,
+    "authenticationFlow": true,
+    "flowId": "{{flowId}}",
+    "level": 0,
+    "index": 3
+}
+
+###
+
+# @name postIdpAuthenticationConfig
+POST /auth/admin/realms/{{realm}}/authentication/executions/{{idpExecutionId}}/config HTTP/1.1
+Host: {{host}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "config": {
+        "defaultProvider": "Doorman"
+    },
+    "alias": "doorman"
+}
+
+@configLocation = {{postIdpAuthenticationConfig.response.headers.Location}}

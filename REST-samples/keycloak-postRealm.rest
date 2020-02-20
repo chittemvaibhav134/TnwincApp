@@ -130,7 +130,7 @@ Authorization: Bearer {{accessToken}}
                 "wantAssertionsSigned": "",
                 "postBindingAuthnRequest": "",
                 "forceAuthn": "",
-                "singleSignOnServiceUrl": "https://doorman.dev.gw.local/SamlRequest",
+                "singleSignOnServiceUrl": "https://doorman.dev.gw.local/SamlRequest?clientKey={{realm}}",
                 "wantAuthnRequestsSigned": ""
             }
         }

@@ -1,4 +1,5 @@
-@realm = trial12
+@realm = navex
+@flowAlias = browser
 @host = {{hostname}}:{{port}}
 @accessToken = {{login.response.body.$.access_token}}
 
@@ -11,8 +12,8 @@ username={{adminUsername}}&password={{adminPassword}}&client_id=admin-cli&grant_
 
 ###
 
-# @name deleteRealm
-DELETE /auth/admin/realms/{{realm}} HTTP/1.1
+# @name getAuthenticationFlowExecutions
+GET /auth/admin/realms/{{realm}}/authentication/flows/{{flowAlias}}/executions HTTP/1.1
 Host: {{host}}
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
