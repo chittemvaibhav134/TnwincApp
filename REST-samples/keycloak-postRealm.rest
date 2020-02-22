@@ -1,0 +1,260 @@
+@realm = trial12
+@host = {{hostname}}:{{port}}
+@accessToken = {{login.response.body.$.access_token}}
+
+# @name login
+POST /auth/realms/master/protocol/openid-connect/token HTTP/1.1
+Host: {{host}}
+Content-Type: application/x-www-form-urlencoded
+
+username={{adminUsername}}&password={{adminPassword}}&client_id=admin-cli&grant_type=password
+
+###
+
+# @name postRealm
+POST /auth/admin/realms HTTP/1.1
+Host: {{host}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "id": "{{realm}}",
+    "realm": "{{realm}}",
+    "notBefore": 0,
+    "revokeRefreshToken": false,
+    "refreshTokenMaxReuse": 0,
+    "accessTokenLifespan": 300,
+    "accessTokenLifespanForImplicitFlow": 900,
+    "ssoSessionIdleTimeout": 1800,
+    "ssoSessionMaxLifespan": 36000,
+    "ssoSessionIdleTimeoutRememberMe": 0,
+    "ssoSessionMaxLifespanRememberMe": 0,
+    "offlineSessionIdleTimeout": 2592000,
+    "offlineSessionMaxLifespanEnabled": false,
+    "offlineSessionMaxLifespan": 5184000,
+    "accessCodeLifespan": 60,
+    "accessCodeLifespanUserAction": 300,
+    "accessCodeLifespanLogin": 1800,
+    "actionTokenGeneratedByAdminLifespan": 43200,
+    "actionTokenGeneratedByUserLifespan": 300,
+    "enabled": true,
+    "sslRequired": "external",
+    "registrationAllowed": false,
+    "registrationEmailAsUsername": false,
+    "rememberMe": false,
+    "verifyEmail": false,
+    "loginWithEmailAllowed": false,
+    "duplicateEmailsAllowed": true,
+    "resetPasswordAllowed": false,
+    "editUsernameAllowed": false,
+    "bruteForceProtected": false,
+    "permanentLockout": false,
+    "maxFailureWaitSeconds": 900,
+    "minimumQuickLoginWaitSeconds": 60,
+    "waitIncrementSeconds": 60,
+    "quickLoginCheckMilliSeconds": 1000,
+    "maxDeltaTimeSeconds": 43200,
+    "failureFactor": 30,
+    "defaultRoles": [
+        "offline_access",
+        "uma_authorization"
+    ],
+    "requiredCredentials": [
+        "password"
+    ],
+    "otpPolicyType": "totp",
+    "otpPolicyAlgorithm": "HmacSHA1",
+    "otpPolicyInitialCounter": 0,
+    "otpPolicyDigits": 6,
+    "otpPolicyLookAheadWindow": 1,
+    "otpPolicyPeriod": 30,
+    "otpSupportedApplications": [
+        "FreeOTP",
+        "Google Authenticator"
+    ],
+    "webAuthnPolicyRpEntityName": "keycloak",
+    "webAuthnPolicySignatureAlgorithms": [
+        "ES256"
+    ],
+    "webAuthnPolicyRpId": "",
+    "webAuthnPolicyAttestationConveyancePreference": "not specified",
+    "webAuthnPolicyAuthenticatorAttachment": "not specified",
+    "webAuthnPolicyRequireResidentKey": "not specified",
+    "webAuthnPolicyUserVerificationRequirement": "not specified",
+    "webAuthnPolicyCreateTimeout": 0,
+    "webAuthnPolicyAvoidSameAuthenticatorRegister": false,
+    "webAuthnPolicyAcceptableAaguids": [],
+    "browserSecurityHeaders": {
+        "contentSecurityPolicyReportOnly": "",
+        "xContentTypeOptions": "nosniff",
+        "xRobotsTag": "none",
+        "xFrameOptions": "SAMEORIGIN",
+        "contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self' https://doorman.dev.gw.local; object-src 'none';",
+        "xXSSProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains"
+    },
+    "smtpServer": {},
+    "eventsEnabled": false,
+    "eventsListeners": [
+        "jboss-logging"
+    ],
+    "enabledEventTypes": [],
+    "adminEventsEnabled": false,
+    "adminEventsDetailsEnabled": false,
+    "identityProviders": [
+        {
+            "alias": "doorman",
+            "displayName": "Doorman",
+            "providerId": "saml",
+            "enabled": true,
+            "updateProfileFirstLoginMode": "on",
+            "trustEmail": false,
+            "storeToken": false,
+            "addReadTokenRoleOnCreate": false,
+            "authenticateByDefault": false,
+            "linkOnly": false,
+            "firstBrokerLoginFlowAlias": "first broker login",
+            "config": {
+                "hideOnLoginPage": "",
+                "validateSignature": "true",
+                "samlXmlKeyNameTranformer": "KEY_ID",
+                "signingCertificate": "MIIDETCCAf2gAwIBAgIQYwcmdzAnyJZBuTdkoqeoOTAJBgUrDgMCHQUAMB4xHDAaBgNVBAMTE3d3dy5uYXZleGdsb2JhbC5jb20wHhcNMTUwNTE1MTcwMjM4WhcNMzkxMjMxMjM1OTU5WjAeMRwwGgYDVQQDExN3d3cubmF2ZXhnbG9iYWwuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmOJPBT4JjW8vpSwdvTLEFP+C9AP6qwQpq7OCPZcLoTGFjhvj8J4gWpVyB33hJVzqOo1vOzU4FRieAu+vT2VEEnavjxlEQ2oH8dfcia8sHMmFEHrXmWxBQbShQrMXHqpMxm08PV4GVdRmN0RNqCzQh+ibWfZGon2uRFHketH45ghEjdtFMUcivYnF61OVPVEvCemIzi7uHTka6Qo+oaBKPrCvrrzEj8n25wxu4S3nArm37Q3b+kcw6iTk3dZ2IVTsJ+eLNLlw6bnOp5S6hzftKYDJrPW7F4eFbhz4JC94eZbo88CwQtVzcZ3iaWhYHRam9TZ2pmJxF7ueJ6UBMgsAGwIDAQABo1MwUTBPBgNVHQEESDBGgBAt4HxR+tOwS4xWYJ9b7iHioSAwHjEcMBoGA1UEAxMTd3d3Lm5hdmV4Z2xvYmFsLmNvbYIQYwcmdzAnyJZBuTdkoqeoOTAJBgUrDgMCHQUAA4IBAQBLpmI00LFDXan+J9nuWmqYZbxQ/u/FxrT1AS+AbGN2j5+Hv4XbMTY+farpQn4pwwk9o8leoa+SIKMzmmX3b1VXYkVMxVRVLQLdsDm4+WBokMl87pxOR9H6uQluOJZly7SFcSWu8+aL0Gz8N83d2+1x/rnIXupik+/K73oGsP/b0KUPVmU3xpnzyVKNfczuYHuRGzeO8jAuo8NaKMo6DUVTRiMTEjq1UvAplNp0fIDtREDCQxXGKnIjoj55d4JlGD6rnt0JY17Gbddlbf2TN7e39EdUk/PcEjOO9GQe8V/hn3SPMpsvzkWS76dOsYNaeZ2rz3lfkQOhlI0hBzuLYnpz",
+                "postBindingLogout": "",
+                "nameIDPolicyFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+                "postBindingResponse": "",
+                "singleLogoutServiceUrl": "https://doorman.dev.gw.local/Logout",
+                "backchannelSupported": "",
+                "signatureAlgorithm": "RSA_SHA256",
+                "wantAssertionsEncrypted": "",
+                "useJwksUrl": "true",
+                "wantAssertionsSigned": "",
+                "postBindingAuthnRequest": "",
+                "forceAuthn": "",
+                "singleSignOnServiceUrl": "https://doorman.dev.gw.local/SamlRequest?clientKey={{realm}}",
+                "wantAuthnRequestsSigned": ""
+            }
+        }
+    ],
+    "identityProviderMappers": [
+        {
+            "name": "UserName",
+            "identityProviderAlias": "doorman",
+            "identityProviderMapper": "saml-username-idp-mapper",
+            "config": {
+                "template": "${ATTRIBUTE.http://schemas.navexglobal.com/identity/claims/UserName}"
+            }
+        },
+        {
+            "name": "LastName",
+            "identityProviderAlias": "doorman",
+            "identityProviderMapper": "saml-user-attribute-idp-mapper",
+            "config": {
+                "user.attribute": "lastName",
+                "attribute.name": "http://schemas.navexglobal.com/identity/claims/LastName"
+            }
+        },
+        {
+            "name": "FirstName",
+            "identityProviderAlias": "doorman",
+            "identityProviderMapper": "saml-user-attribute-idp-mapper",
+            "config": {
+                "user.attribute": "firstName",
+                "attribute.name": "http://schemas.navexglobal.com/identity/claims/FirstName"
+            }
+        },
+        {
+            "name": "MiddleName",
+            "identityProviderAlias": "doorman",
+            "identityProviderMapper": "saml-user-attribute-idp-mapper",
+            "config": {
+                "user.attribute": "middle_name",
+                "attribute.name": "http://schemas.navexglobal.com/identity/claims/MiddleName"
+            }
+        },
+        {
+            "name": "PreferredLanguageRegion",
+            "identityProviderAlias": "doorman",
+            "identityProviderMapper": "saml-user-attribute-idp-mapper",
+            "config": {
+                "user.attribute": "locale",
+                "attribute.name": "http://schemas.navexglobal.com/identity/claims/PreferredLanguageRegion"
+            }
+        },
+        {
+            "name": "UserStoreRole",
+            "identityProviderAlias": "doorman",
+            "identityProviderMapper": "saml-user-attribute-idp-mapper",
+            "config": {
+                "user.attribute": "user_store_role",
+                "attribute.name": "http://schemas.navexglobal.com/identity/claims/UserStoreRole"
+            }
+        },
+        {
+            "name": "EmailAddress",
+            "identityProviderAlias": "doorman",
+            "identityProviderMapper": "saml-user-attribute-idp-mapper",
+            "config": {
+                "user.attribute": "email",
+                "attribute.name": "http://schemas.navexglobal.com/identity/claims/EmailAddress"
+            }
+        },
+        {
+            "name": "Puid",
+            "identityProviderAlias": "doorman",
+            "identityProviderMapper": "saml-user-attribute-idp-mapper",
+            "config": {
+                "user.attribute": "puid",
+                "attribute.name": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+            }
+        },
+        {
+            "name": "ClientKey",
+            "identityProviderAlias": "doorman",
+            "identityProviderMapper": "saml-user-attribute-idp-mapper",
+            "config": {
+                "user.attribute": "clientkey",
+                "attribute.name": "http://schemas.navexglobal.com/identity/claims/DoormanClientKey"
+            }
+        }
+    ],
+    "internationalizationEnabled": false,
+    "supportedLocales": [],
+    "browserFlow": "browser",
+    "registrationFlow": "registration",
+    "directGrantFlow": "direct grant",
+    "resetCredentialsFlow": "reset credentials",
+    "clientAuthenticationFlow": "clients",
+    "dockerAuthenticationFlow": "docker auth",
+    "attributes": {
+        "webAuthnPolicyAuthenticatorAttachment": "not specified",
+        "_browser_header.xRobotsTag": "none",
+        "webAuthnPolicyRpEntityName": "keycloak",
+        "failureFactor": "30",
+        "hostname": "{{realm}}.keycloak.devlocal.navex-pe.com",
+        "actionTokenGeneratedByUserLifespan": "300",
+        "maxDeltaTimeSeconds": "43200",
+        "webAuthnPolicySignatureAlgorithms": "ES256",
+        "offlineSessionMaxLifespan": "5184000",
+        "_browser_header.contentSecurityPolicyReportOnly": "",
+        "bruteForceProtected": "false",
+        "_browser_header.contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self' https://doorman.dev.gw.local; object-src 'none';",
+        "_browser_header.xXSSProtection": "1; mode=block",
+        "_browser_header.xFrameOptions": "SAMEORIGIN",
+        "_browser_header.strictTransportSecurity": "max-age=31536000; includeSubDomains",
+        "webAuthnPolicyUserVerificationRequirement": "not specified",
+        "permanentLockout": "false",
+        "quickLoginCheckMilliSeconds": "1000",
+        "webAuthnPolicyCreateTimeout": "0",
+        "webAuthnPolicyRequireResidentKey": "not specified",
+        "webAuthnPolicyRpId": "",
+        "webAuthnPolicyAttestationConveyancePreference": "not specified",
+        "maxFailureWaitSeconds": "900",
+        "minimumQuickLoginWaitSeconds": "60",
+        "webAuthnPolicyAvoidSameAuthenticatorRegister": "false",
+        "_browser_header.xContentTypeOptions": "nosniff",
+        "actionTokenGeneratedByAdminLifespan": "43200",
+        "waitIncrementSeconds": "60",
+        "offlineSessionMaxLifespanEnabled": "false"
+    },
+    "userManagedAccessAllowed": false
+}
