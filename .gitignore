@@ -4,7 +4,8 @@ logs
 npm-debug.log*
 
 # Visual Studio Code
-.vscode
+# .vscode - it's okay to check in files in the .vscode folder, they are generally 
+#           related to shareable workspace config and should be checked in for sharing
 
 tmp
 
