@@ -3,6 +3,8 @@ logs
 *.log
 npm-debug.log*
 
+__pycache__
+
 # Visual Studio Code
 # .vscode - it's okay to check in files in the .vscode folder, they are generally 
 #           related to shareable workspace config and should be checked in for sharing
