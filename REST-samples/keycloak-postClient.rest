@@ -1,6 +1,6 @@
 @realm = navex
-@client_id = testClient
-@baseUri = http://oidcspike.devlocal.navex-pe.com/OIDCSpike
+@client_id = testclient
+@baseUri = http://admin.devlocal.navex-pe.com:3000/
 @host = {{hostname}}:{{port}}
 @accessToken = {{login.response.body.$.access_token}}
 
