@@ -1,0 +1,18 @@
+@realm = trial12
+@host = {{hostname}}:{{port}}
+@accessToken = {{login.response.body.$.access_token}}
+
+# @name login
+POST /auth/realms/master/protocol/openid-connect/token HTTP/1.1
+Host: {{host}}
+Content-Type: application/x-www-form-urlencoded
+
+username={{adminUsername}}&password={{adminPassword}}&client_id=admin-cli&grant_type=password
+
+###
+
+# @name deleteRealm
+DELETE /auth/admin/realms/{{realm}} HTTP/1.1
+Host: {{host}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
