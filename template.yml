@@ -466,6 +466,73 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
 
+  ClientSecretRotateCloudwatchEvent:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Schedule keycloak client secret rotation"
+      ScheduleExpression: "cron(0 2 * * ? *)"
+      State: DISABLED
+      Targets:
+        - Arn: !GetAtt ClientSecretRotateLambda.Arn
+          Id: "ClientSecretRotateLambda"
+
+  PermissionForEventsToInvokeCoiDataCleanupPurgeDormantInProgressResponsesSchedulerLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ClientSecretRotateLambda
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt ClientSecretRotateCloudwatchEvent.Arn
+
+  ClientSecretRotateLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: SsmParamPutAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*"
+                Effect: Allow
+                Action: ssm:PutParameter
+              - Resource: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm"
+                Effect: Allow
+                Action:  kms:Encrypt
+    
+  ClientSecretRotateLambda:
+    Type: AWS::Lambda::Function
+    # REMOVE ONCE ADMIN API BOOTSTRAPPING IS SOLVED
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - W2501
+    Properties:
+      # FunctionName: !Sub ${AWS::StackName}-ApiProxy
+      Code: ./lambdas/kc-api-proxy/
+      Runtime: python3.8
+      Role: !GetAtt ClientSecretRotateLambdaRole.Arn
+      MemorySize: 256
+      Timeout: 60
+      Handler: apiproxy.lambda_handler
+      Environment:
+        Variables:
+          KeyCloakBaseUrl: !Sub "https://navex.${Subdomain}.${DnsHostedZone}"
+          # VERY TEMPORARY; JUST FOR POC WORK
+          AdminUserName: 'dvader'
+          AdminPassword: 'password'
+          SsmPrefix: !Sub "/${AWS::StackName}/client-secrets/"
+
   Dns:
     Type: AWS::Route53::RecordSet
     Properties:
@@ -725,3 +792,7 @@ Outputs:
     Value: !Ref S3ConfigBucket
   CpConfigImportLambdaArn:
     Value: !GetAtt CpRunImportConfigTaskLambda.Arn
+  ClientSecretSsmPrefix:
+    Value: !Sub "/${AWS::StackName}/client-secrets/"
+  ClientSecretSsmRegion:
+    Value: !Ref AWS::Region

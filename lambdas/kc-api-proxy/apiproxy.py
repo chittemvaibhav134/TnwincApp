@@ -46,7 +46,7 @@ class KeyCloakApiProxy():
 
 
     def _make_request(self, method: str, endpoint: str, query_params: dict = None, body: Union[dict,str,bytes] = None, headers: dict = None):
-        method = method.lower()
+        method = method.upper()
         body = body or {}
         # questionable default...
         headers = headers or {'Content-Type' : 'application/json'}
@@ -105,6 +105,7 @@ def rotate_and_store_client_keys(kc: KeyCloakApiProxy, ssm_prefix: str):
     for client in kc.get_clients():
         secret = kc.rotate_secret(client['id'])
         ssm_path = f"{ssm_prefix}/{client['clientId']}"
+        print(f"Persisting rotated secret for {client['clientId']} ({client['id']}) to {ssm_prefix}...")
         ssm_client.put_parameter(
             Name=ssm_path, 
             Description='Keycloak client secret source of truth',
