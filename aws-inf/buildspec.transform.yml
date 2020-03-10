@@ -25,8 +25,13 @@ phases:
       - DoormanBaseUrl=$(jq -r '.BaseUrl' "$DC_ART_DIR/doorman")
       - |
           # I think this handles a default value if the artifact is missing or if the entire json file is
-          AppShellUrlDefault="http://admin.devlocal.navex-pe.com:3000"
-          AppshellUrl=$(jq --arg DEFAULT "$AppShellUrlDefault" -r '.RootUiAdminUrl // $DEFAULT' "$DC_ART_DIR/appshell-infra" || echo "$AppShellUrlDefault")
+          AppshellAdminUrlDefault="http://admin.devlocal.navex-pe.com:3000"
+          AppshellAdminUrl=$(jq --arg DEFAULT "$AppshellAdminUrlDefault" -r '.RootUiAdminUrl // $DEFAULT' "$DC_ART_DIR/appshell-infra" || echo "$AppshellAdminUrlDefault")
+          AppshellPlatforminatorUrlDefault="http://navexadmin.devlocal.navex-pe.com:3000"
+          AppshellPlatforminatorUrl=$(jq --arg DEFAULT "$AppshellPlatforminatorUrlDefault" -r '.RootUiNavexAdminUrl // $DEFAULT' "$DC_ART_DIR/appshell-infra" || echo "$AppshellPlatforminatorUrlDefault")
+          AppshellUserAppUrlDefault="http://user.app.devlocal.navex-pe.com:3000"
+          AppshellUserAppUrl=$(jq --arg DEFAULT "$AppshellUserAppUrlDefault" -r '.RootUiUserAppUrl // $DEFAULT' "$DC_ART_DIR/appshell-infra" || echo "$AppshellUserAppUrlDefault")
+
       - mkdir transformed-import
   build:
     commands:
@@ -47,8 +52,12 @@ phases:
         jq --arg CERT "$CERT" '(.identityProviders[] | select(.alias == "doorman") | .config.signingCertificate) |= $CERT' $APP_DIR/import/navex-realm.json |
           jq --arg LOGOUT_URL "$LOGOUT_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleLogoutServiceUrl) |= $LOGOUT_URL' |
           jq --arg LOGIN_URL "$LOGIN_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleSignOnServiceUrl) |= $LOGIN_URL' | 
-          jq --arg APPSHELL_REDIRECT "$AppshellUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[0]) |= $APPSHELL_REDIRECT' |
-          jq --arg APPSHELL "$AppshellUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL' |
+          jq --arg APPSHELL_ADMIN_REDIRECT "$AppshellAdminUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[0]) |= $APPSHELL_ADMIN_REDIRECT' |
+          jq --arg APPSHELL_ADMIN "$AppshellAdminUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL_ADMIN' |
+          jq --arg APPSHELL_PLATFORMINATOR_REDIRECT "$AppshellPlatforminatorUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[1]) |= $APPSHELL_PLATFORMINATOR_REDIRECT' |
+          jq --arg APPSHELL_PLATFORMINATOR "$AppshellPlatforminatorUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL_PLATFORMINATOR' |
+          jq --arg APPSHELL_USER_REDIRECT "$AppshellUserAppUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[2]) |= $APPSHELL_USER_REDIRECT' |
+          jq --arg APPSHELL_USER "$AppshellUserAppUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL_USER' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.browserSecurityHeaders.contentSecurityPolicy) |= $CSP_HEADER' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.attributes."_browser_header.contentSecurityPolicy") |= $CSP_HEADER' > transformed-import/navex-realm.json
       - |

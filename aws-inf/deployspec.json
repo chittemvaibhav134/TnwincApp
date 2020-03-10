@@ -34,6 +34,14 @@
         {
           "Name": "RootUiAdminUrl",
           "Required": false
+        },
+        {
+          "Name": "RootUiUserAppUrl",
+          "Required": false
+        },
+        {
+          "Name": "RootUiNavexAdminUrl",
+          "Required": false
         }
       ]
     }
