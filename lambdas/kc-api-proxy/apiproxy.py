@@ -2,20 +2,7 @@ import requests, os, json, boto3, datetime
 from urllib.parse import urlencode, quote_plus, urlparse
 from typing import List, Union
 
-#ssm_client = boto3.client('ssm')
-
-def get_request_config() -> dict:
-    scheme = os.environ.get('SCHEME', 'https')
-    domain = os.environ.get('DOMAIN','localhost')
-    port = os.environ.get('PORT', '8443')
-    verify_ssl = True if domain != 'localhost' else False
-    return {
-        'base_url'  : f"{scheme}://{domain}:{port}/auth",
-        'username'  : os.environ.get('ADMINUSERNAME', 'dvader'),
-        'password'  : os.environ.get('ADMINPASSWORD', 'password'),
-        'realm'     : 'navex',
-        'verify_ssl': verify_ssl
-    }
+ssm_client = boto3.client('ssm')
 
 class KeyCloakApiProxy():
     def __init__(self, base_url: str, username: str, password: str):
@@ -114,3 +101,27 @@ class KeyCloakApiProxy():
         endpoint = f"/admin/realms/{realm_name}/clear-user-cache"
         self._make_request('POST', endpoint)
 
+def rotate_and_store_client_keys(kc: KeyCloakApiProxy, ssm_prefix: str):
+    for client in kc.get_clients():
+        secret = kc.rotate_secret(client['id'])
+        ssm_path = f"{ssm_prefix}/{client['clientId']}"
+        ssm_client.put_parameter(
+            Name=ssm_path, 
+            Description='Keycloak client secret source of truth',
+            Value=secret['value'],
+            Type='SecureString',
+            Overwrite=True
+        )
+
+def lambda_handler(event, context):
+    base_url = os.environ['KeyCloakBaseUrl']
+    user_name = os.environ['AdminUserName']
+    password = os.environ['AdminPassword']
+    ssm_prefix = os.environ['SsmPrefix'].rstrip('/')
+    kc = KeyCloakApiProxy(base_url, user_name, password)
+    rotate_and_store_client_keys(kc, ssm_prefix)
+
+"""
+kc_api = KeyCloakApiProxy('https://localhost:8443', 'dvader', 'password')
+rotate_and_store_client_keys(kc_api, '/weston/keycloak/client-keys')
+"""
