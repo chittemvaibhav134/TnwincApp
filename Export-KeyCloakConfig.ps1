@@ -14,13 +14,15 @@ catch [System.Management.Automation.CommandNotFoundException] {
 $importDir = Join-Path $workingDir "import"
 
 Write-Host "Cleaning export destination."
-if(Test-Path $importDir) { Remove-Item -Recurse -Force $importDir }
-New-Item -ItemType Directory $importDir | Out-Null
+if(Test-Path (Join-Path $importDir "master-realm.json")) { Remove-Item (Join-Path $importDir "master-realm.json") }
+if(Test-Path (Join-Path $importDir "master-users-0.json")) { Remove-Item (Join-Path $importDir "master-users-0.json") }
+if(Test-Path (Join-Path $importDir "navex-realm.json")) { Remove-Item (Join-Path $importDir "navex-realm.json") }
+if(Test-Path (Join-Path $importDir "navex-users-0.json")) { Remove-Item (Join-Path $importDir "navex-users-0.json") }
 
 Write-Host "Exporting KeyCloak configuration to $importDir."
 Invoke-KeyCloakMigration -action "export" -composeFilePath $composeFilePath
 
 Write-Host "Sorting export files."
-Get-ChildItem $importDir | ForEach-Object {
+Get-ChildItem -Path $importDir -File | ForEach-Object {
     Get-Content $_.FullName | jq -S -f (Join-Path $workingDir "sortArrays.jq") | Set-Content $_.FullName
 }

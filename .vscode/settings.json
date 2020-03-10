@@ -1,0 +1,10 @@
+{
+    "rest-client.environmentVariables": {
+        "local": {
+            "hostname": "localhost",
+            "port": "8443",
+            "adminUsername": "dvader",
+            "adminPassword": "password"
+        }
+    }
+}
