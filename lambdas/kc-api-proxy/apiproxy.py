@@ -90,9 +90,10 @@ class KeyCloakApiProxy():
 
     def get_client(self, client_name: str) -> dict:
         r = self._get_clients({'clientId': client_name, 'viewableOnly': True})
-        if len(r) < 1:
+        response = r.json()
+        if len(response) < 1:
             raise RuntimeError(f"Client {client_name} was not found")
-        return r.json()
+        return response[0]
 
     def get_clients( self ) -> List[dict] :
         r = self._get_clients({'viewableOnly': True})
@@ -102,3 +103,14 @@ class KeyCloakApiProxy():
         endpoint = f"/admin/realms/{self.navex_realm}/clients/{client_id}/client-secret"
         r = self._make_request('POST', endpoint)
         return r.json()
+
+    def clear_realm_cache(self, realm_name: str = None) -> None:
+        realm_name = realm_name or self.navex_realm
+        endpoint = f"/admin/realms/{realm_name}/clear-realm-cache"
+        self._make_request('POST', endpoint)
+    
+    def clear_user_cache(self, realm_name: str = None) -> None:
+        realm_name = realm_name or self.navex_realm
+        endpoint = f"/admin/realms/{realm_name}/clear-user-cache"
+        self._make_request('POST', endpoint)
+
