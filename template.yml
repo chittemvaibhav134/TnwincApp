@@ -484,6 +484,22 @@ Resources:
       Principal: "events.amazonaws.com"
       SourceArn: !GetAtt ClientSecretRotateCloudwatchEvent.Arn
 
+  # DefaultSecret exist in the source control config that is imported
+  # it should only be valid for a second after a deploy hopefully...
+  # We can probably get around this if needed, but it will be clunky i think
+  ClientSecretRotationConstants:
+    Type: Custom::VariableHack
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - W2501
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
+      AdminClientId: admin-cli
+      AdminDefaultSecret: '6fcd132c-9ad5-4a09-b0a3-078e20531e3b'
+      SsmPrefix: !Sub /${AWS::StackName}/client-keys
+
   ClientSecretRotateLambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -502,21 +518,20 @@ Resources:
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
-              - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*"
+              - Resource: 
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ClientSecretRotationConstants.SsmPrefix}/*"
+                  - !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm" 
                 Effect: Allow
-                Action: ssm:PutParameter
-              - Resource: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm"
+                Action: 
+                  - ssm:PutParameter
+                  - kms:Encrypt
+                  - kms:Decrypt
+              - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ClientSecretRotationConstants.SsmPrefix}/master/${ClientSecretRotationConstants.AdminClientId}"
                 Effect: Allow
-                Action:  kms:Encrypt
+                Action: ssm:GetParameter
     
   ClientSecretRotateLambda:
     Type: AWS::Lambda::Function
-    # REMOVE ONCE ADMIN API BOOTSTRAPPING IS SOLVED
-    Metadata:
-      cfn-lint:
-        config:
-          ignore_checks:
-            - W2501
     Properties:
       # FunctionName: !Sub ${AWS::StackName}-ApiProxy
       Code: ./lambdas/kc-api-proxy/
@@ -528,10 +543,9 @@ Resources:
       Environment:
         Variables:
           KeyCloakBaseUrl: !Sub "https://navex.${Subdomain}.${DnsHostedZone}"
-          # VERY TEMPORARY; JUST FOR POC WORK
-          AdminUserName: 'dvader'
-          AdminPassword: 'password'
-          SsmPrefix: !Sub "/${AWS::StackName}/client-secrets/"
+          AdminClientId: !GetAtt ClientSecretRotationConstants.AdminClientId
+          AdminDefaultSecret: !GetAtt ClientSecretRotationConstants.AdminDefaultSecret
+          SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
 
   Dns:
     Type: AWS::Route53::RecordSet

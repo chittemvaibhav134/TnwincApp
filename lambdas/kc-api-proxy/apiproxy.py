@@ -5,30 +5,37 @@ from typing import List, Union
 ssm_client = boto3.client('ssm')
 
 class KeyCloakApiProxy():
-    def __init__(self, base_url: str, username: str, password: str):
+    def __init__(self, base_url: str, client_id: str, default_secret: str, ssm_secret_path: str):
         parsed_url = urlparse(base_url)
         self.base_url = f"{parsed_url.scheme}://{parsed_url.netloc}/auth"
-        self.username = username
-        self.password = password
+        self.client_id = client_id
+        self.default_secret = self.secret = default_secret
+        self.ssm_secret_path = ssm_secret_path
         self.scheme = parsed_url.scheme
         self.verify_ssl = True if parsed_url.hostname != 'localhost' else False
         self.access_token = self.token_refresh_expiration = None
-        self.navex_realm = 'navex'
 
+    def _retrieve_secret_from_ssm(self):
+        parameter = ssm_client.get_parameter(
+            Name=self.ssm_secret_path,
+            WithDecryption=True
+        )
+        return parameter['Parameter']['Value']
 
-    def _get_auth_header(self) -> dict:
+    def _get_auth_header(self, secret: str) -> dict:
         endpoint = '/realms/master/protocol/openid-connect/token'
         request_args = {
             'url'     :  f"{self.base_url}{endpoint}",
             'headers' : {
                 'Content-Type' : 'application/x-www-form-urlencoded'
             },
+            'auth': (self.client_id, secret),
             'verify'  : self.verify_ssl 
         }
         now = datetime.datetime.utcnow()
         if not self.access_token or (self.token_refresh_expiration and self.token_refresh_expiration < now):
             print("Creating initial access token..")
-            payload = f"username={self.username}&password={self.password}&client_id=admin-cli&grant_type=password"
+            payload = f"grant_type=client_credentials"
             r = requests.post( data=bytes(payload.encode('utf-8')), **request_args )
             r.raise_for_status()
             self.access_token = r.json()
@@ -50,10 +57,10 @@ class KeyCloakApiProxy():
         body = body or {}
         # questionable default...
         headers = headers or {'Content-Type' : 'application/json'}
-        query_params = '' if not query_params else '?' + urlencode(query_params, quote_via=quote_plus)
+        query_param_string = '' if not query_params else '?' + urlencode(query_params, quote_via=quote_plus)
         request_args = {
             'verify'  : self.verify_ssl,
-            'url'     : f"{self.base_url}{endpoint}{query_params}"
+            'url'     : f"{self.base_url}{endpoint}{query_param_string}"
         }
         # probably not a great approach.. should just make it dependent on if body was passed in
         if method != 'GET':
@@ -63,66 +70,99 @@ class KeyCloakApiProxy():
                 request_args['data'] = bytes(body.encode('utf-8'))
             elif isinstance(body,bytes):
                 request_args['data'] = body
-
-        auth_headers = self._get_auth_header()
-        auth_headers.update(headers)
-        request_args['headers'] = auth_headers
-        r = requests.request(method, **request_args)
-        r.raise_for_status()
+        try:
+            auth_headers = self._get_auth_header(self.secret)
+            auth_headers.update(headers)
+            request_args['headers'] = auth_headers
+            r = requests.request(method, **request_args)
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 400 and e.response.json()['error_description'] == 'Invalid client secret':
+                if self.secret == self.default_secret:
+                    print(f"Client secret access failed; fetching secret from ssm and retrying request...")
+                    self.secret = self._retrieve_secret_from_ssm()
+                    r = self._make_request(method, endpoint, query_params, body, headers)
+                    pass
+                else:
+                    print(f"Client secret access failed for both default secret and value in ssm...")
+                    raise
+            else:
+                raise
         return r
 
-    def _get_clients(self, params: dict):
-        endpoint = f"/admin/realms/{self.navex_realm}/clients"
+    def _get_clients(self, realm_name: str, params: dict):
+        endpoint = f"/admin/realms/{realm_name}/clients"
         return self._make_request('GET', endpoint, params)
 
-    def get_client(self, client_name: str) -> dict:
-        r = self._get_clients({'clientId': client_name, 'viewableOnly': True})
+    def get_client(self, realm_name: str, client_name: str) -> dict:
+        r = self._get_clients(realm_name, {'clientId': client_name, 'viewableOnly': True})
         response = r.json()
         if len(response) < 1:
             raise RuntimeError(f"Client {client_name} was not found")
         return response[0]
 
-    def get_clients( self ) -> List[dict] :
-        r = self._get_clients({'viewableOnly': True})
+    def get_clients( self, realm_name: str ) -> List[dict] :
+        r = self._get_clients(realm_name, {'viewableOnly': True})
         return r.json()
 
-    def rotate_secret(self, client_id: str) -> dict:
-        endpoint = f"/admin/realms/{self.navex_realm}/clients/{client_id}/client-secret"
+    def rotate_secret(self, realm_name: str, client_id: str) -> dict:
+        endpoint = f"/admin/realms/{realm_name}/clients/{client_id}/client-secret"
         r = self._make_request('POST', endpoint)
         return r.json()
 
-    def clear_realm_cache(self, realm_name: str = None) -> None:
-        realm_name = realm_name or self.navex_realm
+    def clear_realm_cache(self, realm_name: str) -> None:
         endpoint = f"/admin/realms/{realm_name}/clear-realm-cache"
         self._make_request('POST', endpoint)
     
-    def clear_user_cache(self, realm_name: str = None) -> None:
-        realm_name = realm_name or self.navex_realm
+    def clear_user_cache(self, realm_name: str) -> None:
         endpoint = f"/admin/realms/{realm_name}/clear-user-cache"
         self._make_request('POST', endpoint)
 
-def rotate_and_store_client_keys(kc: KeyCloakApiProxy, ssm_prefix: str):
-    for client in kc.get_clients():
-        secret = kc.rotate_secret(client['id'])
-        ssm_path = f"{ssm_prefix}/{client['clientId']}"
-        print(f"Persisting rotated secret for {client['clientId']} ({client['id']}) to {ssm_prefix}...")
-        ssm_client.put_parameter(
-            Name=ssm_path, 
-            Description='Keycloak client secret source of truth',
-            Value=secret['value'],
-            Type='SecureString',
-            Overwrite=True
-        )
+    def get_realms(self):
+        endpoint = f"/admin/realms"
+        r = self._make_request('GET', endpoint)
+        return r.json()
+
+def assemble_ssm_path(ssm_prefix: str, realm_name: str, client_id: str) -> str:
+    #normalizing leading/trailing slashes
+    ssm_prefix = '/' + ssm_prefix.strip('/')
+    # cfn template and this function both need to know how to assemble path right now :(
+    # template has the dep around granting lambda role privs for the admin client
+    return '/'.join([ssm_prefix, realm_name, client_id])
+    
+
+def rotate_and_store_client_secrets(kc: KeyCloakApiProxy, ssm_prefix: str):
+    realms = kc.get_realms()
+    for realm in realms:
+        realm_name = realm['realm']
+        for client in kc.get_clients(realm_name):
+            secret = kc.rotate_secret(realm_name, client['id'])
+            ssm_path = assemble_ssm_path(ssm_prefix, realm_name, client['clientId'])
+            print(f"Persisting rotated secret for {client['clientId']} ({client['id']}) to {ssm_path}...")
+            ssm_client.put_parameter(
+                Name=ssm_path, 
+                Description='Keycloak client secret source of truth',
+                Value=secret['value'],
+                Type='SecureString',
+                Overwrite=True
+            )
 
 def lambda_handler(event, context):
     base_url = os.environ['KeyCloakBaseUrl']
-    user_name = os.environ['AdminUserName']
-    password = os.environ['AdminPassword']
-    ssm_prefix = os.environ['SsmPrefix'].rstrip('/')
-    kc = KeyCloakApiProxy(base_url, user_name, password)
-    rotate_and_store_client_keys(kc, ssm_prefix)
+    client_id = os.environ['AdminClientId']
+    default_secret = os.environ['AdminDefaultSecret']
+    ssm_prefix = os.environ['SsmPrefix']
+    # I think master is safe to hardcode.. if not i need to pass it into the auth bit as an arg
+    admin_secret_ssm_path =  assemble_ssm_path(ssm_prefix, 'master', client_id)
+    kc = KeyCloakApiProxy(base_url, client_id, default_secret, admin_secret_ssm_path)
+    rotate_and_store_client_secrets(kc, ssm_prefix)
+    
 
 """
-kc_api = KeyCloakApiProxy('https://localhost:8443', 'dvader', 'password')
-rotate_and_store_client_keys(kc_api, '/weston/keycloak/client-keys')
+from apiproxy import *
+client_id = 'admin-cli'
+default_secret = '6fcd132c-9ad5-4a09-b0a3-078e20531e3b'
+ssm_prefix = '/weston/keycloak/client-keys'
+admin_secret_ssm_path =  assemble_ssm_path(ssm_prefix, 'master', client_id)
+kc = KeyCloakApiProxy('https://localhost:8443', client_id, default_secret, admin_secret_ssm_path)
 """
