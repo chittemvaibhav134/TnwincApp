@@ -9,7 +9,7 @@ class KeyCloakApiProxy():
         parsed_url = urlparse(base_url)
         self.base_url = f"{parsed_url.scheme}://{parsed_url.netloc}/auth"
         self.client_id = client_id
-        self.default_secret = self.secret = default_secret
+        self.secret = self.default_secret = default_secret
         self.ssm_secret_path = ssm_secret_path
         self.scheme = parsed_url.scheme
         self.verify_ssl = True if parsed_url.hostname != 'localhost' else False
@@ -78,9 +78,10 @@ class KeyCloakApiProxy():
             r.raise_for_status()
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 400 and e.response.json()['error_description'] == 'Invalid client secret':
-                if self.secret == self.default_secret:
+                ssm_secret = self._retrieve_secret_from_ssm()
+                if self.secret != ssm_secret:
                     print(f"Client secret access failed; fetching secret from ssm and retrying request...")
-                    self.secret = self._retrieve_secret_from_ssm()
+                    self.secret = ssm_secret
                     r = self._make_request(method, endpoint, query_params, body, headers)
                     pass
                 else:
@@ -157,6 +158,11 @@ def lambda_handler(event, context):
     kc = KeyCloakApiProxy(base_url, client_id, default_secret, admin_secret_ssm_path)
     rotate_and_store_client_secrets(kc, ssm_prefix)
     
+"""
+$env:PYTHONWARNINGS="ignore:Unverified HTTPS request"
+$env:AWS_DEFAULT_REGION = "us-east-2"
+Set-AwsSsoCreds -Account 'navexdev' -Role DevAccountAdministratorAccess -EnvironmentVariables
+"""
 
 """
 from apiproxy import *
