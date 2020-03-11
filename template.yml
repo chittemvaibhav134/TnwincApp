@@ -621,6 +621,9 @@ Resources:
       VpcSecurityGroupIds:
         - !Ref DbClusterSecurityGroup
       DBClusterParameterGroupName: !Ref DatabaseClusterParameterGroup
+      MasterUsername: !GetAtt DbUser.Name
+      MasterUserPassword: !GetAtt DbPassword.Value
+      StorageEncrypted: true
       Port: 5432
       Tags:
         - Key: navex:backup
