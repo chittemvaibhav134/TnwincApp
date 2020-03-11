@@ -109,7 +109,7 @@ Resources:
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
-      Name: !Sub ${GitHubRepo}-${GitHubBranch}
+      Name: !Ref GitHubRepo
       RoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/navex-codepipeline
       ArtifactStores:
         - Region: us-east-1
@@ -633,12 +633,12 @@ Resources:
                     "BaseDirectory": "transformed-import",
                     "ExcludeArtifactsFromUpload": ["CfnDeploy_StageEU"],
                     "AccountId": "${StageAccountId}",
-                    "Region": "us-east-1"
+                    "Region": "eu-central-1"
                   }
               RunOrder: 6
             - 
               Name: CfnAuthDeploy_StageEU_EuCentral1
-              Region: us-east-1
+              Region: eu-central-1
               RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
               ActionTypeId:
                 Category: Deploy
@@ -677,7 +677,7 @@ Resources:
                     "TargetFunctionName": "CfnDeploy_StageEU::stack-outputs.json:CpConfigImportLambdaArn",
                     "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
                     "AccountId": "${StageAccountId}",
-                    "Region": "us-west-2",
+                    "Region": "eu-central-1",
                     "ParseResponse": true
                   }
               InputArtifacts:
@@ -896,7 +896,7 @@ Resources:
                     "TargetFunctionName": "CfnDeploy_StageUS::stack-outputs.json:CpConfigImportLambdaArn",
                     "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
                     "AccountId": "${StageAccountId}",
-                    "Region": "us-west-2",
+                    "Region": "us-east-1",
                     "ParseResponse": true
                   }
               InputArtifacts:
