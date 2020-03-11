@@ -109,7 +109,7 @@ Resources:
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
-      Name: !Sub ${GitHubRepo}-${GitHubBranch}
+      Name: !Ref GitHubRepo
       RoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/navex-codepipeline
       ArtifactStores:
         - Region: us-east-1
