@@ -479,7 +479,7 @@ Resources:
                     "Payload": { },
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
-                    "InvocationType": "RequestResponse"
+                    "InvocationType": "RequestResponse",
                     "ParseResponse": true
                   }
               InputArtifacts:
@@ -719,7 +719,7 @@ Resources:
                     "Payload": { },
                     "AccountId": "${StageAccountId}",
                     "Region": "eu-central-1",
-                    "InvocationType": "RequestResponse"
+                    "InvocationType": "RequestResponse",
                     "ParseResponse": true
                   }
               InputArtifacts:
@@ -959,7 +959,7 @@ Resources:
                     "Payload": { },
                     "AccountId": "${StageAccountId}",
                     "Region": "us-east-1",
-                    "InvocationType": "RequestResponse"
+                    "InvocationType": "RequestResponse",
                     "ParseResponse": true
                   }
               InputArtifacts:

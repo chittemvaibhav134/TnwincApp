@@ -420,7 +420,7 @@ Resources:
                     "Payload": { },
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
-                    "InvocationType": "RequestResponse"
+                    "InvocationType": "RequestResponse",
                     "ParseResponse": true
                   }
               InputArtifacts:

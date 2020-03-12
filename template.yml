@@ -496,8 +496,8 @@ Resources:
             - W2501
     Properties:
       ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
-      AdminClientId: admin-cli
-      AdminDefaultSecret: '6fcd132c-9ad5-4a09-b0a3-078e20531e3b'
+      AdminClientId: admin-api-proxy
+      AdminDefaultSecret: '4d1e3de1-6f61-46b1-92a8-e1eccce61559'
       SsmPrefix: !Sub /${AWS::StackName}/client-keys
 
   ClientSecretRotateLambdaRole:
