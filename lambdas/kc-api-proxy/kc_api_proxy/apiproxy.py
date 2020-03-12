@@ -136,9 +136,10 @@ Set-AwsSsoCreds -Account 'navexdev' -Role DevAccountAdministratorAccess -Environ
 
 """
 from apiproxy import *
-client_id = 'admin-cli'
-default_secret = '6fcd132c-9ad5-4a09-b0a3-078e20531e3b'
-ssm_prefix = '/weston/keycloak/client-keys'
-admin_secret_ssm_path =  assemble_ssm_path(ssm_prefix, 'master', client_id)
-kc = KeyCloakApiProxy('https://localhost:8443', client_id, default_secret, admin_secret_ssm_path)
+client_id = 'admin-api-proxy'
+default_secret = '4d1e3de1-6f61-46b1-92a8-e1eccce61559'
+ssm_prefix = '/weston/keycloak/client-keys/master/admin-api-proxy'
+#admin_secret_ssm_path =  assemble_ssm_path(ssm_prefix, 'master', client_id)
+base_url = 'https://navex.id3.psychic-potato.navex-int.com'
+kc = KeyCloakApiProxy(base_url, client_id, default_secret, admin_secret_ssm_path)
 """

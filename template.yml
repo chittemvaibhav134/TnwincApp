@@ -519,14 +519,14 @@ Resources:
             Version: "2012-10-17"
             Statement:
               - Resource: 
-                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ClientSecretRotationConstants.SsmPrefix}/*"
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/*"
                   - !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm" 
                 Effect: Allow
                 Action: 
                   - ssm:PutParameter
                   - kms:Encrypt
                   - kms:Decrypt
-              - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ClientSecretRotationConstants.SsmPrefix}/master/${ClientSecretRotationConstants.AdminClientId}"
+              - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/master/${ClientSecretRotationConstants.AdminClientId}"
                 Effect: Allow
                 Action: ssm:GetParameter
     

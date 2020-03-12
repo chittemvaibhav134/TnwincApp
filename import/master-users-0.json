@@ -8,15 +8,16 @@
           "view-profile"
         ]
       },
-      "createdTimestamp": 1584043861137,
+      "createdTimestamp": 1584049301021,
       "credentials": [],
       "disableableCredentialTypes": [],
       "emailVerified": false,
       "enabled": true,
       "groups": [],
-      "id": "fad7f8d0-4e4c-405a-80cf-630de9c6ba35",
+      "id": "e2dbba79-e019-48bf-ba77-b0be4f99a478",
       "notBefore": 0,
       "realmRoles": [
+        "admin",
         "offline_access",
         "uma_authorization"
       ],
