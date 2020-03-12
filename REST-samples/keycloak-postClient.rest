@@ -1,5 +1,5 @@
-@realm = trial12
-@client_id = appshell
+@realm = navex
+@client_id = testclient
 @baseUri = http://admin.devlocal.navex-pe.com:3000/
 @host = {{hostname}}:{{port}}
 @accessToken = {{login.response.body.$.access_token}}
