@@ -1,22 +1,22 @@
-import requests, os, json, boto3, datetime
+import requests, json, datetime
 from urllib.parse import urlencode, quote_plus, urlparse
 from typing import List, Union
 
-ssm_client = boto3.client('ssm')
-
 class KeyCloakApiProxy():
-    def __init__(self, base_url: str, client_id: str, default_secret: str, ssm_secret_path: str):
+    def __init__(self, base_url: str, client_id: str, default_secret: str, ssm_client, ssm_secret_path: str):
         parsed_url = urlparse(base_url)
         self.base_url = f"{parsed_url.scheme}://{parsed_url.netloc}/auth"
         self.client_id = client_id
         self.secret = self.default_secret = default_secret
+        self.ssm_client = ssm_client
         self.ssm_secret_path = ssm_secret_path
         self.scheme = parsed_url.scheme
         self.verify_ssl = True if parsed_url.hostname != 'localhost' else False
         self.access_token = self.token_refresh_expiration = None
 
     def _retrieve_secret_from_ssm(self):
-        parameter = ssm_client.get_parameter(
+        print(f"Fetching client secret for {self.client_id} from {self.ssm_secret_path}..")
+        parameter = self.ssm_client.get_parameter(
             Name=self.ssm_secret_path,
             WithDecryption=True
         )
@@ -124,39 +124,9 @@ class KeyCloakApiProxy():
         r = self._make_request('GET', endpoint)
         return r.json()
 
-def assemble_ssm_path(ssm_prefix: str, realm_name: str, client_id: str) -> str:
-    #normalizing leading/trailing slashes
-    ssm_prefix = '/' + ssm_prefix.strip('/')
-    # cfn template and this function both need to know how to assemble path right now :(
-    # template has the dep around granting lambda role privs for the admin client
-    return '/'.join([ssm_prefix, realm_name, client_id])
-    
 
-def rotate_and_store_client_secrets(kc: KeyCloakApiProxy, ssm_prefix: str):
-    realms = kc.get_realms()
-    for realm in realms:
-        realm_name = realm['realm']
-        for client in kc.get_clients(realm_name):
-            secret = kc.rotate_secret(realm_name, client['id'])
-            ssm_path = assemble_ssm_path(ssm_prefix, realm_name, client['clientId'])
-            print(f"Persisting rotated secret for {client['clientId']} ({client['id']}) to {ssm_path}...")
-            ssm_client.put_parameter(
-                Name=ssm_path, 
-                Description='Keycloak client secret source of truth',
-                Value=secret['value'],
-                Type='SecureString',
-                Overwrite=True
-            )
 
-def lambda_handler(event, context):
-    base_url = os.environ['KeyCloakBaseUrl']
-    client_id = os.environ['AdminClientId']
-    default_secret = os.environ['AdminDefaultSecret']
-    ssm_prefix = os.environ['SsmPrefix']
-    # I think master is safe to hardcode.. if not i need to pass it into the auth bit as an arg
-    admin_secret_ssm_path =  assemble_ssm_path(ssm_prefix, 'master', client_id)
-    kc = KeyCloakApiProxy(base_url, client_id, default_secret, admin_secret_ssm_path)
-    rotate_and_store_client_secrets(kc, ssm_prefix)
+
     
 """
 $env:PYTHONWARNINGS="ignore:Unverified HTTPS request"

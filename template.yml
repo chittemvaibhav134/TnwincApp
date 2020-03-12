@@ -473,13 +473,13 @@ Resources:
       ScheduleExpression: "cron(0 2 * * ? *)"
       State: DISABLED
       Targets:
-        - Arn: !GetAtt ClientSecretRotateLambda.Arn
-          Id: "ClientSecretRotateLambda"
+        - Arn: !GetAtt CweClientSecretRotateLambda.Arn
+          Id: "CweClientSecretRotateLambda"
 
   PermissionForEventsToInvokeCoiDataCleanupPurgeDormantInProgressResponsesSchedulerLambda:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !Ref ClientSecretRotateLambda
+      FunctionName: !Ref CweClientSecretRotateLambda
       Action: "lambda:InvokeFunction"
       Principal: "events.amazonaws.com"
       SourceArn: !GetAtt ClientSecretRotateCloudwatchEvent.Arn
@@ -530,16 +530,31 @@ Resources:
                 Effect: Allow
                 Action: ssm:GetParameter
     
-  ClientSecretRotateLambda:
+  CweClientSecretRotateLambda:
     Type: AWS::Lambda::Function
     Properties:
-      # FunctionName: !Sub ${AWS::StackName}-ApiProxy
       Code: ./lambdas/kc-api-proxy/
       Runtime: python3.8
       Role: !GetAtt ClientSecretRotateLambdaRole.Arn
       MemorySize: 256
       Timeout: 60
-      Handler: apiproxy.lambda_handler
+      Handler: kc_api_proxy.cwe_rotate_handler
+      Environment:
+        Variables:
+          KeyCloakBaseUrl: !Sub "https://navex.${Subdomain}.${DnsHostedZone}"
+          AdminClientId: !GetAtt ClientSecretRotationConstants.AdminClientId
+          AdminDefaultSecret: !GetAtt ClientSecretRotationConstants.AdminDefaultSecret
+          SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
+
+  CpClientSecretRotateLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ./lambdas/kc-api-proxy/
+      Runtime: python3.8
+      Role: !GetAtt ClientSecretRotateLambdaRole.Arn
+      MemorySize: 256
+      Timeout: 60
+      Handler: kc_api_proxy.cp_rotate_handler
       Environment:
         Variables:
           KeyCloakBaseUrl: !Sub "https://navex.${Subdomain}.${DnsHostedZone}"
@@ -806,7 +821,9 @@ Outputs:
     Value: !Ref S3ConfigBucket
   CpConfigImportLambdaArn:
     Value: !GetAtt CpRunImportConfigTaskLambda.Arn
+  CpClientSecretRotateLambda:
+    Value: !GetAtt CpClientSecretRotateLambda.Arn
   ClientSecretSsmPrefix:
-    Value: !Sub "/${AWS::StackName}/client-secrets/"
+    Value: !GetAtt ClientSecretRotationConstants.SsmPrefix
   ClientSecretSsmRegion:
     Value: !Ref AWS::Region
