@@ -83,4 +83,4 @@ def cp_post_deploy_handler(event, context):
         except Exception as e:
             logger.exception(e)
             return CodePipelineHelperResponse.failed(f"Error performing action {action}: {e}")
-    return CodePipelineHelperResponse.succeeded(f"Successfully performed all actions: {actions}")
+    return CodePipelineHelperResponse.succeeded(f"Successfully performed actions: {actions}")
