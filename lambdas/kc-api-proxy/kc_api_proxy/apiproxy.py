@@ -1,7 +1,7 @@
 import requests, json, datetime
 from urllib.parse import urlencode, quote_plus, urlparse
 from typing import List, Union
-from .logging import get_logger
+from .logging_setup import get_logger
 
 class KeyCloakApiProxy():
     def __init__(self, base_url: str, client_id: str, default_secret: str, ssm_client, ssm_secret_path: str, logger = None):
@@ -79,7 +79,7 @@ class KeyCloakApiProxy():
             auth_headers.update(headers)
             request_args['headers'] = auth_headers
             # might be a bad idea for both security and random serialization?
-            self.logger.debug("Making keycloak api request", extra=request_args)
+            self.logger.debug(f"Making keycloak api request: {request_args}")
             r = requests.request(**request_args)
             r.raise_for_status()
         except requests.exceptions.HTTPError as e:
@@ -100,7 +100,7 @@ class KeyCloakApiProxy():
 
     def _get_clients(self, realm_name: str, params: dict):
         endpoint = f"/admin/realms/{realm_name}/clients"
-        self.logger.debug(f"Fetching clients for {realm_name}", extra={'params': params})
+        self.logger.debug(f"Fetching clients for {realm_name} with params: {params}")
         return self._make_request('GET', endpoint, params)
 
     def get_client(self, realm_name: str, client_name: str) -> dict:
