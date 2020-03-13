@@ -464,7 +464,7 @@ Resources:
               InputArtifacts:
                 - Name: CfnDeploy_IntStable
             -
-              Name: RotateClientSecrets_IntStable
+              Name: PostDeployApiActions_IntStable
               RunOrder: 8
               ActionTypeId:
                 Category: Invoke
@@ -475,8 +475,8 @@ Resources:
                 FunctionName: CPInvokeLambda
                 UserParameters: !Sub |
                   {
-                    "TargetFunctionName": "CfnDeploy_IntStable::stack-outputs.json:CpClientSecretRotateLambda",
-                    "Payload": { },
+                    "TargetFunctionName": "CfnDeploy_IntStable::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets" ] },
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
                     "InvocationType": "RequestResponse",
@@ -704,7 +704,7 @@ Resources:
               InputArtifacts:
                 - Name: CfnDeploy_StageEU
             -
-              Name: RotateClientSecrets_StageEU
+              Name: PostDeployApiActions_StageEU
               RunOrder: 8
               ActionTypeId:
                 Category: Invoke
@@ -715,8 +715,8 @@ Resources:
                 FunctionName: CPInvokeLambda
                 UserParameters: !Sub |
                   {
-                    "TargetFunctionName": "CfnDeploy_StageEU::stack-outputs.json:CpClientSecretRotateLambda",
-                    "Payload": { },
+                    "TargetFunctionName": "CfnDeploy_StageEU::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets" ] },
                     "AccountId": "${StageAccountId}",
                     "Region": "eu-central-1",
                     "InvocationType": "RequestResponse",
@@ -944,7 +944,7 @@ Resources:
               InputArtifacts:
                 - Name: CfnDeploy_StageUS
             -
-              Name: RotateClientSecrets_StageUS
+              Name: PostDeployApiActions_StageUS
               RunOrder: 8
               ActionTypeId:
                 Category: Invoke
@@ -955,8 +955,8 @@ Resources:
                 FunctionName: CPInvokeLambda
                 UserParameters: !Sub |
                   {
-                    "TargetFunctionName": "CfnDeploy_StageUS::stack-outputs.json:CpClientSecretRotateLambda",
-                    "Payload": { },
+                    "TargetFunctionName": "CfnDeploy_StageUS::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets" ] },
                     "AccountId": "${StageAccountId}",
                     "Region": "us-east-1",
                     "InvocationType": "RequestResponse",
