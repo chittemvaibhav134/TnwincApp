@@ -68,7 +68,7 @@
       ],
       "builtIn": true,
       "description": "Handle what to do if there is existing account with same email/username like authenticated identity provider",
-      "id": "7ca5484d-f272-44e0-84bf-7281704cd899",
+      "id": "31e85ccf-edd9-4e92-9eaa-eb2f0c146ef8",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -92,7 +92,7 @@
       ],
       "builtIn": true,
       "description": "Reauthentication of existing account",
-      "id": "d7493fe8-3fe8-4384-a1e1-3e4ec36f631a",
+      "id": "5ee24fa6-4aa2-4fb5-9f67-7fdf3f4848f4",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -116,7 +116,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the auth-otp-form authenticator should be used or not.",
-      "id": "354a67be-bc76-48a6-9f14-eb509f6ccf17",
+      "id": "70e77126-be2c-422c-b901-ecee60bda5e0",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -154,7 +154,7 @@
       ],
       "builtIn": true,
       "description": "browser based authentication",
-      "id": "18a0ed24-0034-439d-b7fc-09bc87a9d8dc",
+      "id": "ac4761f7-0840-44af-83ca-c640058b5dd5",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -192,7 +192,7 @@
       ],
       "builtIn": true,
       "description": "Base authentication for clients",
-      "id": "47346ff0-b2c7-4ffa-a63b-9a4307f60ce9",
+      "id": "430b2b0d-f63d-4841-9fbc-2433a8e6fa6d",
       "providerId": "client-flow",
       "topLevel": true
     },
@@ -223,7 +223,7 @@
       ],
       "builtIn": true,
       "description": "OpenID Connect Resource Owner Grant",
-      "id": "7ee40c87-db05-4ce0-bb50-9e60284a1057",
+      "id": "c62546e0-2838-43be-a43d-0af9117eecc7",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -247,7 +247,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the direct-grant-validate-otp authenticator should be used or not.",
-      "id": "c6f6b7d4-8e4d-4607-bacf-0f7f289e5c52",
+      "id": "33ef9970-a353-42d0-b661-24f7a4850e94",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -264,7 +264,7 @@
       ],
       "builtIn": true,
       "description": "Used by Docker clients to authenticate against the IDP",
-      "id": "7a545008-fe2e-49be-a486-50acb649c93e",
+      "id": "683ceaa6-b230-4d39-8f2b-7ce009a07692",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -297,7 +297,7 @@
       ],
       "builtIn": true,
       "description": "Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account",
-      "id": "b40037dc-512f-4519-b764-7ed84cfee3ba",
+      "id": "8e0667d5-2cb4-42bd-8bd1-3f6ac5b7ab3e",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -321,7 +321,7 @@
       ],
       "builtIn": true,
       "description": "Username, password, otp and other auth forms.",
-      "id": "2e83665d-d960-4428-af93-99c7dc647d69",
+      "id": "8c53a622-89c8-4fdd-b84c-f441a84c2e85",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -345,7 +345,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the auth-otp-form authenticator should be used or not.",
-      "id": "a6e748e6-441e-4a96-a77c-51ec2360bdd7",
+      "id": "4ecded9e-cebe-41d0-8811-ac6fd6936d57",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -383,7 +383,7 @@
       ],
       "builtIn": true,
       "description": "An authentication flow based on challenge-response HTTP Authentication Schemes",
-      "id": "3abb086b-4165-405b-a004-5ba381fff143",
+      "id": "3fbf26ee-c8b8-49bf-be87-738f4d165ef1",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -401,7 +401,7 @@
       ],
       "builtIn": true,
       "description": "registration flow",
-      "id": "d89fc7b2-c862-4a92-b01c-77be4218f3a7",
+      "id": "f6186b08-75fd-4045-93a3-8da42c4e356b",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -439,7 +439,7 @@
       ],
       "builtIn": true,
       "description": "registration form",
-      "id": "ea9826c2-d027-435b-993d-8add1f0d56fc",
+      "id": "818d256b-0eb1-40c7-a3d2-147842557cce",
       "providerId": "form-flow",
       "topLevel": false
     },
@@ -477,7 +477,7 @@
       ],
       "builtIn": true,
       "description": "Reset credentials for a user if they forgot their password or something",
-      "id": "420ce9a1-e100-4022-94f1-4dd2213afef1",
+      "id": "d7e21def-02f3-44c3-a5d1-8e94a941ef6e",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -501,7 +501,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the reset-otp authenticator should be used or not.",
-      "id": "c1a4a703-18ba-4210-889c-7a4553989ec3",
+      "id": "319a9341-f855-48dd-bf39-902b9ff49c69",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -518,7 +518,7 @@
       ],
       "builtIn": true,
       "description": "SAML ECP Profile Authentication Flow",
-      "id": "48ac8afa-a4df-4c57-ba81-c97c7fb14ed2",
+      "id": "23a04930-09ac-4a87-adee-fb9390880f88",
       "providerId": "basic-flow",
       "topLevel": true
     }
@@ -529,14 +529,14 @@
       "config": {
         "require.password.update.after.registration": "false"
       },
-      "id": "1b2f78bb-b7f4-4066-90b8-f804abf89e8e"
+      "id": "afd1aeae-c3a9-4e1c-abcb-c1ec9698e543"
     },
     {
       "alias": "review profile config",
       "config": {
         "update.profile.on.first.login": "missing"
       },
-      "id": "f7903221-6abf-48e1-93f5-8ea8e2214b75"
+      "id": "a391094e-db99-4ba8-beb2-fcf0a5e774ca"
     }
   ],
   "browserFlow": "browser",
