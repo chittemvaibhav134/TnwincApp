@@ -405,7 +405,7 @@ Resources:
               InputArtifacts:
                 - Name: CfnDeploy_PsyPot
             -
-              Name: RotateClientSecrets_PsyPot
+              Name: PostDeployApiActions_PsyPot
               RunOrder: 8
               ActionTypeId:
                 Category: Invoke
@@ -416,8 +416,8 @@ Resources:
                 FunctionName: CPInvokeLambda
                 UserParameters: !Sub |
                   {
-                    "TargetFunctionName": "CfnDeploy_PsyPot::stack-outputs.json:CpClientSecretRotateLambda",
-                    "Payload": { },
+                    "TargetFunctionName": "CfnDeploy_PsyPot::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets" ] },
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
                     "InvocationType": "RequestResponse",
