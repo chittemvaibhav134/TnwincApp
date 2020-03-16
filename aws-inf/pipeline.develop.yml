@@ -407,6 +407,27 @@ Resources:
                   }
               InputArtifacts:
                 - Name: CfnDeploy_Wobbly
+            -
+              Name: PostDeployApiActions_Wobbly
+              RunOrder: 8
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_Wobbly::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets" ] },
+                    "AccountId": "${IntegrationAccountId}",
+                    "Region": "us-west-2",
+                    "InvocationType": "RequestResponse",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_Wobbly
             - 
               Name: PublishDeployment_Wobbly
               ActionTypeId:
@@ -430,4 +451,4 @@ Resources:
                 - Name: ProjectVersion
                 - Name: CfnDeploy_Wobbly
                 - Name: CfnAuthDeploy_Wobbly_UsWest2                 
-              RunOrder: 8
+              RunOrder: 9
