@@ -567,7 +567,7 @@ Resources:
     Properties:
       HostedZoneName: !Sub "${DnsHostedZone}."
       Name: !Sub "*.${Subdomain}.${DnsHostedZone}."
-      TTL: "900"
+      TTL: 900
       Type: CNAME
       ResourceRecords:
         - !GetAtt LoadBalancer.DNSName
