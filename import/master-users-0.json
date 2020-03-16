@@ -8,6 +8,31 @@
           "view-profile"
         ]
       },
+      "createdTimestamp": 1584049301021,
+      "credentials": [],
+      "disableableCredentialTypes": [],
+      "emailVerified": false,
+      "enabled": true,
+      "groups": [],
+      "id": "e2dbba79-e019-48bf-ba77-b0be4f99a478",
+      "notBefore": 0,
+      "realmRoles": [
+        "admin",
+        "offline_access",
+        "uma_authorization"
+      ],
+      "requiredActions": [],
+      "serviceAccountClientId": "admin-api-proxy",
+      "totp": false,
+      "username": "service-account-admin-api-proxy"
+    },
+    {
+      "clientRoles": {
+        "account": [
+          "manage-account",
+          "view-profile"
+        ]
+      },
       "createdTimestamp": 1574178438088,
       "credentials": [
         {
