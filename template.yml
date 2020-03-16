@@ -827,3 +827,5 @@ Outputs:
     Value: !GetAtt ClientSecretRotationConstants.SsmPrefix
   ClientSecretSsmRegion:
     Value: !Ref AWS::Region
+  NcisApiClientSecretSsmArn:
+    Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/ncis-api"
