@@ -466,6 +466,102 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
 
+  ClientSecretRotateCloudwatchEvent:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Schedule keycloak client secret rotation"
+      ScheduleExpression: "cron(0 2 * * ? *)"
+      State: DISABLED
+      Targets:
+        - Arn: !GetAtt CweClientSecretRotateLambda.Arn
+          Id: "CweClientSecretRotateLambda"
+
+  PermissionForEventsToInvokeCoiDataCleanupPurgeDormantInProgressResponsesSchedulerLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref CweClientSecretRotateLambda
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt ClientSecretRotateCloudwatchEvent.Arn
+
+  # DefaultSecret exist in the source control config that is imported
+  # it should only be valid for a second after a deploy hopefully...
+  # We can probably get around this if needed, but it will be clunky i think
+  ClientSecretRotationConstants:
+    Type: Custom::VariableHack
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - W2501
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
+      AdminClientId: admin-api-proxy
+      AdminDefaultSecret: '4d1e3de1-6f61-46b1-92a8-e1eccce61559'
+      SsmPrefix: !Sub /${AWS::StackName}/client-keys
+
+  ClientSecretRotateLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: SsmParameterAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Resource: 
+                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/*"
+                  - !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm" 
+                Effect: Allow
+                Action: 
+                  - ssm:PutParameter
+                  - kms:Encrypt
+                  - kms:Decrypt
+              - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/master/${ClientSecretRotationConstants.AdminClientId}"
+                Effect: Allow
+                Action: ssm:GetParameter
+    
+  CweClientSecretRotateLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ./lambdas/kc-api-proxy/
+      Runtime: python3.8
+      Role: !GetAtt ClientSecretRotateLambdaRole.Arn
+      MemorySize: 256
+      Timeout: 60
+      Handler: kc_api_proxy.cwe_rotate_handler
+      Environment:
+        Variables:
+          KeyCloakBaseUrl: !Sub "https://navex.${Subdomain}.${DnsHostedZone}"
+          AdminClientId: !GetAtt ClientSecretRotationConstants.AdminClientId
+          AdminDefaultSecret: !GetAtt ClientSecretRotationConstants.AdminDefaultSecret
+          SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
+
+  CpPostDeployLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ./lambdas/kc-api-proxy/
+      Runtime: python3.8
+      Role: !GetAtt ClientSecretRotateLambdaRole.Arn
+      MemorySize: 256
+      Timeout: 60
+      Handler: kc_api_proxy.cp_post_deploy_handler
+      Environment:
+        Variables:
+          KeyCloakBaseUrl: !Sub "https://navex.${Subdomain}.${DnsHostedZone}"
+          AdminClientId: !GetAtt ClientSecretRotationConstants.AdminClientId
+          AdminDefaultSecret: !GetAtt ClientSecretRotationConstants.AdminDefaultSecret
+          SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
+
   Dns:
     Type: AWS::Route53::RecordSet
     Properties:
@@ -725,3 +821,11 @@ Outputs:
     Value: !Ref S3ConfigBucket
   CpConfigImportLambdaArn:
     Value: !GetAtt CpRunImportConfigTaskLambda.Arn
+  CpPostDeployLambdaArn:
+    Value: !GetAtt CpPostDeployLambda.Arn
+  ClientSecretSsmPrefix:
+    Value: !GetAtt ClientSecretRotationConstants.SsmPrefix
+  ClientSecretSsmRegion:
+    Value: !Ref AWS::Region
+  NcisApiClientSecretSsmArn:
+    Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/ncis-api"

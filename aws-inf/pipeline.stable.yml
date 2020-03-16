@@ -463,6 +463,27 @@ Resources:
                   }
               InputArtifacts:
                 - Name: CfnDeploy_IntStable
+            -
+              Name: PostDeployApiActions_IntStable
+              RunOrder: 8
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_IntStable::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets" ] },
+                    "AccountId": "${IntegrationAccountId}",
+                    "Region": "us-west-2",
+                    "InvocationType": "RequestResponse",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_IntStable
             - 
               Name: PublishDeployment_IntStable
               ActionTypeId:
@@ -486,7 +507,7 @@ Resources:
                 - Name: ProjectVersion
                 - Name: CfnDeploy_IntStable
                 - Name: CfnAuthDeploy_IntStable_UsWest2                 
-              RunOrder: 8
+              RunOrder: 9
             -
               Name: IntStableManualGate
               ActionTypeId:
@@ -682,6 +703,27 @@ Resources:
                   }
               InputArtifacts:
                 - Name: CfnDeploy_StageEU
+            -
+              Name: PostDeployApiActions_StageEU
+              RunOrder: 8
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_StageEU::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets" ] },
+                    "AccountId": "${StageAccountId}",
+                    "Region": "eu-central-1",
+                    "InvocationType": "RequestResponse",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_StageEU
             - 
               Name: PublishDeployment_StageEU
               ActionTypeId:
@@ -705,7 +747,7 @@ Resources:
                 - Name: ProjectVersion
                 - Name: CfnDeploy_StageEU
                 - Name: CfnAuthDeploy_StageEU_EuCentral1                 
-              RunOrder: 8
+              RunOrder: 9
             -
               Name: StageEUManualGate
               ActionTypeId:
@@ -901,6 +943,27 @@ Resources:
                   }
               InputArtifacts:
                 - Name: CfnDeploy_StageUS
+            -
+              Name: PostDeployApiActions_StageUS
+              RunOrder: 8
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_StageUS::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets" ] },
+                    "AccountId": "${StageAccountId}",
+                    "Region": "us-east-1",
+                    "InvocationType": "RequestResponse",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_StageUS
             - 
               Name: PublishDeployment_StageUS
               ActionTypeId:
@@ -924,7 +987,7 @@ Resources:
                 - Name: ProjectVersion
                 - Name: CfnDeploy_StageUS
                 - Name: CfnAuthDeploy_StageUS_UsEast1                 
-              RunOrder: 8
+              RunOrder: 9
             # -
             #   Name: StageUSManualGate
             #   ActionTypeId:

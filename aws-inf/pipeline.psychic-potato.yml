@@ -404,6 +404,27 @@ Resources:
                   }
               InputArtifacts:
                 - Name: CfnDeploy_PsyPot
+            -
+              Name: PostDeployApiActions_PsyPot
+              RunOrder: 8
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_PsyPot::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets" ] },
+                    "AccountId": "${IntegrationAccountId}",
+                    "Region": "us-west-2",
+                    "InvocationType": "RequestResponse",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_PsyPot
             - 
               Name: PublishDeployment_PsyPot
               ActionTypeId:
@@ -427,4 +448,4 @@ Resources:
                 - Name: ProjectVersion
                 - Name: CfnDeploy_PsyPot
                 - Name: CfnAuthDeploy_PsyPot_UsWest2                 
-              RunOrder: 8
+              RunOrder: 9
