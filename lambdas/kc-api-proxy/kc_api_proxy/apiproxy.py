@@ -138,20 +138,3 @@ class KeyCloakApiProxy():
         endpoint = f"/admin/realms"
         r = self._make_request('GET', endpoint)
         return r.json()
-
-
-"""
-$env:PYTHONWARNINGS="ignore:Unverified HTTPS request"
-$env:AWS_DEFAULT_REGION = "us-east-2"
-Set-AwsSsoCreds -Account 'navexdev' -Role DevAccountAdministratorAccess -EnvironmentVariables
-"""
-
-"""
-from apiproxy import *
-client_id = 'admin-api-proxy'
-default_secret = '4d1e3de1-6f61-46b1-92a8-e1eccce61559'
-ssm_prefix = '/weston/keycloak/client-keys/master/admin-api-proxy'
-#admin_secret_ssm_path =  assemble_ssm_path(ssm_prefix, 'master', client_id)
-base_url = 'https://navex.id3.psychic-potato.navex-int.com'
-kc = KeyCloakApiProxy(base_url, client_id, default_secret, admin_secret_ssm_path)
-"""
