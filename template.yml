@@ -735,7 +735,6 @@ Resources:
       DBClusterIdentifier:  !Ref DatabaseCluster
       DBInstanceClass: db.r4.large
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
-      CopyTagsToSnapshot: true
       DBParameterGroupName: !Ref DatabaseInstanceParameterGroup
       MonitoringInterval: 1
       MonitoringRoleArn: !GetAtt DatabaseMonitoringRole.Arn
