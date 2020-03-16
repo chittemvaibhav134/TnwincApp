@@ -567,7 +567,7 @@ Resources:
     Properties:
       HostedZoneName: !Sub "${DnsHostedZone}."
       Name: !Sub "*.${Subdomain}.${DnsHostedZone}."
-      TTL: "900"
+      TTL: 900
       Type: CNAME
       ResourceRecords:
         - !GetAtt LoadBalancer.DNSName
@@ -735,7 +735,6 @@ Resources:
       DBClusterIdentifier:  !Ref DatabaseCluster
       DBInstanceClass: db.r4.large
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
-      CopyTagsToSnapshot: true
       DBParameterGroupName: !Ref DatabaseInstanceParameterGroup
       MonitoringInterval: 1
       MonitoringRoleArn: !GetAtt DatabaseMonitoringRole.Arn
