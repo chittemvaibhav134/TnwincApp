@@ -1586,7 +1586,7 @@
       "protocol": "openid-connect",
       "publicClient": true,
       "redirectUris": [
-        "https://maint.pt.dev.local/oidc/coderedirector/*"
+        "https://maint.pt.dev.local/oidc/coderedirector/*", "https://maint.pt.dev.local/oidc/silentchecksso/*"
       ],
       "secret": "2605c91b-0722-424d-b530-8cb49951d37f",
       "serviceAccountsEnabled": false,
