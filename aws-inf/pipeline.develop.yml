@@ -611,27 +611,27 @@ Resources:
                   }
               InputArtifacts:
                 - Name: CfnDeploy_Wobbly
-            -
-              Name: PostDeployApiActions_Rickety
-              RunOrder: 8
-              ActionTypeId:
-                Category: Invoke
-                Owner: AWS
-                Version: "1"
-                Provider: Lambda
-              Configuration:
-                FunctionName: CPInvokeLambda
-                UserParameters: !Sub |
-                  {
-                    "TargetFunctionName": "CfnDeploy_Rickety::stack-outputs.json:CpPostDeployLambdaArn",
-                    "Payload": { "Actions": [ "rotate_client_secrets" ] },
-                    "AccountId": "${IntegrationAccountId}",
-                    "Region": "us-west-2",
-                    "InvocationType": "RequestResponse",
-                    "ParseResponse": true
-                  }
-              InputArtifacts:
-                - Name: CfnDeploy_Rickety                
+            # -
+            #   Name: PostDeployApiActions_Rickety
+            #   RunOrder: 8
+            #   ActionTypeId:
+            #     Category: Invoke
+            #     Owner: AWS
+            #     Version: "1"
+            #     Provider: Lambda
+            #   Configuration:
+            #     FunctionName: CPInvokeLambda
+            #     UserParameters: !Sub |
+            #       {
+            #         "TargetFunctionName": "CfnDeploy_Rickety::stack-outputs.json:CpPostDeployLambdaArn",
+            #         "Payload": { "Actions": [ "rotate_client_secrets" ] },
+            #         "AccountId": "${IntegrationAccountId}",
+            #         "Region": "us-west-2",
+            #         "InvocationType": "RequestResponse",
+            #         "ParseResponse": true
+            #       }
+            #   InputArtifacts:
+            #     - Name: CfnDeploy_Rickety                
             - 
               Name: PublishDeployment_Wobbly
               ActionTypeId:
