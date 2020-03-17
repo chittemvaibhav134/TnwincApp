@@ -319,9 +319,13 @@ Resources:
               Value: postgres
             - Name: DB_DATABASE
               Value: postgres
+            - Name: KEYCLOAK_USER
+              Value: ClientSecretRotationConstants.AdminUser
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
+            - Name: KEYCLOAK_PASSWORD
+              ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.AdminPasswordSsmPath}
 
   ImportConfigTaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -484,6 +488,25 @@ Resources:
       Principal: "events.amazonaws.com"
       SourceArn: !GetAtt ClientSecretRotateCloudwatchEvent.Arn
 
+  KcApiPassword:
+    Type: Custom::GeneratedString
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnGenString
+      ExcludePunctuation: true
+      Length: 40
+
+  SsmKcApiPassword:
+    Type: Custom::SsmCreateParameter
+    Properties:
+      ServiceToken:
+        !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cloudformation-set-ssm-param
+      ParameterProperties:
+        Name: !GetAtt ClientSecretRotationConstants.AdminPasswordSsmPath
+        Value: !GetAtt KcApiPassword.Value
+        Type: "SecureString"
+        KeyId: "alias/aws/ssm"
+        Overwrite: True
+
   # DefaultSecret exist in the source control config that is imported
   # it should only be valid for a second after a deploy hopefully...
   # We can probably get around this if needed, but it will be clunky i think
@@ -496,9 +519,10 @@ Resources:
             - W2501
     Properties:
       ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
-      AdminClientId: admin-api-proxy
-      AdminDefaultSecret: '4d1e3de1-6f61-46b1-92a8-e1eccce61559'
+      AdminUser: admin-api-proxy
+      AdminPasswordSsmPath: !Sub /${AWS::StackName}/admin-password
       SsmPrefix: !Sub /${AWS::StackName}/client-keys
+      
 
   ClientSecretRotateLambdaRole:
     Type: AWS::IAM::Role
@@ -542,8 +566,8 @@ Resources:
       Environment:
         Variables:
           KeyCloakBaseUrl: !Sub "https://navex.${Subdomain}.${DnsHostedZone}"
-          AdminClientId: !GetAtt ClientSecretRotationConstants.AdminClientId
-          AdminDefaultSecret: !GetAtt ClientSecretRotationConstants.AdminDefaultSecret
+          AdminUser: !GetAtt ClientSecretRotationConstants.AdminUser
+          AdminPasswordSsmPath: !GetAtt ClientSecretRotationConstants.AdminPasswordSsmPath
           SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
 
   CpPostDeployLambda:
@@ -558,8 +582,8 @@ Resources:
       Environment:
         Variables:
           KeyCloakBaseUrl: !Sub "https://navex.${Subdomain}.${DnsHostedZone}"
-          AdminClientId: !GetAtt ClientSecretRotationConstants.AdminClientId
-          AdminDefaultSecret: !GetAtt ClientSecretRotationConstants.AdminDefaultSecret
+          AdminUser: !GetAtt ClientSecretRotationConstants.AdminUser
+          AdminPasswordSsmPath: !GetAtt ClientSecretRotationConstants.AdminPasswordSsmPath
           SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
 
   Dns:
