@@ -4,28 +4,12 @@ from typing import List, Union
 
 
 class KeyCloakApiProxy():
-    def __init__(self, base_url: str, user: str, password: str, logger = None):
+    def __init__(self, base_url: str, client_id: str, user: str, password: str, logger = None):
         parsed_url = urlparse(base_url)
         self.base_url = f"{parsed_url.scheme}://{parsed_url.netloc}/auth"
-        self.set_credentials(user, password)
-        self.scheme = parsed_url.scheme
+        self.set_credentials(client_id, user, password)
         self.verify_ssl = True if parsed_url.hostname != 'localhost' else False
         self.logger = logger or logging.getLogger(__name__)
-
-    # def _retrieve_secret_from_ssm(self):
-    #     self.logger.info(f"Fetching client secret for {self.client_id} from {self.ssm_secret_path}..")
-    #     parameter = self.ssm_client.get_parameter(
-    #         Name=self.ssm_secret_path,
-    #         WithDecryption=True
-    #     )
-    #     return parameter['Parameter']['Value']
-
-    def set_credentials(self, user: str, password: str) -> None:
-        self.user = user
-        self.password = password
-        # should pass through once tested
-        self.client_id = 'security-admin-console'
-        self.access_token = self.token_refresh_expiration = None
 
     def _get_credentials(self) -> tuple:
         return (self.client_id, self.user, self.password)
@@ -42,8 +26,8 @@ class KeyCloakApiProxy():
     def _get_refresh_token(self) -> str:
         return self.refresh_token
 
-    def _access_token_exists(self) -> bool:
-        return self.access_token != None
+    def _access_token_invalid(self, from_time: datetime.datetime = datetime.datetime.utcnow()) -> bool:
+        return not self.access_token or (self.token_refresh_expiration and self.token_refresh_expiration < from_time)
 
     def _token_refresh_expired(self, from_time: datetime.datetime = datetime.datetime.utcnow()) -> bool:
         return self.token_refresh_expiration and self.token_refresh_expiration < from_time
@@ -61,7 +45,7 @@ class KeyCloakApiProxy():
             'verify'  : self.verify_ssl 
         }
         now = datetime.datetime.utcnow()
-        if not self._access_token_exists() or self._token_refresh_expired(now):
+        if self._access_token_invalid(now):
             client_id, user, password = self._get_credentials()
             self.logger.info(f"Creating new access token with user {user}")
             payload = f"username={user}&password={password}&client_id={client_id}&grant_type=password"
@@ -113,13 +97,21 @@ class KeyCloakApiProxy():
         self.logger.debug(f"Fetching clients for {realm_name} with params: {params}")
         return self._make_request('GET', endpoint, params)
 
+    def set_credentials(self, client_id: str, user: str, password: str) -> None:
+        self.user = user
+        self.password = password
+        # should pass through once tested
+        self.client_id = client_id
+        self.access_token = self.token_refresh_expiration = self.token_expiration = self.refresh_token = None
+
     def get_client(self, realm_name: str, client_name: str) -> dict:
         self.logger.info(f"Fetching client '{client_name}' from realm '{realm_name}'")
         r = self._get_clients(realm_name, {'clientId': client_name, 'viewableOnly': True})
         response = r.json()
         if len(response) < 1:
-            self.logger.error(f"Client '{client_name}' was not found in realm '{realm_name}'")
-            raise RuntimeError(f"Client {client_name} was not found")
+            message = f"Client '{client_name}' was not found in realm '{realm_name}'"
+            self.logger.error(message)
+            raise RuntimeError(message)
         return response[0]
 
     def get_clients( self, realm_name: str ) -> List[dict]:

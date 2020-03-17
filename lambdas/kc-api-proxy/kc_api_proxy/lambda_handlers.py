@@ -13,13 +13,14 @@ logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
 def get_keycloak_api_proxy_from_env() -> KeyCloakApiProxy:
     base_url = os.environ['KeyCloakBaseUrl']
+    client_id = os.environ.get('AdminClientId','security-admin-console')
     user = os.environ['AdminUser']
     password_ssm_path = os.environ['AdminPasswordSsmPath']
     password = ssm_client.get_parameter(
         Name=password_ssm_path,
         WithDecryption=True
     )['Parameter']['Value']
-    return KeyCloakApiProxy(base_url, user, password, logger)
+    return KeyCloakApiProxy(base_url, client_id, user, password, logger)
 
 # This entry point will be called by a scheduled cloudwatch job
 # Should probably catch exceptions and return whatever lambdas ought to return...

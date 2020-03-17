@@ -550,7 +550,7 @@ Resources:
                   - ssm:PutParameter
                   - kms:Encrypt
                   - kms:Decrypt
-              - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/master/${ClientSecretRotationConstants.AdminClientId}"
+              - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.AdminPasswordSsmPath}"
                 Effect: Allow
                 Action: ssm:GetParameter
     
