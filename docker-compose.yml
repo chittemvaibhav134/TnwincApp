@@ -21,6 +21,8 @@ services:
       DB_PORT: '5432'
       DB_USER: keycloak
       DB_VENDOR: postgres
+      KEYCLOAK_USER: admin-api-proxy
+      KEYCLOAK_PASSWORD: password
     ports:
       - '8443:8443'
     image: jboss/keycloak:8.0.0
