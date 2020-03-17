@@ -1,57 +1,82 @@
-import requests, json, datetime
+import requests, json, datetime, logging
 from urllib.parse import urlencode, quote_plus, urlparse
 from typing import List, Union
-from .logging_setup import get_logger
+
 
 class KeyCloakApiProxy():
-    def __init__(self, base_url: str, client_id: str, default_secret: str, ssm_client, ssm_secret_path: str, logger = None):
+    def __init__(self, base_url: str, user: str, password: str, logger = None):
         parsed_url = urlparse(base_url)
         self.base_url = f"{parsed_url.scheme}://{parsed_url.netloc}/auth"
-        self.client_id = client_id
-        self.secret = self.default_secret = default_secret
-        self.ssm_client = ssm_client
-        self.ssm_secret_path = ssm_secret_path
+        self.set_credentials(user, password)
         self.scheme = parsed_url.scheme
         self.verify_ssl = True if parsed_url.hostname != 'localhost' else False
+        self.logger = logger or logging.getLogger(__name__)
+
+    # def _retrieve_secret_from_ssm(self):
+    #     self.logger.info(f"Fetching client secret for {self.client_id} from {self.ssm_secret_path}..")
+    #     parameter = self.ssm_client.get_parameter(
+    #         Name=self.ssm_secret_path,
+    #         WithDecryption=True
+    #     )
+    #     return parameter['Parameter']['Value']
+
+    def set_credentials(self, user: str, password: str) -> None:
+        self.user = user
+        self.password = password
+        # should pass through once tested
+        self.client_id = 'security-admin-console'
         self.access_token = self.token_refresh_expiration = None
-        self.logger = logger or get_logger(__name__)
 
-    def _retrieve_secret_from_ssm(self):
-        self.logger.info(f"Fetching client secret for {self.client_id} from {self.ssm_secret_path}..")
-        parameter = self.ssm_client.get_parameter(
-            Name=self.ssm_secret_path,
-            WithDecryption=True
-        )
-        return parameter['Parameter']['Value']
+    def _get_credentials(self) -> tuple:
+        return (self.client_id, self.user, self.password)
 
-    def _get_auth_header(self, secret: str) -> dict:
+    def _set_token_info(self, token: dict, from_time: datetime.datetime = datetime.datetime.utcnow() ):
+        self.access_token = token['access_token']
+        self.refresh_token = token['refresh_token']
+        self.token_refresh_expiration = from_time + datetime.timedelta(seconds=token['refresh_expires_in'])
+        self.token_expiration = from_time + datetime.timedelta(seconds=token['expires_in'])
+
+    def _get_access_token(self) -> str:
+        return self.access_token
+
+    def _get_refresh_token(self) -> str:
+        return self.refresh_token
+
+    def _access_token_exists(self) -> bool:
+        return self.access_token != None
+
+    def _token_refresh_expired(self, from_time: datetime.datetime = datetime.datetime.utcnow()) -> bool:
+        return self.token_refresh_expiration and self.token_refresh_expiration < from_time
+
+    def _token_expired(self, from_time: datetime.datetime = datetime.datetime.utcnow()) -> bool:
+        return self.token_expiration < from_time
+
+    def _get_auth_header( self ) -> dict:
         endpoint = '/realms/master/protocol/openid-connect/token'
         request_args = {
             'url'     :  f"{self.base_url}{endpoint}",
             'headers' : {
                 'Content-Type' : 'application/x-www-form-urlencoded'
             },
-            'auth': (self.client_id, secret),
             'verify'  : self.verify_ssl 
         }
         now = datetime.datetime.utcnow()
-        if not self.access_token or (self.token_refresh_expiration and self.token_refresh_expiration < now):
-            self.logger.info(f"Creating new access token with client id {self.client_id}")
-            payload = f"grant_type=client_credentials"
+        if not self._access_token_exists() or self._token_refresh_expired(now):
+            client_id, user, password = self._get_credentials()
+            self.logger.info(f"Creating new access token with user {user}")
+            payload = f"username={user}&password={password}&client_id={client_id}&grant_type=password"
             r = requests.post( data=bytes(payload.encode('utf-8')), **request_args )
             r.raise_for_status()
-            self.access_token = r.json()
-            self.token_expiration = now + datetime.timedelta(seconds=self.access_token['expires_in'])
-            self.token_refresh_expiration = now + datetime.timedelta(seconds=self.access_token['refresh_expires_in'])
+            self._set_token_info(r.json(), now)
             
-        if self.token_expiration < now:
-            self.logger.info(f"Cached access token has expired for {self.client_id}; refreshing it")
-            payload = f"refresh_token={self.access_token['refresh_token']}&client_id={self.client_id}&grant_type=refresh_token"
+        if self._token_expired(now):
+            client_id, user, password = self._get_credentials()
+            self.logger.info(f"Cached access token has expired for {user}; refreshing it")
+            payload = f"refresh_token={self._get_refresh_token()}&client_id={client_id}&grant_type=refresh_token"
             r = requests.post( data=bytes(payload.encode('utf-8')), **request_args )
             r.raise_for_status()
-            self.access_token = r.json()
-            self.token_expiration = now + datetime.timedelta(seconds=self.access_token['expires_in'])
-        return {"Authorization": f"Bearer {self.access_token['access_token']}"}
+            self._set_token_info(r.json(), now)
+        return {"Authorization": f"Bearer {self._get_access_token()}"}
 
 
     def _make_request(self, method: str, endpoint: str, query_params: dict = None, body: Union[dict,str,bytes] = None, headers: dict = None):
@@ -73,29 +98,14 @@ class KeyCloakApiProxy():
                 request_args['data'] = bytes(body.encode('utf-8'))
             elif isinstance(body,bytes):
                 request_args['data'] = body
-        try:
-            self.logger.debug("Fetching authentication headers for keycloak api request")
-            auth_headers = self._get_auth_header(self.secret)
-            auth_headers.update(headers)
-            request_args['headers'] = auth_headers
-            # might be a bad idea for both security and random serialization?
-            self.logger.debug(f"Making keycloak api request: {request_args}")
-            r = requests.request(**request_args)
-            r.raise_for_status()
-        except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 400 and e.response.json()['error_description'] == 'Invalid client secret':
-                ssm_secret = self._retrieve_secret_from_ssm()
-                if self.secret != ssm_secret:
-                    self.logger.info(f"Client secret access failed; fetching secret from ssm and retrying request")
-                    self.secret = ssm_secret
-                    r = self._make_request(method, endpoint, query_params, body, headers)
-                    pass
-                else:
-                    self.logger.error(f"Client secret access failed for both default secret and value in ssm")
-                    raise
-            else:
-                self.logger.exception(e)
-                raise
+        self.logger.debug("Fetching authentication headers for keycloak api request")
+        auth_headers = self._get_auth_header( )
+        auth_headers.update(headers)
+        request_args['headers'] = auth_headers
+        # might be a bad idea for both security and random serialization?
+        self.logger.debug(f"Making keycloak api request: {request_args}")
+        r = requests.request(**request_args)
+        r.raise_for_status()
         return r
 
     def _get_clients(self, realm_name: str, params: dict):
