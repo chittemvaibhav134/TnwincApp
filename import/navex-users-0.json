@@ -47,6 +47,30 @@
       "requiredActions": [],
       "totp": false,
       "username": "shiva"
+    },
+    {
+      "clientRoles": {
+        "account": [
+          "manage-account",
+          "view-profile"
+        ]
+      },
+      "createdTimestamp": 1584476793291,
+      "credentials": [],
+      "disableableCredentialTypes": [],
+      "emailVerified": false,
+      "enabled": true,
+      "groups": [],
+      "id": "6572da2e-fd70-4c2f-beb9-bf95bec09b42",
+      "notBefore": 0,
+      "realmRoles": [
+        "offline_access",
+        "uma_authorization"
+      ],
+      "requiredActions": [],
+      "serviceAccountClientId": "ncis-api",
+      "totp": false,
+      "username": "service-account-ncis-api"
     }
   ]
 }

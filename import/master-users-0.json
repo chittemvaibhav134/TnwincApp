@@ -8,16 +8,15 @@
           "view-profile"
         ]
       },
-      "createdTimestamp": 1584049301021,
+      "createdTimestamp": 1584476791170,
       "credentials": [],
       "disableableCredentialTypes": [],
       "emailVerified": false,
       "enabled": true,
       "groups": [],
-      "id": "e2dbba79-e019-48bf-ba77-b0be4f99a478",
+      "id": "95f11ad0-7583-461a-a90f-d01abbe1ae12",
       "notBefore": 0,
       "realmRoles": [
-        "admin",
         "offline_access",
         "uma_authorization"
       ],
@@ -57,6 +56,38 @@
       "requiredActions": [],
       "totp": false,
       "username": "dvader"
+    },
+    {
+      "clientRoles": {
+        "account": [
+          "manage-account",
+          "view-profile"
+        ]
+      },
+      "createdTimestamp": 1584476793581,
+      "credentials": [
+        {
+          "createdDate": 1584476793586,
+          "credentialData": "{\"hashIterations\":100000,\"algorithm\":\"pbkdf2-sha256\"}",
+          "id": "ea1b703c-388a-4200-81d5-8ac55e67e864",
+          "secretData": "{\"value\":\"9W8xIjdwGaRZ3t2YluJwDSNLr8LPsUHtm6nWP9L+8rqkR1uhC0etNWCEdznVZ7JGn54721bMGGXoRrWrwJEP9Q==\",\"salt\":\"EjN+qDJAhVPGbPodC4bDrw==\"}",
+          "type": "password"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "emailVerified": false,
+      "enabled": true,
+      "groups": [],
+      "id": "347a0232-16b0-466b-af76-24f34b18af2c",
+      "notBefore": 0,
+      "realmRoles": [
+        "admin",
+        "offline_access",
+        "uma_authorization"
+      ],
+      "requiredActions": [],
+      "totp": false,
+      "username": "admin-api-proxy"
     }
   ]
 }
