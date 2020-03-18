@@ -68,7 +68,7 @@
       ],
       "builtIn": true,
       "description": "Handle what to do if there is existing account with same email/username like authenticated identity provider",
-      "id": "3aeb34f8-43b0-44e4-aa12-df1009c8bcd3",
+      "id": "d3f2e250-b1e7-405c-ae43-f0abd630f6df",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -92,7 +92,7 @@
       ],
       "builtIn": true,
       "description": "Reauthentication of existing account",
-      "id": "e7a772c6-f4db-42de-8816-7245f856401a",
+      "id": "70e3edb8-6f1a-4fa9-8143-67c79084b371",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -116,7 +116,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the auth-otp-form authenticator should be used or not.",
-      "id": "4d01b7f4-e809-422d-bdc0-e98b8c6000b6",
+      "id": "90b7f765-8e7e-4c82-8467-8b08bb33e17c",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -154,7 +154,7 @@
       ],
       "builtIn": true,
       "description": "browser based authentication",
-      "id": "d6c0f8f3-4118-4057-bdc6-dddc7d5324a3",
+      "id": "74c91499-3991-4bf0-8bd4-30abc9f5b6f2",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -192,7 +192,7 @@
       ],
       "builtIn": true,
       "description": "Base authentication for clients",
-      "id": "60497256-ad5d-4b48-9020-5f920154c3d0",
+      "id": "40c848fe-7a14-4875-aafa-b1138dc0465f",
       "providerId": "client-flow",
       "topLevel": true
     },
@@ -223,7 +223,7 @@
       ],
       "builtIn": true,
       "description": "OpenID Connect Resource Owner Grant",
-      "id": "29ebfb3c-db13-445a-b714-4041df740db9",
+      "id": "a2575736-d0b0-4595-9ba1-316fe38035a4",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -247,7 +247,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the direct-grant-validate-otp authenticator should be used or not.",
-      "id": "891b65da-f1b9-405b-95b6-f1e96e3933ba",
+      "id": "c9d69b91-070f-4ea3-8dcf-88cb782be0a9",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -264,7 +264,7 @@
       ],
       "builtIn": true,
       "description": "Used by Docker clients to authenticate against the IDP",
-      "id": "6be2b994-6c21-470f-86df-9358010e14bb",
+      "id": "fcac0dab-ed1a-4639-865c-bb8768508f0a",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -297,7 +297,7 @@
       ],
       "builtIn": true,
       "description": "Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account",
-      "id": "39f703f4-d239-4822-afab-d88e10c066f0",
+      "id": "25234630-df1b-4c09-afcb-61ce0bf7de42",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -321,7 +321,7 @@
       ],
       "builtIn": true,
       "description": "Username, password, otp and other auth forms.",
-      "id": "dccad072-bccb-4338-9d49-49209c023fba",
+      "id": "0994a51f-dcdc-4410-9ba0-f88a3f822a26",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -345,7 +345,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the auth-otp-form authenticator should be used or not.",
-      "id": "816bedb6-6e3e-4582-9ab6-62f40c195775",
+      "id": "87b35781-1ab8-47ae-98f9-9276fff08fa4",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -383,7 +383,7 @@
       ],
       "builtIn": true,
       "description": "An authentication flow based on challenge-response HTTP Authentication Schemes",
-      "id": "41a36b5d-dd99-4951-88aa-77b5086f6bd4",
+      "id": "23a975ca-f034-4921-b2d0-a9e6a6152ae4",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -401,7 +401,7 @@
       ],
       "builtIn": true,
       "description": "registration flow",
-      "id": "de9e289c-b0db-4e99-85e4-b067f58745a8",
+      "id": "0d6df69e-2a76-4708-bf83-73d0d1732978",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -439,7 +439,7 @@
       ],
       "builtIn": true,
       "description": "registration form",
-      "id": "43474d6b-4b75-4264-8f4b-8e9f1e247d7e",
+      "id": "d3003262-31fa-43c4-a4cb-d05016349a8d",
       "providerId": "form-flow",
       "topLevel": false
     },
@@ -477,7 +477,7 @@
       ],
       "builtIn": true,
       "description": "Reset credentials for a user if they forgot their password or something",
-      "id": "3945d770-f974-43c8-afd6-de8dbc77f817",
+      "id": "0484a331-01b6-4925-b339-f9a0501d5cdc",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -501,7 +501,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the reset-otp authenticator should be used or not.",
-      "id": "51bec71b-a125-4e60-be17-27fd2c1086ac",
+      "id": "3fdfc692-4e71-46c6-a20c-6e12581b4d56",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -518,7 +518,7 @@
       ],
       "builtIn": true,
       "description": "SAML ECP Profile Authentication Flow",
-      "id": "0268963c-52bd-454b-9fbf-1cbc0c7fb734",
+      "id": "73b22f6c-8779-41ca-8691-22d7b1fa3df7",
       "providerId": "basic-flow",
       "topLevel": true
     }
@@ -529,14 +529,14 @@
       "config": {
         "require.password.update.after.registration": "false"
       },
-      "id": "39515388-799f-4d80-84aa-a211fd433dc8"
+      "id": "2d45ac5d-2184-4eaa-814e-a26e8ebfab91"
     },
     {
       "alias": "review profile config",
       "config": {
         "update.profile.on.first.login": "missing"
       },
-      "id": "e318e16f-25a4-470b-b006-fa1143f6aad6"
+      "id": "425958bd-91a4-49cd-baea-880bbe4af1a7"
     }
   ],
   "browserFlow": "browser",
@@ -1113,7 +1113,7 @@
         "roles",
         "web-origins"
       ],
-      "directAccessGrantsEnabled": true,
+      "directAccessGrantsEnabled": false,
       "enabled": true,
       "frontchannelLogout": false,
       "fullScopeAllowed": false,
@@ -1339,7 +1339,7 @@
         "roles",
         "web-origins"
       ],
-      "directAccessGrantsEnabled": true,
+      "directAccessGrantsEnabled": false,
       "enabled": true,
       "frontchannelLogout": false,
       "fullScopeAllowed": true,
@@ -1407,7 +1407,7 @@
       ],
       "secret": "4d1e3de1-6f61-46b1-92a8-e1eccce61559",
       "serviceAccountsEnabled": true,
-      "standardFlowEnabled": true,
+      "standardFlowEnabled": false,
       "surrogateAuthRequired": false,
       "webOrigins": []
     }
@@ -2203,6 +2203,65 @@
   "ssoSessionMaxLifespanRememberMe": 0,
   "supportedLocales": [],
   "userManagedAccessAllowed": false,
+  "users": [
+    {
+      "clientRoles": {
+        "account": [
+          "manage-account",
+          "view-profile"
+        ]
+      },
+      "createdTimestamp": 1584483308086,
+      "credentials": [],
+      "disableableCredentialTypes": [],
+      "emailVerified": false,
+      "enabled": true,
+      "groups": [],
+      "id": "a71aa34d-f81d-475b-98d2-5dcccb84d9f0",
+      "notBefore": 0,
+      "realmRoles": [
+        "admin",
+        "offline_access",
+        "uma_authorization"
+      ],
+      "requiredActions": [],
+      "serviceAccountClientId": "admin-api-proxy",
+      "totp": false,
+      "username": "service-account-admin-api-proxy"
+    },
+    {
+      "clientRoles": {
+        "account": [
+          "manage-account",
+          "view-profile"
+        ]
+      },
+      "createdTimestamp": 1574178438088,
+      "credentials": [
+        {
+          "createdDate": 1574873777033,
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\"}",
+          "id": "9d860796-6218-430b-97a6-e1995ded1d81",
+          "secretData": "{\"value\":\"+xPAQ1XLxxAyh2wT2TNqh8zaTbC8noITERdDAFD0QSSjANzfsHKSqlE4sq3kXYmfyC88e/hdQFQINfqKSmpwIQ==\",\"salt\":\"i6Gk3OP6ndDmxig7pc7zDA==\"}",
+          "type": "password"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "emailVerified": false,
+      "enabled": true,
+      "groups": [],
+      "id": "6daff541-192a-4a3b-a639-e7fce26d53fb",
+      "notBefore": 0,
+      "realmRoles": [
+        "admin",
+        "offline_access",
+        "uma_authorization"
+      ],
+      "requiredActions": [],
+      "totp": false,
+      "username": "dvader"
+    }
+  ],
   "verifyEmail": false,
   "waitIncrementSeconds": 60,
   "webAuthnPolicyAcceptableAaguids": [],
