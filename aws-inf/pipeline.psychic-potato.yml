@@ -353,6 +353,7 @@ Resources:
                   {
                     "S3BucketName": "CfnDeploy_PsyPot::stack-outputs.json:ConfigBucket",
                     "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
                     "ExcludeArtifactsFromUpload": ["CfnDeploy_PsyPot"],
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2"
