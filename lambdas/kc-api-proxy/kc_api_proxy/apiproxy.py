@@ -6,7 +6,7 @@ class KeyCloakApiProxy( ):
     def __init__(self, base_url: str, client_id: str, secret: str, logger = None):
         parsed_url = urlparse(base_url)
         self.base_url = f"{parsed_url.scheme}://{parsed_url.netloc}/auth"
-        self.set_credentials(client_id, secret)
+        self._set_credentials(client_id, secret)
         self.verify_ssl = True if parsed_url.hostname != 'localhost' else False
         self.logger = logger or logging.getLogger(__name__)
 
@@ -66,6 +66,13 @@ class KeyCloakApiProxy( ):
             self._set_token_info(r.json(), now)
         return {"Authorization": f"Bearer {self._get_access_token()}"}
 
+    def _refresh_credentials(self) -> bool:
+        new_client_id, new_secret = self._get_updated_credentials()
+        current_client_id, current_secret = self._get_credentials()
+        if new_client_id != current_client_id or new_secret != current_secret:
+            self._set_credentials(new_client_id, new_secret)
+            return True
+        return False
 
     def _make_request(self, method: str, endpoint: str, query_params: dict = None, body: Union[dict,str,bytes] = None, headers: dict = None):
         method = method.upper()
@@ -97,10 +104,7 @@ class KeyCloakApiProxy( ):
             r.raise_for_status()
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 400 and e.response.json()['error_description'] == 'Invalid client secret':
-                new_client_id, new_secret = self._get_updated_credentials()
-                current_client_id, current_secret = self._get_credentials()
-                if new_client_id != current_client_id or new_secret != current_secret:
-                    self.set_credentials(new_client_id, new_secret)
+                if self._refresh_credentials( ):
                     r = self._make_request(method, endpoint, query_params, body, headers)
                     pass
                 else:
@@ -117,7 +121,7 @@ class KeyCloakApiProxy( ):
         self.logger.debug(f"Fetching clients for {realm_name} with params: {params}")
         return self._make_request('GET', endpoint, params)
 
-    def set_credentials(self, client_id: str, secret: str) -> None:
+    def _set_credentials(self, client_id: str, secret: str) -> None:
         self.secret = secret
         # should pass through once tested
         self.client_id = client_id
