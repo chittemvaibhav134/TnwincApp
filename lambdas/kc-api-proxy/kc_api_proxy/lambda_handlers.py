@@ -11,16 +11,20 @@ ssm_client = boto3.client('ssm')
 logger = logging.getLogger(__name__)
 logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
-def get_keycloak_api_proxy_from_env() -> KeyCloakApiProxy:
+class KcApiProxySsmRefresh(KeyCloakApiProxy):
+    def _get_updated_credentials(self):
+        ssm_secret_path = os.environ['AdminSecretSsmPath']
+        secret = ssm_client.get_parameter(
+            Name=ssm_secret_path,
+            WithDecryption=True
+        )['Parameter']['Value']
+        return (os.environ['AdminClientId'], secret)
+
+def get_keycloak_api_proxy_from_env() -> KcApiProxySsmRefresh:
     base_url = os.environ['KeyCloakBaseUrl']
-    client_id = os.environ.get('AdminClientId','security-admin-console')
-    user = os.environ['AdminUser']
-    password_ssm_path = os.environ['AdminPasswordSsmPath']
-    password = ssm_client.get_parameter(
-        Name=password_ssm_path,
-        WithDecryption=True
-    )['Parameter']['Value']
-    return KeyCloakApiProxy(base_url, client_id, user, password, logger)
+    client_id = os.environ['AdminClientId']
+    default_secret = os.environ['AdminDefaultSecret']
+    return KcApiProxySsmRefresh(base_url, client_id, default_secret, logger)
 
 # This entry point will be called by a scheduled cloudwatch job
 # Should probably catch exceptions and return whatever lambdas ought to return...

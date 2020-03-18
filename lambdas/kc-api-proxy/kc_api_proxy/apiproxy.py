@@ -2,17 +2,22 @@ import requests, json, datetime, logging
 from urllib.parse import urlencode, quote_plus, urlparse
 from typing import List, Union
 
-
-class KeyCloakApiProxy():
-    def __init__(self, base_url: str, client_id: str, user: str, password: str, logger = None):
+class KeyCloakApiProxy( ):
+    def __init__(self, base_url: str, client_id: str, secret: str, logger = None):
         parsed_url = urlparse(base_url)
         self.base_url = f"{parsed_url.scheme}://{parsed_url.netloc}/auth"
-        self.set_credentials(client_id, user, password)
+        self.set_credentials(client_id, secret)
         self.verify_ssl = True if parsed_url.hostname != 'localhost' else False
         self.logger = logger or logging.getLogger(__name__)
 
+    def _get_updated_credentials(self) -> tuple:
+        # should return tuple of (client_id,secret)
+        # used to allow the class to check for rotated client creds if Invalid Client Secret is thrown as a request error
+        logging.warn(f"Default implementation of {__name__} return already set creds; override if needed")
+        return self._get_credentials()    
+
     def _get_credentials(self) -> tuple:
-        return (self.client_id, self.user, self.password)
+        return (self.client_id, self.secret)
 
     def _set_token_info(self, token: dict, from_time: datetime.datetime = datetime.datetime.utcnow() ):
         self.access_token = token['access_token']
@@ -46,16 +51,15 @@ class KeyCloakApiProxy():
         }
         now = datetime.datetime.utcnow()
         if self._access_token_invalid(now):
-            client_id, user, password = self._get_credentials()
-            self.logger.info(f"Creating new access token with user {user}")
-            payload = f"username={user}&password={password}&client_id={client_id}&grant_type=password"
-            r = requests.post( data=bytes(payload.encode('utf-8')), **request_args )
+            client_id, secret = self._get_credentials()
+            self.logger.info(f"Creating new access token with user {client_id}")
+            payload = "grant_type=client_credentials"
+            r = requests.post( auth=(client_id, secret), data=bytes(payload.encode('utf-8')), **request_args )
             r.raise_for_status()
             self._set_token_info(r.json(), now)
-            
         if self._token_expired(now):
-            client_id, user, password = self._get_credentials()
-            self.logger.info(f"Cached access token has expired for {user}; refreshing it")
+            client_id, _ = self._get_credentials()
+            self.logger.info(f"Cached access token has expired for {client_id}; refreshing it")
             payload = f"refresh_token={self._get_refresh_token()}&client_id={client_id}&grant_type=refresh_token"
             r = requests.post( data=bytes(payload.encode('utf-8')), **request_args )
             r.raise_for_status()
@@ -82,14 +86,30 @@ class KeyCloakApiProxy():
                 request_args['data'] = bytes(body.encode('utf-8'))
             elif isinstance(body,bytes):
                 request_args['data'] = body
-        self.logger.debug("Fetching authentication headers for keycloak api request")
-        auth_headers = self._get_auth_header( )
-        auth_headers.update(headers)
-        request_args['headers'] = auth_headers
-        # might be a bad idea for both security and random serialization?
-        self.logger.debug(f"Making keycloak api request: {request_args}")
-        r = requests.request(**request_args)
-        r.raise_for_status()
+        try:
+            self.logger.debug("Fetching authentication headers for keycloak api request")
+            auth_headers = self._get_auth_header( )
+            auth_headers.update(headers)
+            request_args['headers'] = auth_headers
+            # might be a bad idea for both security and random serialization?
+            self.logger.debug(f"Making keycloak api request: {request_args}")
+            r = requests.request(**request_args)
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 400 and e.response.json()['error_description'] == 'Invalid client secret':
+                new_client_id, new_secret = self._get_updated_credentials()
+                current_client_id, current_secret = self._get_credentials()
+                if new_client_id != current_client_id or new_secret != current_secret:
+                    self.set_credentials(new_client_id, new_secret)
+                    r = self._make_request(method, endpoint, query_params, body, headers)
+                    pass
+                else:
+                    self.logger.error(f"Client secret access failed for both default secret and value from credenital refresh hook")
+                    raise
+            else:
+                self.logger.exception(e)
+                raise
+
         return r
 
     def _get_clients(self, realm_name: str, params: dict):
@@ -97,9 +117,8 @@ class KeyCloakApiProxy():
         self.logger.debug(f"Fetching clients for {realm_name} with params: {params}")
         return self._make_request('GET', endpoint, params)
 
-    def set_credentials(self, client_id: str, user: str, password: str) -> None:
-        self.user = user
-        self.password = password
+    def set_credentials(self, client_id: str, secret: str) -> None:
+        self.secret = secret
         # should pass through once tested
         self.client_id = client_id
         self.access_token = self.token_refresh_expiration = self.token_expiration = self.refresh_token = None
