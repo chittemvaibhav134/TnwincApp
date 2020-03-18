@@ -412,6 +412,7 @@ Resources:
                   {
                     "S3BucketName": "CfnDeploy_IntStable::stack-outputs.json:ConfigBucket",
                     "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
                     "ExcludeArtifactsFromUpload": ["CfnDeploy_IntStable"],
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2"
@@ -652,6 +653,7 @@ Resources:
                   {
                     "S3BucketName": "CfnDeploy_StageEU::stack-outputs.json:ConfigBucket",
                     "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
                     "ExcludeArtifactsFromUpload": ["CfnDeploy_StageEU"],
                     "AccountId": "${StageAccountId}",
                     "Region": "eu-central-1"
@@ -892,6 +894,7 @@ Resources:
                   {
                     "S3BucketName": "CfnDeploy_StageUS::stack-outputs.json:ConfigBucket",
                     "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
                     "ExcludeArtifactsFromUpload": ["CfnDeploy_StageUS"],
                     "AccountId": "${StageAccountId}",
                     "Region": "us-east-1"

@@ -356,6 +356,7 @@ Resources:
                   {
                     "S3BucketName": "CfnDeploy_Wobbly::stack-outputs.json:ConfigBucket",
                     "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
                     "ExcludeArtifactsFromUpload": ["CfnDeploy_Wobbly"],
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2"
