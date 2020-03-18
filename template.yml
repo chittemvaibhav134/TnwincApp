@@ -27,6 +27,10 @@ Parameters:
       - Development
   KeyCloakImage:
     Type: String
+  KeyCloakAdminApiDefaultSecret:
+    Type: String
+    NoEcho: True
+    Default: '4d1e3de1-6f61-46b1-92a8-e1eccce61559'
   InstanceCertificateArn:
     Type: String
     Default: None
@@ -497,9 +501,9 @@ Resources:
     Properties:
       ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
       AdminClientId: admin-api-proxy
-      AdminDefaultSecret: '4d1e3de1-6f61-46b1-92a8-e1eccce61559'
+      AdminSecretSsmPath: !Sub /${AWS::StackName}/client-keys/master/admin-api-proxy
       SsmPrefix: !Sub /${AWS::StackName}/client-keys
-
+      
   ClientSecretRotateLambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -526,7 +530,7 @@ Resources:
                   - ssm:PutParameter
                   - kms:Encrypt
                   - kms:Decrypt
-              - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/master/${ClientSecretRotationConstants.AdminClientId}"
+              - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.AdminSecretSsmPath}"
                 Effect: Allow
                 Action: ssm:GetParameter
     
@@ -543,7 +547,8 @@ Resources:
         Variables:
           KeyCloakBaseUrl: !Sub "https://navex.${Subdomain}.${DnsHostedZone}"
           AdminClientId: !GetAtt ClientSecretRotationConstants.AdminClientId
-          AdminDefaultSecret: !GetAtt ClientSecretRotationConstants.AdminDefaultSecret
+          AdminDefaultSecret: !Ref KeyCloakAdminApiDefaultSecret
+          AdminSecretSsmPath: !GetAtt ClientSecretRotationConstants.AdminSecretSsmPath
           SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
 
   CpPostDeployLambda:
@@ -559,7 +564,8 @@ Resources:
         Variables:
           KeyCloakBaseUrl: !Sub "https://navex.${Subdomain}.${DnsHostedZone}"
           AdminClientId: !GetAtt ClientSecretRotationConstants.AdminClientId
-          AdminDefaultSecret: !GetAtt ClientSecretRotationConstants.AdminDefaultSecret
+          AdminDefaultSecret: !Ref KeyCloakAdminApiDefaultSecret
+          AdminSecretSsmPath: !GetAtt ClientSecretRotationConstants.AdminSecretSsmPath
           SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
 
   Dns:

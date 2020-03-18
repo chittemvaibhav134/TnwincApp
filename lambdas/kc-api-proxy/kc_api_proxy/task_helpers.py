@@ -1,8 +1,8 @@
-import os
+import os, logging
 from .apiproxy import KeyCloakApiProxy
-from .logging_setup import get_logger
 
-logger = get_logger(__name__, log_level=os.environ.get('LOG_LEVEL', 'INFO'))
+logger = logging.getLogger(__name__)
+logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
 def assemble_ssm_path(ssm_prefix: str, realm_name: str, client_id: str) -> str:
     #normalizing leading/trailing slashes

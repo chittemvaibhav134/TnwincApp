@@ -37,8 +37,11 @@ phases:
     commands:
       - cp $APP_DIR/import/master-realm.json transformed-import/
       - |
-        if $INCLUDE_ADMIN_USER_IMPORT ; then
-          cp $APP_DIR/import/master-users-0.json transformed-import/
+        if ! $INCLUDE_ADMIN_USER_IMPORT ; then
+          # remove any users in the master realm with hard coded credentials
+          # should probably do this in navex-realm as well
+          jq 'del(.users[] | select(.credentials != []))' $APP_DIR/import/master-realm.json > master-realm.temp.json
+          mv master-realm.temp.json $APP_DIR/import/master-realm.json
         fi
       - |
         # TODO: Learn how to actually use either sed or xml with namespaces...
