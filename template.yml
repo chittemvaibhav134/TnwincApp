@@ -530,7 +530,7 @@ Resources:
                   - ssm:PutParameter
                   - kms:Encrypt
                   - kms:Decrypt
-              - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.AdminPasswordSsmPath}"
+              - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.AdminSecretSsmPath}"
                 Effect: Allow
                 Action: ssm:GetParameter
     
@@ -565,7 +565,7 @@ Resources:
           KeyCloakBaseUrl: !Sub "https://navex.${Subdomain}.${DnsHostedZone}"
           AdminClientId: !GetAtt ClientSecretRotationConstants.AdminClientId
           AdminDefaultSecret: !Ref KeyCloakAdminApiDefaultSecret
-          AdminPasswordSsmPath: !GetAtt ClientSecretRotationConstants.AdminSecretSsmPath
+          AdminSecretSsmPath: !GetAtt ClientSecretRotationConstants.AdminSecretSsmPath
           SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
 
   Dns:
