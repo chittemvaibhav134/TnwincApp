@@ -12,12 +12,22 @@ function Invoke-KeyCloakMigration {
     Restart-KeyCloak $composeFilePath
 
     Write-Host "Starting another KeyCloak instance with migration action [$action]."
+    $systemProps = @(
+        '-Djboss.socket.binding.port-offset=100',
+        "-Dkeycloak.migration.action=$action",
+        '-Dkeycloak.migration.provider=dir',
+        '-Dkeycloak.migration.dir=/import'
+    )
+    if($action -eq 'export'){
+        $systemProps += '-Dkeycloak.migration.usersExportStrategy=REALM_FILE'
+    }
+    $systemPropsQuoteEncapsulated = '"{0}"' -f ($systemProps -join ' ')
     $argumentList = @(
         'exec',
         '-it',
         'keycloak-app',
         'opt/jboss/tools/docker-entrypoint.sh',
-        "`"-Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=$action -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import`""
+        "$systemPropsQuoteEncapsulated"
     )
 
     Wait-KeyCloakStartup -argumentList $argumentList
