@@ -14,6 +14,7 @@ logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 class KcApiProxySsmRefresh(KeyCloakApiProxy):
     def _get_updated_credentials(self):
         ssm_secret_path = os.environ['AdminSecretSsmPath']
+        self.logger.info(f"Checking ssm {ssm_secret_path} for updated client secret")
         secret = ssm_client.get_parameter(
             Name=ssm_secret_path,
             WithDecryption=True
@@ -44,7 +45,7 @@ def cp_post_deploy_handler(event, context):
     unsupported_actions = [action for action in actions if action not in supported_actions]
     logger.info(f"Codepipeline post-deploy started for actions: {actions}")
     if not actions:
-        logger.warn("Post deploy lambda was invoked without any 'Actions'")
+        logger.warning("Post deploy lambda was invoked without any 'Actions'")
         return CodePipelineHelperResponse.succeeded("No-op due to no actions begin specified")
 
     if unsupported_actions:

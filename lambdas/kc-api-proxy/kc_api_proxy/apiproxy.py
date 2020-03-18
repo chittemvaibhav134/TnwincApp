@@ -70,8 +70,10 @@ class KeyCloakApiProxy( ):
         new_client_id, new_secret = self._get_updated_credentials()
         current_client_id, current_secret = self._get_credentials()
         if new_client_id != current_client_id or new_secret != current_secret:
+            self.logger.info("Updated credentials found! Setting them as new api credentials")
             self._set_credentials(new_client_id, new_secret)
             return True
+        self.logger.warning("No updated credentials were found")
         return False
 
     def _make_request(self, method: str, endpoint: str, query_params: dict = None, body: Union[dict,str,bytes] = None, headers: dict = None):
