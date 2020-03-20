@@ -115,12 +115,6 @@ Resources:
     Properties:
       ClusterName: !Ref AWS::StackName
 
-  EcsCluster:
-    Type: Custom::VariableHack
-    Properties:
-      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
-      Arn: !GetAtt Cluster.Arn
-
   SecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
@@ -312,7 +306,7 @@ Resources:
     Properties:
       MinCapacity: 1
       MaxCapacity: 5
-      ResourceId: !Sub "service/${EcsCluster.Name}/${FargateService.Name}"
+      ResourceId: !Sub "service/${Cluster.Name}/${FargateService.Name}"
       ScalableDimension: ecs:service:DesiredCount
       ServiceNamespace: ecs
       RoleARN: !GetAtt AutoScalingRole.Arn
@@ -348,7 +342,7 @@ Resources:
     DependsOn:
       - LoadBalancerListenerHttps
     Properties:
-      Cluster: !GetAtt EcsCluster.Arn
+      Cluster: !GetAtt Cluster.Arn
       DesiredCount: !Ref EcsDesiredCount
       TaskDefinition: !Ref TaskDefinition
       LaunchType: FARGATE
@@ -517,7 +511,7 @@ Resources:
             Statement:
               - Resource:
                   - !Sub "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/${AWS::StackName}-KCCONFIG:*"
-                  - !GetAtt EcsCluster.Arn
+                  - !GetAtt Cluster.Arn
                 Effect: Allow
                 Action:
                   - ecs:RunTask
@@ -529,7 +523,7 @@ Resources:
                   - ecs:ListTasks
                 Condition:
                   ArnEquals:
-                    "ecs:cluster": !GetAtt EcsCluster.Arn
+                    "ecs:cluster": !GetAtt Cluster.Arn
               - Resource: "*"
                 Effect: Allow
                 Action: 
@@ -558,7 +552,7 @@ Resources:
       Handler: kc_import_config.cp_handler
       Environment:
         Variables:
-          Cluster: !GetAtt EcsCluster.Arn
+          Cluster: !GetAtt Cluster.Arn
           TaskDefinition: !Ref ImportConfigTaskDefinition
           #TaskFamily: !Sub ${AWS::StackName}-KCCONFIG
           TaskSubnets: !Sub ${KeycloakSubnet1},${KeycloakSubnet2}
