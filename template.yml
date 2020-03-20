@@ -614,7 +614,7 @@ Resources:
           AdminSecretSsmPath: !GetAtt ClientSecretRotationConstants.AdminSecretSsmPath
           SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
 
-  ClientDns:
+  Dns:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneName: !Sub "${DnsHostedZone}."
@@ -874,7 +874,7 @@ Resources:
 Outputs:
   Domain:
     Description: domain to KC service
-    Value: !Ref ClientDns
+    Value: !Ref Dns
   RootDomain:
     Description: domain to KC service without string substitution
     Value: !Ref RootDns
