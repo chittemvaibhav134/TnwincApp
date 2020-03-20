@@ -162,6 +162,27 @@ Resources:
         - Type: forward
           TargetGroupArn: !Ref TargetGroup
 
+  LoadBalancerWildFlyListener:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref LoadBalancerListenerHttps
+      Priority: 5
+      Conditions:
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - !Sub "monitor.${Subdomain}.${DnsHostedZone}"
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - /health
+      Actions:
+        - Type: forward 
+          ForwardConfig:
+            TargetGroups:
+              - TargetGroupArn: !Ref WildFlyTargetGroup
+
+
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     DependsOn: LoadBalancer
@@ -175,6 +196,26 @@ Resources:
       HealthCheckIntervalSeconds: 300
       HealthCheckPath: /
       HealthCheckProtocol: HTTPS
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      TargetType: "ip"
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: "30"
+
+  WildFlyTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: LoadBalancer
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
+      Port: 9990
+      Protocol: HTTP
+      Matcher:
+        HttpCode: 200-299
+      HealthCheckIntervalSeconds: 60
+      HealthCheckPath: /health
+      HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
       TargetType: "ip"
@@ -306,6 +347,7 @@ Resources:
           Essential: true
           PortMappings:
             - ContainerPort: 8443
+            - ContainerPort: 9990
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -323,6 +365,10 @@ Resources:
               Value: postgres
             - Name: DB_DATABASE
               Value: postgres
+            # using this as a hack instead of adding -Djboss.bind.address.management=0.0.0.0 to entrypoint/command
+            # probably enables some metric gather as well i imagine...
+            - Name: KEYCLOAK_STATISTICS
+              Value: http
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
@@ -568,11 +614,21 @@ Resources:
           AdminSecretSsmPath: !GetAtt ClientSecretRotationConstants.AdminSecretSsmPath
           SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
 
-  Dns:
+  ClientDns:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneName: !Sub "${DnsHostedZone}."
       Name: !Sub "*.${Subdomain}.${DnsHostedZone}."
+      TTL: 900
+      Type: CNAME
+      ResourceRecords:
+        - !GetAtt LoadBalancer.DNSName
+
+  RootDns:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Sub "${DnsHostedZone}."
+      Name: !Sub "${Subdomain}.${DnsHostedZone}."
       TTL: 900
       Type: CNAME
       ResourceRecords:
@@ -818,10 +874,10 @@ Resources:
 Outputs:
   Domain:
     Description: domain to KC service
-    Value: !Ref Dns
+    Value: !Ref ClientDns
   RootDomain:
     Description: domain to KC service without string substitution
-    Value: !Sub "${Subdomain}.${DnsHostedZone}"
+    Value: !Ref RootDns
   ConfigBucket:
     Value: !Ref S3ConfigBucket
   CpConfigImportLambdaArn:
