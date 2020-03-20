@@ -147,6 +147,8 @@ Resources:
     Condition: CreateInstanceCert
     Properties:
       DomainName: !Sub "*.${Subdomain}.${DnsHostedZone}"
+      SubjectAlternativeNames:
+        - !Sub "${Subdomain}.${DnsHostedZone}"
       ValidationMethod: DNS
 
   LoadBalancerListenerHttps:
@@ -314,6 +316,9 @@ Resources:
         - ContainerName: Navex-Keycloak
           ContainerPort: 8443
           TargetGroupArn: !Ref TargetGroup
+        - ContainerName: Navex-Keycloak
+          ContainerPort: 9990
+          TargetGroupArn: !Ref WildFlyTargetGroup
 
   TaskExecutionRole:
     Type: AWS::IAM::Role
@@ -365,13 +370,12 @@ Resources:
               Value: postgres
             - Name: DB_DATABASE
               Value: postgres
-            # using this as a hack instead of adding -Djboss.bind.address.management=0.0.0.0 to entrypoint/command
-            # probably enables some metric gather as well i imagine...
-            - Name: KEYCLOAK_STATISTICS
-              Value: http
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
+          EntryPoint:
+            - /opt/jboss/tools/docker-entrypoint.sh
+            - "-Djboss.bind.address.management=0.0.0.0"
 
   ImportConfigTaskDefinition:
     Type: AWS::ECS::TaskDefinition
