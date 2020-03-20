@@ -173,7 +173,7 @@ Resources:
         - Field: host-header
           HostHeaderConfig:
             Values:
-              - !Sub "monitor.${Subdomain}.${DnsHostedZone}"
+              - !Sub "${Subdomain}.${DnsHostedZone}"
         - Field: path-pattern
           PathPatternConfig:
             Values:
