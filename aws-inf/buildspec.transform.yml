@@ -35,7 +35,9 @@ phases:
       - |
           CmdUiRootDomainDefault="pt.dev.local"
           CmdUiRootDomain=$(jq --arg DEFAULT "$CmdUiRootDomainDefault" -r '.UiRootDomain // $DEFAULT' "$DC_ART_DIR/policytech" || echo "$CmdUiRootDomainDefault")
-
+      - |
+          EpimIemRootDomainDefault="dev.ep.local"
+          EpimIemRootDomain=$(jq --arg DEFAULT "$EpimIemRootDomainDefault" -r '.UiRootDomain // $DEFAULT' "$DC_ART_DIR/epim" || echo "$EpimIemRootDomainDefault")
       - mkdir transformed-import
   build:
     commands:
@@ -67,6 +69,9 @@ phases:
           jq --arg APPSHELL_USER "$AppshellUserAppUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL_USER' |
           jq --arg CMDUIROOTDOMAIN "$CmdUiRootDomain" --arg CMDUIROOTDOMAINDEFAULT "$CmdUiRootDomainDefault" '(.clients[] | select(.name == "Content Management and Distribution") | .redirectUris[]) |= sub($CMDUIROOTDOMAINDEFAULT;$CMDUIROOTDOMAIN)' |
           jq --arg CMDUIROOTDOMAIN "$CmdUiRootDomain" --arg CMDUIROOTDOMAINDEFAULT "$CmdUiRootDomainDefault" '(.clients[] | select(.name == "Content Management and Distribution") | .webOrigins[]) |= sub($CMDUIROOTDOMAINDEFAULT;$CMDUIROOTDOMAIN)' |
+          jq --arg EPIMIEMADMINURL "https://${EpimIemRootDomain}/" '(.clients[] | select(.clientId == "epim-iem") | .adminUrl) |= $EPIMIEMADMINURL' |
+          jq --arg EPIMIEMREDIRECTURI "https://${EpimIemRootDomain}/*" '(.clients[] | select(.clientId == "epim-iem") | .redirectUris[0]) |= $EPIMIEMREDIRECTURI' |
+          jq --arg EPIMIEMWEBORIGIN "https://${EpimIemRootDomain}" '(.clients[] | select(.clientId == "epim-iem") | .webOrigins[0]) |= $EPIMIEMWEBORIGIN' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.browserSecurityHeaders.contentSecurityPolicy) |= $CSP_HEADER' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.attributes."_browser_header.contentSecurityPolicy") |= $CSP_HEADER' > transformed-import/navex-realm.json
       - |
