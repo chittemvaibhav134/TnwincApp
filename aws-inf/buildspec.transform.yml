@@ -32,13 +32,20 @@ phases:
           AppshellUserAppUrlDefault="http://user.app.devlocal.navex-pe.com:3000"
           AppshellUserAppUrl=$(jq --arg DEFAULT "$AppshellUserAppUrlDefault" -r '.RootUiUserAppUrl // $DEFAULT' "$DC_ART_DIR/appshell-infra" || echo "$AppshellUserAppUrlDefault")
 
+      - |
+          CmdUiRootDomainDefault="pt.dev.local"
+          CmdUiRootDomain=$(jq --arg DEFAULT "$CmdUiRootDomainDefault" -r '.UiRootDomain // $DEFAULT' "$DC_ART_DIR/policytech" || echo "$CmdUiRootDomainDefault")
+
       - mkdir transformed-import
   build:
     commands:
       - cp $APP_DIR/import/master-realm.json transformed-import/
       - |
-        if $INCLUDE_ADMIN_USER_IMPORT ; then
-          cp $APP_DIR/import/master-users-0.json transformed-import/
+        if ! $INCLUDE_ADMIN_USER_IMPORT ; then
+          # remove any users in the master realm with hard coded credentials
+          # should probably do this in navex-realm as well
+          jq 'del(.users[] | select(.credentials != []))' $APP_DIR/import/master-realm.json > master-realm.temp.json
+          mv master-realm.temp.json $APP_DIR/import/master-realm.json
         fi
       - |
         # TODO: Learn how to actually use either sed or xml with namespaces...
@@ -58,6 +65,8 @@ phases:
           jq --arg APPSHELL_PLATFORMINATOR "$AppshellPlatforminatorUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL_PLATFORMINATOR' |
           jq --arg APPSHELL_USER_REDIRECT "$AppshellUserAppUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[2]) |= $APPSHELL_USER_REDIRECT' |
           jq --arg APPSHELL_USER "$AppshellUserAppUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL_USER' |
+          jq --arg CMDUIROOTDOMAIN "$CmdUiRootDomain" --arg CMDUIROOTDOMAINDEFAULT "$CmdUiRootDomainDefault" '(.clients[] | select(.name == "Content Management and Distribution") | .redirectUris[]) |= sub($CMDUIROOTDOMAINDEFAULT;$CMDUIROOTDOMAIN)' |
+          jq --arg CMDUIROOTDOMAIN "$CmdUiRootDomain" --arg CMDUIROOTDOMAINDEFAULT "$CmdUiRootDomainDefault" '(.clients[] | select(.name == "Content Management and Distribution") | .webOrigins[]) |= sub($CMDUIROOTDOMAINDEFAULT;$CMDUIROOTDOMAIN)' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.browserSecurityHeaders.contentSecurityPolicy) |= $CSP_HEADER' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.attributes."_browser_header.contentSecurityPolicy") |= $CSP_HEADER' > transformed-import/navex-realm.json
       - |

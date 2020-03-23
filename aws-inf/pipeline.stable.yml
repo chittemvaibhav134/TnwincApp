@@ -412,6 +412,7 @@ Resources:
                   {
                     "S3BucketName": "CfnDeploy_IntStable::stack-outputs.json:ConfigBucket",
                     "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
                     "ExcludeArtifactsFromUpload": ["CfnDeploy_IntStable"],
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2"
@@ -476,7 +477,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_IntStable::stack-outputs.json:CpPostDeployLambdaArn",
-                    "Payload": { "Actions": [ "rotate_client_secrets" ] },
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_realm_cache","clear_user_cache" ] },
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
                     "InvocationType": "RequestResponse",
@@ -652,6 +653,7 @@ Resources:
                   {
                     "S3BucketName": "CfnDeploy_StageEU::stack-outputs.json:ConfigBucket",
                     "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
                     "ExcludeArtifactsFromUpload": ["CfnDeploy_StageEU"],
                     "AccountId": "${StageAccountId}",
                     "Region": "eu-central-1"
@@ -716,7 +718,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_StageEU::stack-outputs.json:CpPostDeployLambdaArn",
-                    "Payload": { "Actions": [ "rotate_client_secrets" ] },
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_realm_cache","clear_user_cache" ] },
                     "AccountId": "${StageAccountId}",
                     "Region": "eu-central-1",
                     "InvocationType": "RequestResponse",
@@ -892,6 +894,7 @@ Resources:
                   {
                     "S3BucketName": "CfnDeploy_StageUS::stack-outputs.json:ConfigBucket",
                     "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
                     "ExcludeArtifactsFromUpload": ["CfnDeploy_StageUS"],
                     "AccountId": "${StageAccountId}",
                     "Region": "us-east-1"
@@ -956,7 +959,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_StageUS::stack-outputs.json:CpPostDeployLambdaArn",
-                    "Payload": { "Actions": [ "rotate_client_secrets" ] },
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_realm_cache","clear_user_cache" ] },
                     "AccountId": "${StageAccountId}",
                     "Region": "us-east-1",
                     "InvocationType": "RequestResponse",

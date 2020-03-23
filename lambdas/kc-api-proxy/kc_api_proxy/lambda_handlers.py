@@ -1,7 +1,6 @@
 import os, boto3, logging
 from .apiproxy import KeyCloakApiProxy
 from .cpresponse import CodePipelineHelperResponse
-from .logging_setup import get_logger
 from .task_helpers import (
     assemble_ssm_path, 
     rotate_and_store_client_secrets, 
@@ -9,15 +8,24 @@ from .task_helpers import (
 )
 
 ssm_client = boto3.client('ssm')
-logger = get_logger(__name__, log_level=os.environ.get('LOG_LEVEL', 'INFO'))
+logger = logging.getLogger(__name__)
+logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
-def get_keycloak_api_proxy_from_env() -> KeyCloakApiProxy:
+class KcApiProxySsmRefresh(KeyCloakApiProxy):
+    def _get_updated_credentials(self):
+        ssm_secret_path = os.environ['AdminSecretSsmPath']
+        self.logger.info(f"Checking ssm {ssm_secret_path} for updated client secret")
+        secret = ssm_client.get_parameter(
+            Name=ssm_secret_path,
+            WithDecryption=True
+        )['Parameter']['Value']
+        return (os.environ['AdminClientId'], secret)
+
+def get_keycloak_api_proxy_from_env() -> KcApiProxySsmRefresh:
     base_url = os.environ['KeyCloakBaseUrl']
     client_id = os.environ['AdminClientId']
     default_secret = os.environ['AdminDefaultSecret']
-    ssm_prefix = os.environ['SsmPrefix']
-    admin_secret_ssm_path =  assemble_ssm_path(ssm_prefix, 'master', client_id)
-    return KeyCloakApiProxy(base_url, client_id, default_secret, ssm_client, admin_secret_ssm_path, logger)
+    return KcApiProxySsmRefresh(base_url, client_id, default_secret, logger)
 
 # This entry point will be called by a scheduled cloudwatch job
 # Should probably catch exceptions and return whatever lambdas ought to return...
@@ -37,7 +45,7 @@ def cp_post_deploy_handler(event, context):
     unsupported_actions = [action for action in actions if action not in supported_actions]
     logger.info(f"Codepipeline post-deploy started for actions: {actions}")
     if not actions:
-        logger.warn("Post deploy lambda was invoked without any 'Actions'")
+        logger.warning("Post deploy lambda was invoked without any 'Actions'")
         return CodePipelineHelperResponse.succeeded("No-op due to no actions begin specified")
 
     if unsupported_actions:

@@ -356,6 +356,7 @@ Resources:
                   {
                     "S3BucketName": "CfnDeploy_Wobbly::stack-outputs.json:ConfigBucket",
                     "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
                     "ExcludeArtifactsFromUpload": ["CfnDeploy_Wobbly"],
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2"
@@ -420,7 +421,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_Wobbly::stack-outputs.json:CpPostDeployLambdaArn",
-                    "Payload": { "Actions": [ "rotate_client_secrets" ] },
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_realm_cache","clear_user_cache" ] },
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
                     "InvocationType": "RequestResponse",
