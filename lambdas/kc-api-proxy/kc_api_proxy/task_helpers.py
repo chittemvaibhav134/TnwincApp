@@ -17,6 +17,12 @@ def clear_all_realms_cache(kc: KeyCloakApiProxy):
         realm_name = realm['realm']
         kc.clear_realm_cache(realm_name)
 
+def clear_all_users_cache(kc: KeyCloakApiProxy):
+    realms = kc.get_realms()
+    for realm in realms:
+        realm_name = realm['realm']
+        kc.clear_user_cache(realm_name)
+
 def rotate_and_store_client_secrets(kc: KeyCloakApiProxy, ssm_client, ssm_prefix: str):
     realms = kc.get_realms()
     for realm in realms:
