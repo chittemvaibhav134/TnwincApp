@@ -53,6 +53,15 @@
           "Required": false
         }
       ]
+    },
+    {
+      "Project": "epim",
+      "Artifacts": [
+        {
+          "Name": "UiRootDomain",
+          "Required": false
+        }
+      ]
     }
   ],
   "Exposes": [
