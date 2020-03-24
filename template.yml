@@ -940,3 +940,5 @@ Outputs:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/ncis-api"
   CmdBackendClientSecretSsmArn:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/cmd-backend"
+  EpimIemClientSecretSsmArn:
+    Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/epim-iem"
