@@ -44,6 +44,24 @@
           "Required": false
         }
       ]
+    },
+    {
+      "Project": "policytech",
+      "Artifacts": [
+        {
+          "Name": "UiRootDomain",
+          "Required": false
+        }
+      ]
+    },
+    {
+      "Project": "epim",
+      "Artifacts": [
+        {
+          "Name": "UiRootDomain",
+          "Required": false
+        }
+      ]
     }
   ],
   "Exposes": [
