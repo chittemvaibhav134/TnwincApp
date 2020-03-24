@@ -477,7 +477,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_IntStable::stack-outputs.json:CpPostDeployLambdaArn",
-                    "Payload": { "Actions": [ "rotate_client_secrets","clear_realm_cache","clear_user_cache" ] },
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
                     "InvocationType": "RequestResponse",
@@ -718,7 +718,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_StageEU::stack-outputs.json:CpPostDeployLambdaArn",
-                    "Payload": { "Actions": [ "rotate_client_secrets","clear_realm_cache","clear_user_cache" ] },
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
                     "AccountId": "${StageAccountId}",
                     "Region": "eu-central-1",
                     "InvocationType": "RequestResponse",
@@ -959,7 +959,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_StageUS::stack-outputs.json:CpPostDeployLambdaArn",
-                    "Payload": { "Actions": [ "rotate_client_secrets","clear_realm_cache","clear_user_cache" ] },
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
                     "AccountId": "${StageAccountId}",
                     "Region": "us-east-1",
                     "InvocationType": "RequestResponse",

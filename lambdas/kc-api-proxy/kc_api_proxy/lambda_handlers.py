@@ -4,7 +4,8 @@ from .cpresponse import CodePipelineHelperResponse
 from .task_helpers import (
     assemble_ssm_path, 
     rotate_and_store_client_secrets, 
-    clear_all_realms_cache
+    clear_all_realms_cache,
+    clear_all_users_cache
 )
 
 ssm_client = boto3.client('ssm')
@@ -44,10 +45,7 @@ def cp_post_deploy_handler(event, context):
     supported_actions = ['rotate_client_secrets','clear_realm_cache','clear_user_cache']
     unsupported_actions = [action for action in actions if action not in supported_actions]
     logger.info(f"Codepipeline post-deploy started for actions: {actions}")
-    if not actions:
-        logger.warning("Post deploy lambda was invoked without any 'Actions'")
-        return CodePipelineHelperResponse.succeeded("No-op due to no actions begin specified")
-
+    
     if unsupported_actions:
         logger.error(f"Called with unsupported action(s) {unsupported_actions}")
         return CodePipelineHelperResponse.failed(f"Called with unsupported actions. Supported actions: {supported_actions}. Unsupported actions: {unsupported_actions}")
@@ -58,13 +56,33 @@ def cp_post_deploy_handler(event, context):
         logger.exception(e)
         return CodePipelineHelperResponse.failed(f"Error creating keycloak api proxy from env: {e}")
 
+    # Always clear realm cache. I think importing the config easily leads to 
+    # the ids not matching in db vs app cache and then rotating the secrets (or anything else hitting a client-id)
+    # has a solid chance of of throwing a 500 :/
+    try:
+        clear_all_realms_cache(kc)
+    except Exception as e:
+        logger.exception(e)
+        return CodePipelineHelperResponse.failed(f"Error clearing realm cache pre deploy actions: {e}")
+
+    if not actions:
+        logger.warning("Post deploy lambda was invoked without any 'Actions'")
+        return CodePipelineHelperResponse.succeeded("No-op due to no actions begin specified")
+
     for action in actions:
         try:
             if 'rotate_client_secrets' == action:
                 rotate_and_store_client_secrets(kc, ssm_client, os.environ['SsmPrefix'])
-            if 'clear_realm_cache' == action:
-                clear_all_realms_cache(kc)
+            if 'clear_user_cache' == action:
+                clear_all_users_cache(kc)
         except Exception as e:
             logger.exception(e)
             return CodePipelineHelperResponse.failed(f"Error performing action {action}: {e}")
+
+    try:
+        clear_all_realms_cache(kc)
+    except Exception as e:
+        logger.exception(e)
+        return CodePipelineHelperResponse.failed(f"Error clearing realm cache post deploy actions: {e}")
+
     return CodePipelineHelperResponse.succeeded(f"Successfully performed actions: {actions}")
