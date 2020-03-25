@@ -1674,7 +1674,7 @@
       "authenticationFlowBindingOverrides": {},
       "bearerOnly": false,
       "clientAuthenticatorType": "client-secret",
-      "clientId": "COI",
+      "clientId": "coi",
       "consentRequired": false,
       "defaultClientScopes": [
         "doorman-mappings",
@@ -1696,11 +1696,11 @@
           "config": {
             "access.token.claim": "true",
             "id.token.claim": "false",
-            "included.client.audience": "COI"
+            "included.client.audience": "coi"
           },
           "consentRequired": false,
           "id": "337cf350-bbbe-40ad-b2ec-9d8e13fa5611",
-          "name": "COI_audience",
+          "name": "coi_audience",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-audience-mapper"
         }
@@ -2220,7 +2220,7 @@
   "revokeRefreshToken": false,
   "roles": {
     "client": {
-      "COI": [],
+      "coi": [],
       "account": [
         {
           "attributes": {},
