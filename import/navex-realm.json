@@ -1710,7 +1710,7 @@
         "https://auth.coi.devlocal.navex-pe.com:18443/*",
         "https://auth.coi.devlocal.navex-pe.com:8443/*"
       ],
-      "secret": "**********",
+      "secret": "9bcd2fa1-b504-4949-89ca-5ab076dcc6f8",
       "serviceAccountsEnabled": false,
       "standardFlowEnabled": true,
       "surrogateAuthRequired": false,
