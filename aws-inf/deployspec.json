@@ -62,6 +62,15 @@
           "Required": false
         }
       ]
+    },
+    {
+      "Project": "coi-ui",
+      "Artifacts": [
+        {
+          "Name": "CoiAuthRedirectUrl",
+          "Required": false
+        }
+      ]
     }
   ],
   "Exposes": [
