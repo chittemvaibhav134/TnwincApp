@@ -566,8 +566,11 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Description: "Schedule keycloak client secret rotation"
-      ScheduleExpression: "cron(0 2 * * ? *)"
-      State: DISABLED
+      # more frequent rotation in lower environments so that we catch
+      # clients who don't support the rotation scheme long before
+      # stage/prod
+      ScheduleExpression: !If [ Development, "rate(1 day)", "rate(7 days)" ]
+      State: ENABLED
       Targets:
         - Arn: !GetAtt CweClientSecretRotateLambda.Arn
           Id: "CweClientSecretRotateLambda"
