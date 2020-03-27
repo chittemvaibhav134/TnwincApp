@@ -38,17 +38,21 @@ phases:
       - |
           EpimIemRootDomainDefault="dev.ep.local"
           EpimIemRootDomain=$(jq --arg DEFAULT "$EpimIemRootDomainDefault" -r '.UiRootDomain // $DEFAULT' "$DC_ART_DIR/epim" || echo "$EpimIemRootDomainDefault")
+      - |
+          CoiAuthRedirectUrlDefault="https://auth.coi.devlocal.navex-pe.com"
+          CoiAuthRedirectUrl=$(jq --arg DEFAULT "$CoiAuthRedirectUrlDefault" -r '.CoiAuthRedirectUrl // $DEFAULT' "$DC_ART_DIR/coi-ui" || echo "$CoiAuthRedirectUrlDefault")
       - mkdir transformed-import
   build:
     commands:
-      - cp $APP_DIR/import/master-realm.json transformed-import/
       - |
         if ! $INCLUDE_ADMIN_USER_IMPORT ; then
           # remove any users in the master realm with hard coded credentials
           # should probably do this in navex-realm as well
+          echo "Removing hard coded users from master realm..."
           jq 'del(.users[] | select(.credentials != []))' $APP_DIR/import/master-realm.json > master-realm.temp.json
           mv master-realm.temp.json $APP_DIR/import/master-realm.json
         fi
+      - cp $APP_DIR/import/master-realm.json transformed-import/
       - |
         # TODO: Learn how to actually use either sed or xml with namespaces...
         curl -k $DoormanMetadataUrl | sed 's/xmlns="urn:oasis:names:tc:SAML:2.0:metadata"//g' | sed 's/xmlns="http:\/\/www.w3.org\/2000\/09\/xmldsig#"//g' > doorman-metadata.xml
@@ -73,6 +77,7 @@ phases:
           jq --arg EPIMIEMREDIRECTURI "https://${EpimIemRootDomain}/*" '(.clients[] | select(.clientId == "epim-iem") | .redirectUris[0]) |= $EPIMIEMREDIRECTURI' |
           jq --arg EPIMIEMWEBORIGIN "https://${EpimIemRootDomain}" '(.clients[] | select(.clientId == "epim-iem") | .webOrigins[0]) |= $EPIMIEMWEBORIGIN' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.browserSecurityHeaders.contentSecurityPolicy) |= $CSP_HEADER' |
+          jq --arg COIREDIRECTURI "${CoiAuthRedirectUrl}/*" '(.clients[] | select(.clientId == "coi") | .redirectUris[0]) |= $COIREDIRECTURI' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.attributes."_browser_header.contentSecurityPolicy") |= $CSP_HEADER' > transformed-import/navex-realm.json
       - |
         jq --null-input \
