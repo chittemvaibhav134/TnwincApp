@@ -750,14 +750,14 @@ Resources:
                 - Name: CfnDeploy_StageEU
                 - Name: CfnAuthDeploy_StageEU_EuCentral1                 
               RunOrder: 9
-            -
-              Name: ManualGate_StageEU
-              ActionTypeId:
-                Category: Approval
-                Owner: AWS
-                Version: "1"
-                Provider: Manual
-              RunOrder: 9              
+            # -
+            #   Name: ManualGate_StageEU
+            #   ActionTypeId:
+            #     Category: Approval
+            #     Owner: AWS
+            #     Version: "1"
+            #     Provider: Manual
+            #   RunOrder: 9              
         - 
           Name: StageUS
           Actions:
