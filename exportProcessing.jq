@@ -1,0 +1,1 @@
+del( .components."org.keycloak.keys.KeyProvider") | walk(if type == "array" then sort else . end)
