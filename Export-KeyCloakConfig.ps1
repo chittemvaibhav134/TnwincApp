@@ -24,5 +24,5 @@ Invoke-KeyCloakMigration -action "export" -composeFilePath $composeFilePath
 
 Write-Host "Sorting export files."
 Get-ChildItem -Path $importDir -File | ForEach-Object {
-    Get-Content $_.FullName | jq -S -f (Join-Path $workingDir "sortArrays.jq") | Set-Content $_.FullName
+    Get-Content $_.FullName | jq -S -f (Join-Path $workingDir "exportProcessing.jq") | Set-Content $_.FullName
 }
