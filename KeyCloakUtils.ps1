@@ -2,14 +2,13 @@
 
 function Invoke-KeyCloakMigration {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet("import", "export")]
         [string]$action,
-        [Parameter(Mandatory=$true)]
-        [string]$composeFilePath
+        [Parameter(Mandatory = $true)]
+        [string]$composeFilePath,
+        [bool]$showOutput
     )
-
-    Restart-KeyCloak $composeFilePath
 
     Write-Host "Starting another KeyCloak instance with migration action [$action]."
     $systemProps = @(
@@ -18,7 +17,7 @@ function Invoke-KeyCloakMigration {
         '-Dkeycloak.migration.provider=dir',
         '-Dkeycloak.migration.dir=/import'
     )
-    if($action -eq 'export'){
+    if ($action -eq 'export') {
         $systemProps += '-Dkeycloak.migration.usersExportStrategy=REALM_FILE'
     }
     $systemPropsQuoteEncapsulated = '"{0}"' -f ($systemProps -join ' ')
@@ -30,15 +29,16 @@ function Invoke-KeyCloakMigration {
         "$systemPropsQuoteEncapsulated"
     )
 
-    Wait-KeyCloakStartup -argumentList $argumentList
+    Wait-KeyCloakStartup -showOutput $showOutput -argumentList $argumentList
 
     Restart-KeyCloak $composeFilePath
 }
 
 function Restart-KeyCloak {
     param (
-        [Parameter(Mandatory=$true)]
-        [string]$composeFilePath
+        [Parameter(Mandatory = $true)]
+        [string]$composeFilePath,
+        [bool]$showOutput
     )
 
     Write-Host "Restarting KeyCloak."
@@ -50,16 +50,17 @@ function Restart-KeyCloak {
         '-f',
         'keycloak-app'
     )
-    Wait-KeyCloakStartup -argumentList $argumentList
+    Wait-KeyCloakStartup -showOutput $showOutput -argumentList $argumentList
 
     Write-Host "Finished KeyCloak restart."
 }
 
 function Wait-KeyCloakStartup {
     param (
-        [Parameter(Mandatory=$true)]
-        [string[]]$argumentList
+        [Parameter(Mandatory = $true)]
+        [string[]]$argumentList,
+        [bool]$showOutput
     )
 
-    Watch-Process -fileName "docker" -argumentList $argumentList -watchForRegex "Keycloak \d\.\d\.\d \(WildFly Core \d+\.\d\.\d\.Final\) started" -watchCountLimit 3 -description "KeyCloak start"
+    Watch-Process -showOutput $showOutput -fileName "docker" -argumentList $argumentList -watchForRegex "Keycloak \d\.\d\.\d \(WildFly Core \d+\.\d\.\d\.Final\) started" -watchCountLimit 3 -description "KeyCloak start"
 }
