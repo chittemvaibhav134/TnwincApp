@@ -1099,7 +1099,7 @@ Resources:
             - 
               Name: CfnDeploy_ProdEU
               Region: eu-central-1
-              RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
+              RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-codepipelineassume
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
@@ -1108,7 +1108,7 @@ Resources:
               Configuration:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
+                RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-deploymentservice
                 StackName: !Sub ${ProjectName}-stable
                 TemplatePath: "PackageEuCentral1::app.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnConfig_ProdEU::template-configuration.json"
@@ -1137,14 +1137,14 @@ Resources:
                     "BaseDirectory": "transformed-import",
                     "PurgeDirectories": "enabled",
                     "ExcludeArtifactsFromUpload": ["CfnDeploy_ProdEU"],
-                    "AccountId": "${StageAccountId}",
+                    "AccountId": "${ProductionAccountId}",
                     "Region": "eu-central-1"
                   }
               RunOrder: 6
             - 
               Name: CfnAuthDeploy_ProdEU_EuCentral1
               Region: eu-central-1
-              RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
+              RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-codepipelineassume
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
@@ -1153,7 +1153,7 @@ Resources:
               Configuration:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
+                RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-deploymentservice
                 StackName: !Sub ${ProjectName}-stable-auth
                 TemplatePath: "AuthPackageEuCentral1::auth.packaged.yml"
                 OutputFileName: stack-outputs.json
@@ -1181,7 +1181,7 @@ Resources:
                   {
                     "TargetFunctionName": "CfnDeploy_ProdEU::stack-outputs.json:CpConfigImportLambdaArn",
                     "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
-                    "AccountId": "${StageAccountId}",
+                    "AccountId": "${ProductionAccountId}",
                     "Region": "eu-central-1",
                     "ParseResponse": true
                   }
@@ -1201,7 +1201,7 @@ Resources:
                   {
                     "TargetFunctionName": "CfnDeploy_ProdEU::stack-outputs.json:CpPostDeployLambdaArn",
                     "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
-                    "AccountId": "${StageAccountId}",
+                    "AccountId": "${ProductionAccountId}",
                     "Region": "eu-central-1",
                     "InvocationType": "RequestResponse",
                     "ParseResponse": true
@@ -1333,7 +1333,7 @@ Resources:
             - 
               Name: CfnDeploy_ProdUS
               Region: us-east-1
-              RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
+              RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-codepipelineassume
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
@@ -1342,7 +1342,7 @@ Resources:
               Configuration:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
+                RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-deploymentservice
                 StackName: !Sub ${ProjectName}-stable
                 TemplatePath: "PackageUsEast1::app.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnConfig_ProdUS::template-configuration.json"
@@ -1371,14 +1371,14 @@ Resources:
                     "BaseDirectory": "transformed-import",
                     "PurgeDirectories": "enabled",
                     "ExcludeArtifactsFromUpload": ["CfnDeploy_ProdUS"],
-                    "AccountId": "${StageAccountId}",
+                    "AccountId": "${ProductionAccountId}",
                     "Region": "us-east-1"
                   }
               RunOrder: 6
             - 
               Name: CfnAuthDeploy_ProdUS_UsEast1
               Region: us-east-1
-              RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
+              RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-codepipelineassume
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
@@ -1387,7 +1387,7 @@ Resources:
               Configuration:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
+                RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-deploymentservice
                 StackName: !Sub ${ProjectName}-stable-auth
                 TemplatePath: "AuthPackageUsEast1::auth.packaged.yml"
                 OutputFileName: stack-outputs.json
@@ -1415,7 +1415,7 @@ Resources:
                   {
                     "TargetFunctionName": "CfnDeploy_ProdUS::stack-outputs.json:CpConfigImportLambdaArn",
                     "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
-                    "AccountId": "${StageAccountId}",
+                    "AccountId": "${ProductionAccountId}",
                     "Region": "us-east-1",
                     "ParseResponse": true
                   }
@@ -1435,7 +1435,7 @@ Resources:
                   {
                     "TargetFunctionName": "CfnDeploy_ProdUS::stack-outputs.json:CpPostDeployLambdaArn",
                     "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
-                    "AccountId": "${StageAccountId}",
+                    "AccountId": "${ProductionAccountId}",
                     "Region": "us-east-1",
                     "InvocationType": "RequestResponse",
                     "ParseResponse": true
