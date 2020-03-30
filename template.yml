@@ -341,6 +341,7 @@ Resources:
     Type: AWS::ECS::Service
     DependsOn:
       - LoadBalancerListenerHttps
+      - LoadBalancerWildFlyListener
     Properties:
       Cluster: !GetAtt Cluster.Arn
       DesiredCount: !Ref EcsDesiredCount
