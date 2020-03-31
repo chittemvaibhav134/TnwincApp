@@ -865,21 +865,6 @@
         {
           "config": {
             "access.token.claim": "true",
-            "claim.name": "preferred_username",
-            "id.token.claim": "true",
-            "jsonType.label": "String",
-            "user.attribute": "username",
-            "userinfo.token.claim": "true"
-          },
-          "consentRequired": false,
-          "id": "61a8a201-f7ca-4478-8bf8-3907f385e295",
-          "name": "username",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-property-mapper"
-        },
-        {
-          "config": {
-            "access.token.claim": "true",
             "claim.name": "profile",
             "id.token.claim": "true",
             "jsonType.label": "String",
@@ -891,6 +876,21 @@
           "name": "profile",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-attribute-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "puid",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.attribute": "username",
+            "userinfo.token.claim": "true"
+          },
+          "consentRequired": false,
+          "id": "61a8a201-f7ca-4478-8bf8-3907f385e295",
+          "name": "username",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper"
         },
         {
           "config": {
@@ -1137,6 +1137,21 @@
           "consentRequired": false,
           "id": "10434392-21ca-4cb3-bc8a-35e9e77f98c1",
           "name": "UserStoreRole",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "username",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.attribute": "preferred_username",
+            "userinfo.token.claim": "true"
+          },
+          "consentRequired": false,
+          "id": "83ebc0ba-fe9a-49a5-bad0-568d83daa442",
+          "name": "userName",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-attribute-mapper"
         },
@@ -2018,6 +2033,16 @@
     },
     {
       "config": {
+        "attribute.name": "http://schemas.navexglobal.com/identity/claims/UserName",
+        "user.attribute": "preferred_username"
+      },
+      "id": "9bce083c-83c9-4dd5-a8d3-90dbec8a79f8",
+      "identityProviderAlias": "doorman",
+      "identityProviderMapper": "saml-user-attribute-idp-mapper",
+      "name": "Preferred Username"
+    },
+    {
+      "config": {
         "attribute.name": "http://schemas.navexglobal.com/identity/claims/UserStoreRole",
         "user.attribute": "user_store_role"
       },
@@ -2038,7 +2063,7 @@
     },
     {
       "config": {
-        "template": "${ATTRIBUTE.http://schemas.navexglobal.com/identity/claims/UserName}"
+        "template": "${ATTRIBUTE.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name}"
       },
       "id": "bd8bc516-cf9a-4484-a60a-6e3cda91a07e",
       "identityProviderAlias": "doorman",
@@ -2472,14 +2497,20 @@
   "users": [
     {
       "attributes": {
+        "clientkey": [
+          "trial12"
+        ],
         "locale": [
           "en-US"
         ],
         "middle_name": [
           "CanUpdateMiddleName-1549420977"
         ],
+        "preferred_username": [
+          "shiva"
+        ],
         "puid": [
-          "C785A0FB-8B1A-E511-AF9F-00155D103480"
+          "c785a0fb-8b1a-e511-af9f-00155d103480"
         ],
         "user_store_role": [
           "UserStoreAdministrator"
@@ -2491,7 +2522,7 @@
           "view-profile"
         ]
       },
-      "createdTimestamp": 1574267834546,
+      "createdTimestamp": 1585593668395,
       "credentials": [],
       "disableableCredentialTypes": [],
       "email": "mheade@navexglobal.com",
@@ -2506,7 +2537,7 @@
       ],
       "firstName": "Shiva",
       "groups": [],
-      "id": "697e59c4-ac93-428f-a852-c03e3cca355e",
+      "id": "c958c517-fa7f-482a-9efe-02c70860a065",
       "lastName": "GW Admin",
       "notBefore": 0,
       "realmRoles": [
@@ -2515,7 +2546,7 @@
       ],
       "requiredActions": [],
       "totp": false,
-      "username": "shiva"
+      "username": "c785a0fb-8b1a-e511-af9f-00155d103480"
     },
     {
       "clientRoles": {
