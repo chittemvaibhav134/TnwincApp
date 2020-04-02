@@ -4,20 +4,34 @@ phases:
   install:
     runtime-versions:
       python: 3.8
+      docker: 19
     commands:
-      - pip install --upgrade cfn-lint
+      - pip install --upgrade cfn-lint awscli
   pre_build:
     commands:
+      - echo Running cfn-lint to validate cfn templates
       - cfn-lint --version
+      - cfn-lint --include-checks I -t template.yml
+      - cfn-lint --include-checks I -t template.authorizer.yml
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login --region $ECR_REGION --no-include-email)
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      
   build:
     commands:
-      - echo Build started on `date`      
-      - cfn-lint --include-checks I -t template.yml
+      - echo Build started on `date`
+      - echo Building the Docker image... 
+      - docker build -t $REPOSITORY_URI:latest ./build/app
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
       - |
         jq --null-input \
-          --arg KeyCloakImage "jboss/keycloak:8.0.0" \
+          --arg KeyCloakImage "$REPOSITORY_URI:$IMAGE_TAG" \
           '{
             "Parameters":{
               "KeyCloakImage": $KeyCloakImage

@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+      docker: 19
+    commands:
+      - pip install --upgrade cfn-lint
+  build:
+    commands:
+      - echo Running cfn-lint to validate cfn templates
+      - cfn-lint --version
+      - cfn-lint --include-checks I -t template.yml
+      - cfn-lint --include-checks I -t template.authorizer.yml
+      - echo Building the Docker image... 
+      - docker build -t navex/keycloak:pr ./build/app
+
+

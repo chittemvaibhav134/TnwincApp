@@ -1,15 +1,12 @@
 version: '2.0'
 
 volumes:
-
   db:
 
 networks:
-
   keycloak:
 
 services:
-
   app:
     container_name: keycloak-app
     depends_on:
@@ -24,7 +21,9 @@ services:
     ports:
       - '8443:8443'
       - '9990:9990'
-    image: jboss/keycloak:8.0.0
+    build:
+      context: ./build/app
+    image: navex/keycloak:8.0.0
     links:
       - db
     networks:
