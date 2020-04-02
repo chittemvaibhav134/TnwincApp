@@ -20,14 +20,48 @@ Parameters:
     NoEcho: true
   RegionalPackageStackName:
     Type: String
-  # DevAccountId:
-  #   Type: String
-  #   Default: "552242929734"
   IntegrationAccountId:
     Type: String
     Default: "455920928861"
 
 Resources:
+  NavexKcContainerRepository:
+    Type: AWS::ECR::Repository
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      RepositoryPolicyText: !Sub |
+        {
+          "Version": "2008-10-17",
+          "Statement": [
+            {
+              "Sid": "AllowCrossAccountPush",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": [
+                  "arn:aws:iam::${IntegrationAccountId}:root"
+                ]
+              },
+              "Action": [
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:BatchGetImage"
+              ]
+            }
+          ]
+        }
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {"rules":[
+            {
+              "rulePriority":1,
+              "description":"Expire images older than 14 days",
+              "selection":{
+                "tagStatus":"untagged","countType":"sinceImagePushed","countUnit":"days","countNumber":14
+              },
+              "action":{"type":"expire"}
+            }
+          ]}
 
   KCCodeBuild:
     Type: AWS::CodeBuild::Project
@@ -42,8 +76,14 @@ Resources:
         BuildSpec: aws-inf/buildspec.yml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:3.0
+        Image: aws/codebuild/standard:4.0
         Type: LINUX_CONTAINER
+        PrivilegedMode: True
+        EnvironmentVariables:
+          - Name: ECR_REGION
+            Value: !Ref AWS::Region
+          - Name: REPOSITORY_URI
+            Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${NavexKcContainerRepository}
 
   KCPRCodeBuild:
     Type: AWS::CodeBuild::Project
@@ -54,11 +94,11 @@ Resources:
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:3.0
+        Image: aws/codebuild/standard:4.0
       Source:
         Type: GITHUB
         Location: !Sub "https://github.com/${GitHubOwner}/${GitHubRepo}"
-        BuildSpec: aws-inf/buildspec.yml
+        BuildSpec: aws-inf/buildspec.prblocker.yml
         GitCloneDepth: 1
         ReportBuildStatus: true
       Triggers:
@@ -84,7 +124,7 @@ Resources:
         BuildSpec: app/aws-inf/buildspec.transform.yml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:3.0
+        Image: aws/codebuild/standard:4.0
         Type: LINUX_CONTAINER   
 
   PipelineWebhook:

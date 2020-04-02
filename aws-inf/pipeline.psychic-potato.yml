@@ -86,32 +86,6 @@ Resources:
           - Name: REPOSITORY_URI
             Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${NavexKcContainerRepository}
 
-  KCPRCodeBuild:
-    Type: AWS::CodeBuild::Project
-    Properties:
-      ServiceRole: "navex-codebuild"
-      Artifacts:
-        Type: NO_ARTIFACTS
-      Environment:
-        Type: LINUX_CONTAINER
-        ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:4.0
-      Source:
-        Type: GITHUB
-        Location: !Sub "https://github.com/${GitHubOwner}/${GitHubRepo}"
-        BuildSpec: aws-inf/buildspec.prblocker.yml
-        GitCloneDepth: 1
-        ReportBuildStatus: true
-      Triggers:
-        Webhook: true
-        FilterGroups:
-          - 
-            - Type: EVENT
-              Pattern: PULL_REQUEST_CREATED,PULL_REQUEST_UPDATED
-            - Type: BASE_REF
-              Pattern: !Sub "^refs/heads/${GitHubBranch}$"
-              ExcludeMatchedPattern: false
-
   TransformCodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
