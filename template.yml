@@ -37,7 +37,7 @@ Parameters:
     Description: This is the existing certificate for this developer's stack. If 'None' is provided the certificate will be created
   DbaAccessCidr:
     Type: String
-    Default: None
+    Default: "255.255.255.255/32"
     Description: If specified adds an ingress rule to the DB security group for dba management
     AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
 
@@ -45,7 +45,7 @@ Conditions:
   CreateInstanceCert: !Equals [ !Ref InstanceCertificateArn, "None"]
   Development: !Equals [ !Ref Stage, "Development" ]
   NotDevelopment: !Not [!Equals [ !Ref Stage, "Development" ] ]
-  DbaAccess: !Not [!Equals [ !Ref DbaAccessCidr, "None" ] ]
+  DbaAccess: !Not [!Equals [ !Ref DbaAccessCidr, "255.255.255.255/32" ] ]
 
 Mappings:
   StageToSubnets:
