@@ -649,7 +649,8 @@ Resources:
                       "Parameters": {
                         "Subdomain": "id3",
                         "DnsHostedZone": "navex-stage.eu",
-                        "Stage": "Production"
+                        "Stage": "Production",
+                        "DbaAccessCidr": "10.162.24.15/32"
                       },
                       "Tags": {"navex:deploy:context": "stageEU"} 
                     },
@@ -890,7 +891,8 @@ Resources:
                       "Parameters": {
                         "Subdomain": "id3",
                         "DnsHostedZone": "navex-stage.com",
-                        "Stage": "Production"
+                        "Stage": "Production",
+                        "DbaAccessCidr": "10.98.24.15/32"
                       },
                       "Tags": {"navex:deploy:context": "stageUS"} 
                     },
@@ -1131,7 +1133,8 @@ Resources:
                       "Parameters": {
                         "Subdomain": "id3",
                         "DnsHostedZone": "navexone.eu",
-                        "Stage": "Production"
+                        "Stage": "Production",
+                        "DbaAccessCidr": "10.162.24.15/32"
                       },
                       "Tags": {"navex:deploy:context": "prodEU"} 
                     },
@@ -1365,7 +1368,8 @@ Resources:
                       "Parameters": {
                         "Subdomain": "id3",
                         "DnsHostedZone": "navexone.com",
-                        "Stage": "Production"
+                        "Stage": "Production",
+                        "DbaAccessCidr": "10.98.24.15/32"
                       },
                       "Tags": {"navex:deploy:context": "prodUS"} 
                     },
