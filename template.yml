@@ -307,41 +307,41 @@ Resources:
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole'
 
-  AutoScalingTarget:
-    Type: AWS::ApplicationAutoScaling::ScalableTarget
-    Properties:
-      MinCapacity: 1
-      MaxCapacity: 5
-      ResourceId: !Sub "service/${Cluster}/${FargateService.Name}"
-      ScalableDimension: ecs:service:DesiredCount
-      ServiceNamespace: ecs
-      RoleARN: !GetAtt AutoScalingRole.Arn
+  # AutoScalingTarget:
+  #   Type: AWS::ApplicationAutoScaling::ScalableTarget
+  #   Properties:
+  #     MinCapacity: 1
+  #     MaxCapacity: 5
+  #     ResourceId: !Sub "service/${Cluster}/${FargateService.Name}"
+  #     ScalableDimension: ecs:service:DesiredCount
+  #     ServiceNamespace: ecs
+  #     RoleARN: !GetAtt AutoScalingRole.Arn
 
-  ScalingPolicyCPU:
-    Type: AWS::ApplicationAutoScaling::ScalingPolicy
-    Properties:
-      PolicyName: !Sub ${FargateService}-cpu
-      PolicyType: TargetTrackingScaling
-      ScalingTargetId: !Ref AutoScalingTarget
-      TargetTrackingScalingPolicyConfiguration:
-        PredefinedMetricSpecification:
-          PredefinedMetricType: ECSServiceAverageCPUUtilization
-        ScaleInCooldown: 10
-        ScaleOutCooldown: 10
-        TargetValue: 45.0
+  # ScalingPolicyCPU:
+  #   Type: AWS::ApplicationAutoScaling::ScalingPolicy
+  #   Properties:
+  #     PolicyName: !Sub ${FargateService}-cpu
+  #     PolicyType: TargetTrackingScaling
+  #     ScalingTargetId: !Ref AutoScalingTarget
+  #     TargetTrackingScalingPolicyConfiguration:
+  #       PredefinedMetricSpecification:
+  #         PredefinedMetricType: ECSServiceAverageCPUUtilization
+  #       ScaleInCooldown: 10
+  #       ScaleOutCooldown: 10
+  #       TargetValue: 45.0
 
-  ScalingPolicyMemory:
-    Type: AWS::ApplicationAutoScaling::ScalingPolicy
-    Properties:
-      PolicyName: !Sub ${FargateService}-memory
-      PolicyType: TargetTrackingScaling
-      ScalingTargetId: !Ref AutoScalingTarget
-      TargetTrackingScalingPolicyConfiguration:
-        PredefinedMetricSpecification:
-          PredefinedMetricType: ECSServiceAverageMemoryUtilization
-        ScaleInCooldown: 10
-        ScaleOutCooldown: 10
-        TargetValue: 50.0
+  # ScalingPolicyMemory:
+  #   Type: AWS::ApplicationAutoScaling::ScalingPolicy
+  #   Properties:
+  #     PolicyName: !Sub ${FargateService}-memory
+  #     PolicyType: TargetTrackingScaling
+  #     ScalingTargetId: !Ref AutoScalingTarget
+  #     TargetTrackingScalingPolicyConfiguration:
+  #       PredefinedMetricSpecification:
+  #         PredefinedMetricType: ECSServiceAverageMemoryUtilization
+  #       ScaleInCooldown: 10
+  #       ScaleOutCooldown: 10
+  #       TargetValue: 50.0
 
   FargateService:
     Type: AWS::ECS::Service
