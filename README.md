@@ -12,20 +12,22 @@ This process allows a developer to install KeyCloak in a development environment
 
 ## Installation
 
-This process should only need to be completed once, unless the KeyCloak shared configuration has changed. If KeyCloak has already been installed, [completely remove it](#removal) prior to reinstallation.
+This process should only need to be performed once, unless the KeyCloak shared configuration has changed. If KeyCloak has already been installed, [completely remove it](#removal) prior to reinstallation.
 
 From the repo root:
+
 ```shell
-docker-compose up -d
+docker-compose up -d --build
 ```
 
-KeyCloak is now installed and accessible at https://localhost:8443. It is not yet configured. To configure, [import the configuration](#import-configuration).
+KeyCloak is now installed and accessible at https://localhost:8443.
 
 ## Removal
 
 This process is destructive to any existing KeyCloak configuration. If you've made any local KeyCloak configuration changes that should be preserved, [export](#export-configuration) and commit them first.
 
 From the repo root:
+
 ```shell
 docker-compose down
 docker volume rm platform-auth-keycloak_db
@@ -40,18 +42,22 @@ PowerShell scripts have been created to help with import/export.
 ### Import
 
 From the repo root, in PowerShell:
+
 ```powershell
 .\Import-KeyCloakConfig.ps1
 ```
+
 After importing a fresh configuration, KC may throw an error message upon first login. If this happens, close the browser window and try again. It should work the second time.
 
 ### Export
 
 From the repo root, in PowerShell:
+
 ```powershell
 .\Export-KeyCloakConfig.ps1
 ```
-The exported configuration is now in the `import` directory. It should be committed to source control if any important changes have been made.
+
+The exported configuration is now in the `import` directory. It should be committed to source control if any important changes have been made. NOTE: KeyCloak generates new IDs for most config elements during export. They will show up as diffs. This is annoying, but normal.
 
 ## Miscellaneous notes
 
@@ -72,11 +78,13 @@ Your configuration may differ depending on which local client keys you typically
 ### Viewing/monitoring KeyCloak logs
 
 To output all KeyCloak logs:
+
 ```shell
 docker logs keycloak-app
 ```
 
 Add an `-f` to the `logs` command to follow the logs in real time:
+
 ```shell
 docker logs -f keycloak-app
 ```

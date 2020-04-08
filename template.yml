@@ -35,11 +35,17 @@ Parameters:
     Type: String
     Default: None
     Description: This is the existing certificate for this developer's stack. If 'None' is provided the certificate will be created
+  DbaAccessCidr:
+    Type: String
+    Default: "255.255.255.255/32"
+    Description: If specified adds an ingress rule to the DB security group for dba management
+    AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
 
 Conditions:
   CreateInstanceCert: !Equals [ !Ref InstanceCertificateArn, "None"]
   Development: !Equals [ !Ref Stage, "Development" ]
   NotDevelopment: !Not [!Equals [ !Ref Stage, "Development" ] ]
+  DbaAccess: !Not [!Equals [ !Ref DbaAccessCidr, "255.255.255.255/32" ] ]
 
 Mappings:
   StageToSubnets:
@@ -301,41 +307,41 @@ Resources:
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole'
 
-  AutoScalingTarget:
-    Type: AWS::ApplicationAutoScaling::ScalableTarget
-    Properties:
-      MinCapacity: 1
-      MaxCapacity: 5
-      ResourceId: !Sub "service/${Cluster}/${FargateService.Name}"
-      ScalableDimension: ecs:service:DesiredCount
-      ServiceNamespace: ecs
-      RoleARN: !GetAtt AutoScalingRole.Arn
+  # AutoScalingTarget:
+  #   Type: AWS::ApplicationAutoScaling::ScalableTarget
+  #   Properties:
+  #     MinCapacity: 1
+  #     MaxCapacity: 5
+  #     ResourceId: !Sub "service/${Cluster}/${FargateService.Name}"
+  #     ScalableDimension: ecs:service:DesiredCount
+  #     ServiceNamespace: ecs
+  #     RoleARN: !GetAtt AutoScalingRole.Arn
 
-  ScalingPolicyCPU:
-    Type: AWS::ApplicationAutoScaling::ScalingPolicy
-    Properties:
-      PolicyName: !Sub ${FargateService}-cpu
-      PolicyType: TargetTrackingScaling
-      ScalingTargetId: !Ref AutoScalingTarget
-      TargetTrackingScalingPolicyConfiguration:
-        PredefinedMetricSpecification:
-          PredefinedMetricType: ECSServiceAverageCPUUtilization
-        ScaleInCooldown: 10
-        ScaleOutCooldown: 10
-        TargetValue: 45.0
+  # ScalingPolicyCPU:
+  #   Type: AWS::ApplicationAutoScaling::ScalingPolicy
+  #   Properties:
+  #     PolicyName: !Sub ${FargateService}-cpu
+  #     PolicyType: TargetTrackingScaling
+  #     ScalingTargetId: !Ref AutoScalingTarget
+  #     TargetTrackingScalingPolicyConfiguration:
+  #       PredefinedMetricSpecification:
+  #         PredefinedMetricType: ECSServiceAverageCPUUtilization
+  #       ScaleInCooldown: 10
+  #       ScaleOutCooldown: 10
+  #       TargetValue: 45.0
 
-  ScalingPolicyMemory:
-    Type: AWS::ApplicationAutoScaling::ScalingPolicy
-    Properties:
-      PolicyName: !Sub ${FargateService}-memory
-      PolicyType: TargetTrackingScaling
-      ScalingTargetId: !Ref AutoScalingTarget
-      TargetTrackingScalingPolicyConfiguration:
-        PredefinedMetricSpecification:
-          PredefinedMetricType: ECSServiceAverageMemoryUtilization
-        ScaleInCooldown: 10
-        ScaleOutCooldown: 10
-        TargetValue: 50.0
+  # ScalingPolicyMemory:
+  #   Type: AWS::ApplicationAutoScaling::ScalingPolicy
+  #   Properties:
+  #     PolicyName: !Sub ${FargateService}-memory
+  #     PolicyType: TargetTrackingScaling
+  #     ScalingTargetId: !Ref AutoScalingTarget
+  #     TargetTrackingScalingPolicyConfiguration:
+  #       PredefinedMetricSpecification:
+  #         PredefinedMetricType: ECSServiceAverageMemoryUtilization
+  #       ScaleInCooldown: 10
+  #       ScaleOutCooldown: 10
+  #       TargetValue: 50.0
 
   FargateService:
     Type: AWS::ECS::Service
@@ -754,6 +760,17 @@ Resources:
         Fn::ImportValue:
           !Sub "${InfrastructureStackName}-VpcId"
 
+  DbaAccessSecurityGroupIngress:
+    Condition: DbaAccess
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      Description: "External management for DBAs"
+      GroupId: !Ref DbClusterSecurityGroup
+      CidrIp: !Ref DbaAccessCidr
+      IpProtocol: "TCP"
+      FromPort: 5432
+      ToPort: 5432
+
   DatabaseSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -948,3 +965,5 @@ Outputs:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/epim-iem"
   CoiClientSecretSsmArn:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/coi"
+  InClientSecretSsmArn:
+    Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/in"

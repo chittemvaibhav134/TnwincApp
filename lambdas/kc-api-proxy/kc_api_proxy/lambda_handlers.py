@@ -4,7 +4,6 @@ from .cpresponse import CodePipelineHelperResponse
 from .task_helpers import (
     assemble_ssm_path, 
     rotate_and_store_client_secrets, 
-    clear_all_realms_cache,
     clear_all_users_cache
 )
 
@@ -60,7 +59,14 @@ def cp_post_deploy_handler(event, context):
     # the ids not matching in db vs app cache and then rotating the secrets (or anything else hitting a client-id)
     # has a solid chance of of throwing a 500 :/
     try:
-        clear_all_realms_cache(kc)
+        kc.clear_realm_cache("master")
+        # reset the kc api proxy because once the master realm cache has been cleared
+        # it will notice that the admin-api-proxy secret has been reset and no longer matches what was pulled 
+        # from ssm.. which causes this to fail every deploy, but succeed on retrying the action.
+        # If we introduce more realms it is probably worth using the clear_all_realms_cache task_helper instead
+        # of hardcoding the two known ones
+        kc = get_keycloak_api_proxy_from_env()
+        kc.clear_realm_cache("navex")
     except Exception as e:
         logger.exception(e)
         return CodePipelineHelperResponse.failed(f"Error clearing realm cache pre deploy actions: {e}")
@@ -80,7 +86,8 @@ def cp_post_deploy_handler(event, context):
             return CodePipelineHelperResponse.failed(f"Error performing action {action}: {e}")
 
     try:
-        clear_all_realms_cache(kc)
+        kc.clear_realm_cache("master")
+        kc.clear_realm_cache("navex")
     except Exception as e:
         logger.exception(e)
         return CodePipelineHelperResponse.failed(f"Error clearing realm cache post deploy actions: {e}")
