@@ -71,6 +71,15 @@
           "Required": false
         }
       ]
+    },
+    {
+      "Project": "in",
+      "Artifacts": [
+        {
+          "Name": "InsightsAuthRedirectUrl",
+          "Required": false
+        }
+      ]
     }
   ],
   "Exposes": [
