@@ -41,6 +41,9 @@ phases:
       - |
           CoiAuthRedirectUrlDefault="https://auth.coi.devlocal.navex-pe.com"
           CoiAuthRedirectUrl=$(jq --arg DEFAULT "$CoiAuthRedirectUrlDefault" -r '.CoiAuthRedirectUrl // $DEFAULT' "$DC_ART_DIR/coi-ui" || echo "$CoiAuthRedirectUrlDefault")
+      - |
+          InsightsApiBaseUrlDefault="https://api.dev.insights.local"
+          InsightsApiBaseUrl=$(jq --arg DEFAULT "$InsightsApiBaseUrlDefault" -r '.ApiFriendlyBaseUrl // $DEFAULT' "$DC_ART_DIR/insights" || echo "$InsightsApiBaseUrlDefault")
       - mkdir transformed-import
   build:
     commands:
@@ -78,6 +81,7 @@ phases:
           jq --arg EPIMIEMWEBORIGIN "https://${EpimIemRootDomain}" '(.clients[] | select(.clientId == "epim-iem") | .webOrigins[0]) |= $EPIMIEMWEBORIGIN' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.browserSecurityHeaders.contentSecurityPolicy) |= $CSP_HEADER' |
           jq --arg COIREDIRECTURI "${CoiAuthRedirectUrl}/*" '(.clients[] | select(.clientId == "coi") | .redirectUris[0]) |= $COIREDIRECTURI' |
+          jq --arg INREDIRECTURI "${InsightsAuthRedirectUrl}/public/v2/BrowserAuthorization.FinishBrowserAuthorization" '(.clients[] | select(.clientId == "insights") | .redirectUris[0]) |= $INREDIRECTURI' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.attributes."_browser_header.contentSecurityPolicy") |= $CSP_HEADER' > transformed-import/navex-realm.json
       - |
         jq --null-input \

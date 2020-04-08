@@ -71,6 +71,15 @@
           "Required": false
         }
       ]
+    },
+    {
+      "Project": "insights",
+      "Artifacts": [
+        {
+          "Name": "ApiFriendlyBaseUrl",
+          "Required": false
+        }
+      ]
     }
   ],
   "Exposes": [
