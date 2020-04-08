@@ -73,10 +73,10 @@
       ]
     },
     {
-      "Project": "in",
+      "Project": "insights",
       "Artifacts": [
         {
-          "Name": "InsightsAuthRedirectUrl",
+          "Name": "ApiFriendlyBaseUrl",
           "Required": false
         }
       ]
