@@ -20,6 +20,9 @@ Parameters:
     NoEcho: true
   RegionalPackageStackName:
     Type: String
+  DevAccountId:
+    Type: String
+    Default: "552242929734"
   IntegrationAccountId:
     Type: String
     Default: "455920928861"
@@ -40,7 +43,8 @@ Resources:
               "Effect": "Allow",
               "Principal": {
                 "AWS": [
-                  "arn:aws:iam::${IntegrationAccountId}:root"
+                  "arn:aws:iam::${IntegrationAccountId}:root",
+                  "arn:aws:iam::${DevAccountId}:root"
                 ]
               },
               "Action": [
