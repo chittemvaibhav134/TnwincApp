@@ -334,7 +334,7 @@ Resources:
   ScalingPolicyCPU:
     Type: AWS::ApplicationAutoScaling::ScalingPolicy
     Properties:
-      PolicyName: !Sub ${FargateService}-cpu
+      PolicyName: !Sub ${FargateService.Name}-cpu
       PolicyType: TargetTrackingScaling
       ScalingTargetId: !Ref AutoScalingTarget
       TargetTrackingScalingPolicyConfiguration:
@@ -347,7 +347,7 @@ Resources:
   ScalingPolicyMemory:
     Type: AWS::ApplicationAutoScaling::ScalingPolicy
     Properties:
-      PolicyName: !Sub ${FargateService}-memory
+      PolicyName: !Sub ${FargateService.Name}-memory
       PolicyType: TargetTrackingScaling
       ScalingTargetId: !Ref AutoScalingTarget
       TargetTrackingScalingPolicyConfiguration:
