@@ -1,15 +1,12 @@
 version: '2.0'
 
 volumes:
-
   db:
 
 networks:
-
   keycloak:
 
 services:
-
   app:
     container_name: keycloak-app
     depends_on:
@@ -24,7 +21,9 @@ services:
     ports:
       - '8443:8443'
       - '9990:9990'
-    image: jboss/keycloak:8.0.0
+    build:
+      context: ./build/app
+    image: navex/keycloak:8.0.2
     links:
       - db
     networks:
@@ -33,8 +32,11 @@ services:
     volumes:
       - ./import:/import:rw
     entrypoint:
-      - /opt/jboss/tools/docker-entrypoint.sh
-      - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import -Djboss.bind.address.management=0.0.0.0"
+      - /opt/jboss/tools/start.sh
+      - "-Dkeycloak.migration.action=import"
+      - "-Dkeycloak.migration.provider=dir"
+      - "-Dkeycloak.migration.dir=/import"
+      - "-Djboss.bind.address.management=0.0.0.0"
 
   db:
     container_name: keycloak-db

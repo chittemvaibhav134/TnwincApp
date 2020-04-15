@@ -1,6 +1,7 @@
 param(
     [string]$workingDir = $PSScriptRoot,
-    [string]$composeFilePath = (Join-Path $PSScriptRoot 'docker-compose.yml')
+    [string]$composeFilePath = (Join-Path $PSScriptRoot 'docker-compose.yml'),
+    [switch]$showOutput
 )
 . (Join-Path $workingDir "KeyCloakUtils.ps1")
 
@@ -14,13 +15,13 @@ catch [System.Management.Automation.CommandNotFoundException] {
 $importDir = Join-Path $workingDir "import"
 
 Write-Host "Cleaning export destination."
-if(Test-Path (Join-Path $importDir "master-realm.json")) { Remove-Item (Join-Path $importDir "master-realm.json") }
-if(Test-Path (Join-Path $importDir "master-users-0.json")) { Remove-Item (Join-Path $importDir "master-users-0.json") }
-if(Test-Path (Join-Path $importDir "navex-realm.json")) { Remove-Item (Join-Path $importDir "navex-realm.json") }
-if(Test-Path (Join-Path $importDir "navex-users-0.json")) { Remove-Item (Join-Path $importDir "navex-users-0.json") }
+if (Test-Path (Join-Path $importDir "master-realm.json")) { Remove-Item (Join-Path $importDir "master-realm.json") }
+if (Test-Path (Join-Path $importDir "master-users-0.json")) { Remove-Item (Join-Path $importDir "master-users-0.json") }
+if (Test-Path (Join-Path $importDir "navex-realm.json")) { Remove-Item (Join-Path $importDir "navex-realm.json") }
+if (Test-Path (Join-Path $importDir "navex-users-0.json")) { Remove-Item (Join-Path $importDir "navex-users-0.json") }
 
 Write-Host "Exporting KeyCloak configuration to $importDir."
-Invoke-KeyCloakMigration -action "export" -composeFilePath $composeFilePath
+Invoke-KeyCloakMigration -action "export" -composeFilePath $composeFilePath -showOutput $showOutput
 
 Write-Host "Sorting export files."
 Get-ChildItem -Path $importDir -File | ForEach-Object {

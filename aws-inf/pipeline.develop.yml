@@ -20,14 +20,52 @@ Parameters:
     NoEcho: true
   RegionalPackageStackName:
     Type: String
-  # DevAccountId:
-  #   Type: String
-  #   Default: "552242929734"
+  DevAccountId:
+    Type: String
+    Default: "552242929734"
   IntegrationAccountId:
     Type: String
     Default: "455920928861"
 
 Resources:
+  NavexKcContainerRepository:
+    Type: AWS::ECR::Repository
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      RepositoryPolicyText: !Sub |
+        {
+          "Version": "2008-10-17",
+          "Statement": [
+            {
+              "Sid": "AllowCrossAccountPush",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": [
+                  "arn:aws:iam::${IntegrationAccountId}:root",
+                  "arn:aws:iam::${DevAccountId}:root"
+                ]
+              },
+              "Action": [
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:BatchGetImage"
+              ]
+            }
+          ]
+        }
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {"rules":[
+            {
+              "rulePriority":1,
+              "description":"Expire images older than 14 days",
+              "selection":{
+                "tagStatus":"untagged","countType":"sinceImagePushed","countUnit":"days","countNumber":14
+              },
+              "action":{"type":"expire"}
+            }
+          ]}
 
   KCCodeBuild:
     Type: AWS::CodeBuild::Project
@@ -42,8 +80,14 @@ Resources:
         BuildSpec: aws-inf/buildspec.yml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:3.0
+        Image: aws/codebuild/standard:4.0
         Type: LINUX_CONTAINER
+        PrivilegedMode: True
+        EnvironmentVariables:
+          - Name: ECR_REGION
+            Value: !Ref AWS::Region
+          - Name: REPOSITORY_URI
+            Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${NavexKcContainerRepository}
 
   KCPRCodeBuild:
     Type: AWS::CodeBuild::Project
@@ -54,11 +98,12 @@ Resources:
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:3.0
+        Image: aws/codebuild/standard:4.0
+        PrivilegedMode: True
       Source:
         Type: GITHUB
         Location: !Sub "https://github.com/${GitHubOwner}/${GitHubRepo}"
-        BuildSpec: aws-inf/buildspec.yml
+        BuildSpec: aws-inf/buildspec.prblocker.yml
         GitCloneDepth: 1
         ReportBuildStatus: true
       Triggers:
@@ -84,7 +129,7 @@ Resources:
         BuildSpec: app/aws-inf/buildspec.transform.yml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:3.0
+        Image: aws/codebuild/standard:4.0
         Type: LINUX_CONTAINER   
 
   PipelineWebhook:
@@ -452,4 +497,233 @@ Resources:
                 - Name: ProjectVersion
                 - Name: CfnDeploy_Wobbly
                 - Name: CfnAuthDeploy_Wobbly_UsWest2                 
+              RunOrder: 9
+            - 
+              Name: GetDcArt_Rickety
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPGetDCArtFromBuildInfo
+                UserParameters: !Sub |
+                  {
+                    "SourceProjectId": "${ProjectName}_navexint_us-west-2",
+                    "DeploymentContext": "rickety",
+                    "BuildInfoFile": "ProjectVersion::build-record.json"
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+              OutputArtifacts:
+                - Name: GetDcArt_Rickety
+              RunOrder: 1
+            -
+              Name: MergeArtifacts_Rickety
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPMergeArtifacts
+                UserParameters: |
+                  {
+                    "ArtifactPrefixMap":{
+                      "ProjectVersion": "build_info",
+                      "GetDcArt_Rickety": "dc_art",
+                      "App": "app"
+                    }
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+                - Name: GetDcArt_Rickety
+                - Name: App
+              OutputArtifacts:
+                - Name: MergeArtifacts_Rickety
+              RunOrder: 2
+            - 
+              Name: Transform_Rickety
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref TransformCodeBuildProject
+                EnvironmentVariables: |
+                  [
+                    {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "true", "type": "PLAINTEXT"}
+                  ]
+              InputArtifacts:
+                - Name: MergeArtifacts_Rickety
+              OutputArtifacts:
+                - Name: Transform_Rickety
+              RunOrder: 3
+            - 
+              Name: FinalizedCfnConfig_Rickety
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "BuildOutput::template-configuration.json", 
+                      "Transform_Rickety::template-configuration.json" 
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "Subdomain": "id3.rickety",
+                        "DnsHostedZone": "navex-int.com",
+                        "Stage": "Development"
+                      },
+                      "Tags": {"navex:deploy:context": "rickety"} 
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: BuildOutput
+                - Name: Transform_Rickety
+              OutputArtifacts:
+                - Name: FinalizedCfnConfig_Rickety
+              RunOrder: 4
+            - 
+              Name: CfnDeploy_Rickety
+              Region: us-west-2
+              RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-rickety
+                TemplatePath: "PackageUsWest2::app.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnConfig_Rickety::template-configuration.json"
+                OutputFileName: stack-outputs.json
+              InputArtifacts:
+                - Name: PackageUsWest2
+                - Name: FinalizedCfnConfig_Rickety
+              OutputArtifacts:
+                - Name: CfnDeploy_Rickety
+              RunOrder: 5
+            -
+              Name: ConfigUpload_Rickety          
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              InputArtifacts:
+                - Name: Transform_Rickety
+                - Name: CfnDeploy_Rickety
+              Configuration:
+                FunctionName: CPS3Deploy
+                UserParameters: !Sub |
+                  {
+                    "S3BucketName": "CfnDeploy_Rickety::stack-outputs.json:ConfigBucket",
+                    "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
+                    "ExcludeArtifactsFromUpload": ["CfnDeploy_Rickety"],
+                    "AccountId": "${IntegrationAccountId}",
+                    "Region": "us-west-2"
+                  }
+              RunOrder: 6
+            - 
+              Name: CfnAuthDeploy_Rickety_UsWest2
+              Region: us-west-2
+              RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-auth-rickety
+                TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
+                OutputFileName: stack-outputs.json
+                ParameterOverrides: |
+                  {
+                    "KCBaseUrl": {"Fn::GetParam" : [ "CfnDeploy_Rickety", "stack-outputs.json", "Domain" ] }
+                  }
+              InputArtifacts:
+                - Name: AuthPackageUsWest2
+                - Name: CfnDeploy_Rickety
+              OutputArtifacts:
+                - Name: CfnAuthDeploy_Rickety_UsWest2
+              RunOrder: 7
+            -
+              Name: ImportConfig_Rickety
+              RunOrder: 7
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_Rickety::stack-outputs.json:CpConfigImportLambdaArn",
+                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "AccountId": "${IntegrationAccountId}",
+                    "Region": "us-west-2",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_Rickety
+            -
+              Name: PostDeployApiActions_Rickety
+              RunOrder: 8
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_Rickety::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
+                    "AccountId": "${IntegrationAccountId}",
+                    "Region": "us-west-2",
+                    "InvocationType": "RequestResponse",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_Rickety
+            - 
+              Name: PublishDeployment_Rickety
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPSetDeploymentContext
+                UserParameters: !Sub |
+                  {
+                    "ProjectId": "${ProjectName}_navexint_us-west-2",
+                    "BuildInfoFile": "ProjectVersion::build-record.json",
+                    "DeploymentContext": "rickety",
+                    "JsonArtifactFiles": [
+                      "CfnDeploy_Rickety::stack-outputs.json",
+                      "CfnAuthDeploy_Rickety_UsWest2::stack-outputs.json"
+                    ]
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+                - Name: CfnDeploy_Rickety
+                - Name: CfnAuthDeploy_Rickety_UsWest2                 
               RunOrder: 9

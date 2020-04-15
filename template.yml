@@ -35,11 +35,17 @@ Parameters:
     Type: String
     Default: None
     Description: This is the existing certificate for this developer's stack. If 'None' is provided the certificate will be created
+  DbaAccessCidr:
+    Type: String
+    Default: "255.255.255.255/32"
+    Description: If specified adds an ingress rule to the DB security group for dba management
+    AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
 
 Conditions:
   CreateInstanceCert: !Equals [ !Ref InstanceCertificateArn, "None"]
   Development: !Equals [ !Ref Stage, "Development" ]
   NotDevelopment: !Not [!Equals [ !Ref Stage, "Development" ] ]
+  DbaAccess: !Not [!Equals [ !Ref DbaAccessCidr, "255.255.255.255/32" ] ]
 
 Mappings:
   StageToSubnets:
@@ -100,13 +106,23 @@ Resources:
               - s3:GetObjectVersion
               - s3:ListBucket
 
-  LBSecurityGroup:
+  AppSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: !Sub ${AWS::StackName}-hosts
       SecurityGroupIngress:
-        - SourceSecurityGroupId: !Ref SecurityGroup
+        - SourceSecurityGroupId: !Ref AlbSecurityGroup
           IpProtocol: "-1"
+        - CidrIp: !GetAtt Cidrs.KCAZ1
+          IpProtocol: "TCP"
+          FromPort: 7600
+          ToPort: 7600
+          Description: !Sub "KeyCloak AZ1 (${KeycloakSubnet1})"
+        - CidrIp: !GetAtt Cidrs.KCAZ2
+          IpProtocol: "TCP"
+          FromPort: 7600
+          ToPort: 7600
+          Description: !Sub "KeyCloak AZ2 (${KeycloakSubnet2})"
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
 
@@ -115,7 +131,7 @@ Resources:
     Properties:
       ClusterName: !Ref AWS::StackName
 
-  SecurityGroup:
+  AlbSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: !Sub ${AWS::StackName}-alb
@@ -134,7 +150,7 @@ Resources:
         - !Ref KeycloakSubnet1
         - !Ref KeycloakSubnet2
       SecurityGroups:
-        - !Ref SecurityGroup
+        - !Ref AlbSecurityGroup
 
   KcCertificate:
     Type: AWS::CertificateManager::Certificate
@@ -198,6 +214,10 @@ Resources:
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: "30"
+        - Key: stickiness.enabled
+          Value: "true"
+        - Key: stickiness.type
+          Value: lb_cookie
 
   WildFlyTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -320,9 +340,9 @@ Resources:
       TargetTrackingScalingPolicyConfiguration:
         PredefinedMetricSpecification:
           PredefinedMetricType: ECSServiceAverageCPUUtilization
-        ScaleInCooldown: 10
-        ScaleOutCooldown: 10
-        TargetValue: 45.0
+        ScaleInCooldown: 20
+        ScaleOutCooldown: 20
+        TargetValue: 35.0
 
   ScalingPolicyMemory:
     Type: AWS::ApplicationAutoScaling::ScalingPolicy
@@ -333,8 +353,8 @@ Resources:
       TargetTrackingScalingPolicyConfiguration:
         PredefinedMetricSpecification:
           PredefinedMetricType: ECSServiceAverageMemoryUtilization
-        ScaleInCooldown: 10
-        ScaleOutCooldown: 10
+        ScaleInCooldown: 20
+        ScaleOutCooldown: 20
         TargetValue: 50.0
 
   FargateService:
@@ -351,7 +371,7 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
-            - !Ref LBSecurityGroup
+            - !Ref AppSecurityGroup
           Subnets:
             - !Ref KeycloakSubnet1
             - !Ref KeycloakSubnet2
@@ -396,6 +416,7 @@ Resources:
           PortMappings:
             - ContainerPort: 8443
             - ContainerPort: 9990
+            - ContainerPort: 7600
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -413,11 +434,21 @@ Resources:
               Value: postgres
             - Name: DB_DATABASE
               Value: postgres
+            - Name: PROXY_ADDRESS_FORWARDING
+              Value: "true"
+            - Name: JGROUPS_TRANSPORT_STACK
+              Value: tcp
+            - Name: JGROUPS_DISCOVERY_PROTOCOL
+              Value: JDBC_PING
+            - Name: JGROUPS_DISCOVERY_PROPERTIES 
+              Value: datasource_jndi_name=java:jboss/datasources/KeycloakDS
+            - Name: DISCOVER_IP
+              Value: aws
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
           EntryPoint:
-            - /opt/jboss/tools/docker-entrypoint.sh
+            - /opt/jboss/tools/start.sh
             - "-Djboss.bind.address.management=0.0.0.0"
 
   ImportConfigTaskDefinition:
@@ -464,7 +495,7 @@ Resources:
               ReadOnly: true
               SourceVolume: config
           EntryPoint:
-            - /opt/jboss/tools/docker-entrypoint.sh
+            - /opt/jboss/tools/start.sh
             - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import"
           DependsOn:
             - Condition: SUCCESS
@@ -754,6 +785,17 @@ Resources:
         Fn::ImportValue:
           !Sub "${InfrastructureStackName}-VpcId"
 
+  DbaAccessSecurityGroupIngress:
+    Condition: DbaAccess
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      Description: "External management for DBAs"
+      GroupId: !Ref DbClusterSecurityGroup
+      CidrIp: !Ref DbaAccessCidr
+      IpProtocol: "TCP"
+      FromPort: 5432
+      ToPort: 5432
+
   DatabaseSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -948,3 +990,5 @@ Outputs:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/epim-iem"
   CoiClientSecretSsmArn:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/coi"
+  InsightsClientSecretSsmArn:
+    Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/insights"
