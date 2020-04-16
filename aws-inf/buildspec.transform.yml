@@ -51,8 +51,8 @@ phases:
         if ! $INCLUDE_ADMIN_USER_IMPORT ; then
           # remove any users in the master realm with hard coded credentials
           # should probably do this in navex-realm as well
-          echo "Removing hard coded users from master realm..."
-          jq 'del(.users[] | select(.credentials != []))' $APP_DIR/import/master-realm.json > master-realm.temp.json
+          echo "Disabling hard coded users from master realm..."
+          jq '(.users[] | select(.credentials != []) | .enabled) |= false' $APP_DIR/import/master-realm.json > master-realm.temp.json
           mv master-realm.temp.json $APP_DIR/import/master-realm.json
         fi
       - cp $APP_DIR/import/master-realm.json transformed-import/
