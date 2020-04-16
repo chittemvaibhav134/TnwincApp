@@ -17,9 +17,6 @@ Parameters:
     Type: String
   DnsHostedZone:
     Type: String
-  EcsDesiredCount:
-    Type: Number
-    Default: 1
   Stage:
     Type: String
     AllowedValues:
@@ -58,9 +55,11 @@ Mappings:
     Development:
       TaskMemory: 2048
       TaskCpu: 1024
+      DesiredTaskCount: 1
     Production:
       TaskMemory: 2048
       TaskCpu: 1024
+      DesiredTaskCount: 2
 
 Resources:
   ECSTaskRole:
@@ -369,7 +368,7 @@ Resources:
       - LoadBalancerWildFlyListener
     Properties:
       Cluster: !GetAtt Cluster.Arn
-      DesiredCount: !Ref EcsDesiredCount
+      DesiredCount: !FindInMap [StageToContainerResources, !Ref "Stage", DesiredTaskCount]
       TaskDefinition: !Ref TaskDefinition
       LaunchType: FARGATE
       NetworkConfiguration:
