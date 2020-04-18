@@ -59,7 +59,7 @@ Mappings:
     Production:
       TaskMemory: 2048
       TaskCpu: 1024
-      DesiredTaskCount: 2
+      DesiredTaskCount: 1
 
 Resources:
   ECSTaskRole:
@@ -440,16 +440,14 @@ Resources:
               Value: postgres
             - Name: PROXY_ADDRESS_FORWARDING
               Value: "true"
-            ## Commenting out for now; these enable jdbc_ping clustering, but 
-            ## not in a stable state apparently 
-            # - Name: JGROUPS_TRANSPORT_STACK
-            #   Value: tcp
-            # - Name: JGROUPS_DISCOVERY_PROTOCOL
-            #   Value: JDBC_PING
-            # - Name: JGROUPS_DISCOVERY_PROPERTIES 
-            #   Value: datasource_jndi_name=java:jboss/datasources/KeycloakDS
-            # - Name: DISCOVER_IP
-            #   Value: aws
+            - Name: JGROUPS_TRANSPORT_STACK
+              Value: tcp
+            - Name: JGROUPS_DISCOVERY_PROTOCOL
+              Value: JDBC_PING
+            - Name: JGROUPS_DISCOVERY_PROPERTIES 
+              Value: datasource_jndi_name=java:jboss/datasources/KeycloakDS
+            - Name: DISCOVER_IP
+              Value: aws
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
