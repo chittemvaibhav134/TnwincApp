@@ -43,6 +43,7 @@ Conditions:
   Development: !Equals [ !Ref Stage, "Development" ]
   NotDevelopment: !Not [!Equals [ !Ref Stage, "Development" ] ]
   DbaAccess: !Not [!Equals [ !Ref DbaAccessCidr, "255.255.255.255/32" ] ]
+  EuDeployment: !Equals [ !Ref "AWS::Region", 'eu-central-1' ]
 
 Mappings:
   StageToSubnets:
@@ -233,6 +234,12 @@ Resources:
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
+      # Bandaid to fix eu deployments. The tasks are pretty consistently starting up
+      # and appear to working from the logs.. but then fail this healthcheck and get 
+      # torn back down. I suspect the Unhealthy threshold (default is 2) timer starts
+      # before the container is fully started and maybe the network overhead pulling from
+      # us-west-2 is causing it to tip over the boundary.
+      UnhealthyThresholdCount: !If [ EuDeployment, 4, !Ref "AWS::NoValue" ]
       TargetType: "ip"
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
