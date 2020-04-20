@@ -32,11 +32,8 @@ services:
     volumes:
       - ./import:/import:rw
     entrypoint:
-      - /opt/jboss/tools/start.sh
-      - "-Dkeycloak.migration.action=import"
-      - "-Dkeycloak.migration.provider=dir"
-      - "-Dkeycloak.migration.dir=/import"
-      - "-Djboss.bind.address.management=0.0.0.0"
+      - /opt/jboss/tools/docker-entrypoint.sh
+      - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import -Djboss.bind.address.management=0.0.0.0"
 
   db:
     container_name: keycloak-db
