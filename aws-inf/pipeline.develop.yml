@@ -45,8 +45,8 @@ Resources:
               "Effect": "Allow",
               "Principal": {
                 "AWS": [
-                  "arn:aws:iam::${IntegrationAccountId}:root",,
-                  "arn:aws:iam::${StageAccountId}:root"
+                  "arn:aws:iam::${IntegrationAccountId}:root",
+                  "arn:aws:iam::${StageAccountId}:root",
                   "arn:aws:iam::${DevAccountId}:root"
                 ]
               },
@@ -220,6 +220,21 @@ Resources:
                 - Name: App
               OutputArtifacts:
                 - Name: PackageUsWest2
+              RunOrder: 1
+            - 
+              Name: PackageUsEast1
+              Region: us-east-1
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Sub ${RegionalPackageStackName}-${ProjectName}
+              InputArtifacts:
+                - Name: App
+              OutputArtifacts:
+                - Name: PackageUsEast1
               RunOrder: 1
             - 
               Name: AuthPackageUsWest2
@@ -813,8 +828,8 @@ Resources:
                     ],
                     "Json": {
                       "Parameters": {
-                        "Subdomain": "id3.previewUS",
-                        "DnsHostedZone": "navex-int.com",
+                        "Subdomain": "id3.previewus",
+                        "DnsHostedZone": "navex-preview.com",
                         "Stage": "Development"
                       },
                       "Tags": {"navex:deploy:context": "previewUS"} 
@@ -950,7 +965,7 @@ Resources:
                 FunctionName: CPSetDeploymentContext
                 UserParameters: !Sub |
                   {
-                    "ProjectId": "${ProjectName}_navexstage_us-west-2",
+                    "ProjectId": "${ProjectName}_navexstage_us-east-1",
                     "BuildInfoFile": "ProjectVersion::build-record.json",
                     "DeploymentContext": "previewUS",
                     "JsonArtifactFiles": [
