@@ -828,7 +828,7 @@ Resources:
                     ],
                     "Json": {
                       "Parameters": {
-                        "Subdomain": "id3.previewus",
+                        "Subdomain": "id3",
                         "DnsHostedZone": "navex-preview.com",
                         "Stage": "Development"
                       },
