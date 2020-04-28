@@ -1826,7 +1826,7 @@
           "protocolMapper": "oidc-audience-mapper"
         }
       ],
-      "publicClient": false,
+      "publicClient": true,
       "redirectUris": [
         "https://auth.coi.devlocal.navex-pe.com:18443/*",
         "https://auth.coi.devlocal.navex-pe.com:8443/*"
@@ -1835,7 +1835,9 @@
       "serviceAccountsEnabled": false,
       "standardFlowEnabled": true,
       "surrogateAuthRequired": false,
-      "webOrigins": []
+      "webOrigins": [
+        "+"
+      ]
     },
     {
       "attributes": {
