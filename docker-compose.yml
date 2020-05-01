@@ -12,6 +12,10 @@ services:
     depends_on:
       - db
     environment:
+      NEW_RELIC_APP_NAME: keycloak (dev)
+      NEW_RELIC_AGENT_ENABLED: 'true'
+      NEW_RELIC_LICENSE_KEY: 'fake'
+      #JAVA_OPTS: -javaagent:/opt/newrelic/newrelic.jar -server -Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true  --add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED --add-exports=jdk.unsupported/sun.reflect=ALL-UNNAMED
       DB_ADDR: db
       DB_DATABASE: keycloak
       DB_PASSWORD: keycloak
@@ -32,7 +36,7 @@ services:
     volumes:
       - ./import:/import:rw
     entrypoint:
-      - /opt/jboss/tools/docker-entrypoint.sh
+      - /opt/jboss/tools/start.sh
       - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import -Djboss.bind.address.management=0.0.0.0"
 
   db:
