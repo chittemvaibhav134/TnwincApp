@@ -80,6 +80,15 @@
           "Required": false
         }
       ]
+    },
+    {
+      "Project": "global-configuration",
+      "Artifacts": [
+        {
+          "Name": "NewRelicenseKeySsmArn",
+          "Required": false
+        }
+      ]
     }
   ],
   "Exposes": [
