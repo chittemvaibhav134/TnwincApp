@@ -246,7 +246,11 @@ Resources:
       # torn back down. I suspect the Unhealthy threshold (default is 2) timer starts
       # before the container is fully started and maybe the network overhead pulling from
       # us-west-2 is causing it to tip over the boundary.
-      UnhealthyThresholdCount: !If [ EuDeployment, 4, !Ref "AWS::NoValue" ]
+
+      # Adding the newrelic agent was the straw that broke the camels back for the us deploys
+      # with the agent it takes almost exactly two minutes to stabilize and that is too much.
+      # Sans agent it takes like 10 seconds less
+      UnhealthyThresholdCount: !If [ EuDeployment, 4, 3 ]
       TargetType: "ip"
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
