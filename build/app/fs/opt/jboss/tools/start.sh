@@ -21,4 +21,6 @@ if [[ -n ${DISCOVER_IP:-} ]]; then
     BONUS_PROPS+=" -Dcontainer.ip=$CONTAINER_IP"
 fi
 
+export JAVA_OPTS="$JAVA_OPTS -javaagent:/opt/newrelic/newrelic.jar"
+echo "$JAVA_OPTS set by me!!!!!!!!!!!!!!!!"
 exec /opt/jboss/tools/docker-entrypoint.sh $@ $BONUS_PROPS
