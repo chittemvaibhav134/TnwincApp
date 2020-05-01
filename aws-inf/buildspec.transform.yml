@@ -89,7 +89,7 @@ phases:
       - |
         jq --null-input \
           --arg InfrastructureStackName "$InfStackName" \
-          --arg NewRelicLicenseKeySsmArn "$NewRelicLicenseKeySsmArn" 
+          --arg NewRelicLicenseKeySsmArn "$NewRelicLicenseKeySsmArn" \
           --arg ProjectName "$ProjectName" \
           --arg ProjectVersion "$ProjectVersion" \
           '{
