@@ -7,5 +7,5 @@ USER 1000
 ENV NEW_RELIC_BROWSER_MONITORING_AUTO_INSTRUMENT false
 ENV NEW_RELIC_LOG_LEVEL off
 COPY --chown=jboss:root fs /
-RUN chmod +x /opt/jboss/tools/start.sh
+RUN chmod +x /opt/jboss/tools/start.sh && chmod +x /opt/jboss/startup-scripts/*.sh
 ENTRYPOINT /opt/jboss/tools/start.sh
