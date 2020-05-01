@@ -12,6 +12,9 @@ services:
     depends_on:
       - db
     environment:
+      NEW_RELIC_APP_NAME: keycloak (dev)
+      NEW_RELIC_AGENT_ENABLED: 'false'
+      NEW_RELIC_LICENSE_KEY: 'fake'
       DB_ADDR: db
       DB_DATABASE: keycloak
       DB_PASSWORD: keycloak
@@ -32,7 +35,7 @@ services:
     volumes:
       - ./import:/import:rw
     entrypoint:
-      - /opt/jboss/tools/docker-entrypoint.sh
+      - /opt/jboss/tools/start.sh
       - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import -Djboss.bind.address.management=0.0.0.0"
 
   db:
