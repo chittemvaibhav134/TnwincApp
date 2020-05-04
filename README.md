@@ -35,21 +35,7 @@ docker volume rm platform-auth-keycloak_db
 
 KeyCloak has now been completely removed.
 
-## Configuration Import/export
-
-PowerShell scripts have been created to help with import/export.
-
-### Import
-
-From the repo root, in PowerShell:
-
-```powershell
-.\Import-KeyCloakConfig.ps1
-```
-
-After importing a fresh configuration, KC may throw an error message upon first login. If this happens, close the browser window and try again. It should work the second time.
-
-### Export
+## Configuration Export
 
 From the repo root, in PowerShell:
 
