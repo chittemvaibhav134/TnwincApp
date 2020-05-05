@@ -44,6 +44,9 @@ phases:
       - |
           InsightsApiBaseUrlDefault="https://api.dev.insights.local"
           InsightsApiBaseUrl=$(jq --arg DEFAULT "$InsightsApiBaseUrlDefault" -r '.ApiFriendlyBaseUrl // $DEFAULT' "$DC_ART_DIR/insights" || echo "$InsightsApiBaseUrlDefault")
+      - |
+          NewRelicLicenseKeySsmArnDefault='None'
+          NewRelicLicenseKeySsmArn=$(jq --arg DEFAULT "$NewRelicLicenseKeySsmArnDefault" -r '.NewRelicenseKeySsmArn // $DEFAULT' "$DC_ART_DIR/global-configuration" || echo "$NewRelicLicenseKeySsmArnDefault")
       - mkdir transformed-import
   build:
     commands:
@@ -86,11 +89,13 @@ phases:
       - |
         jq --null-input \
           --arg InfrastructureStackName "$InfStackName" \
+          --arg NewRelicLicenseKeySsmArn "$NewRelicLicenseKeySsmArn" \
           --arg ProjectName "$ProjectName" \
           --arg ProjectVersion "$ProjectVersion" \
           '{
             "Parameters": {
-              "InfrastructureStackName": $InfrastructureStackName
+              "InfrastructureStackName": $InfrastructureStackName,
+              "NewRelicLicenseKeySsmArn": $NewRelicLicenseKeySsmArn
             },
             "Tags": {
               "navex:project:name": $ProjectName,

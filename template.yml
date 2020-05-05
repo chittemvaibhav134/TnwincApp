@@ -37,6 +37,9 @@ Parameters:
     Default: "255.255.255.255/32"
     Description: If specified adds an ingress rule to the DB security group for dba management
     AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
+  NewRelicLicenseKeySsmArn:
+    Type: String
+    Default: None
 
 Conditions:
   CreateInstanceCert: !Equals [ !Ref InstanceCertificateArn, "None"]
@@ -44,6 +47,7 @@ Conditions:
   NotDevelopment: !Not [!Equals [ !Ref Stage, "Development" ] ]
   DbaAccess: !Not [!Equals [ !Ref DbaAccessCidr, "255.255.255.255/32" ] ]
   EuDeployment: !Equals [ !Ref "AWS::Region", 'eu-central-1' ]
+  EnableNewRelicAgent: !Not [!Equals [ !Ref NewRelicLicenseKeySsmArn, "None" ] ]
 
 Mappings:
   StageToSubnets:
@@ -86,14 +90,17 @@ Resources:
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
-          - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*"
+          - Resource: 
+            - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*"
+            - !If [ EnableNewRelicAgent, !Ref NewRelicLicenseKeySsmArn, !Ref "AWS::NoValue" ]
             Effect: Allow
             Action:
               - ssm:GetParameterHistory
               - ssm:GetParameter
               - ssm:GetParameters
               - ssm:GetParametersByPath
-          - Resource: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm"
+          - Resource: 
+            - !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm"
             Effect: Allow
             Action:
               - kms:Decrypt
@@ -239,7 +246,11 @@ Resources:
       # torn back down. I suspect the Unhealthy threshold (default is 2) timer starts
       # before the container is fully started and maybe the network overhead pulling from
       # us-west-2 is causing it to tip over the boundary.
-      UnhealthyThresholdCount: !If [ EuDeployment, 4, !Ref "AWS::NoValue" ]
+
+      # Adding the newrelic agent was the straw that broke the camels back for the us deploys
+      # with the agent it takes almost exactly two minutes to stabilize and that is too much.
+      # Sans agent it takes like 10 seconds less
+      UnhealthyThresholdCount: !If [ EuDeployment, 4, 3 ]
       TargetType: "ip"
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
@@ -455,9 +466,19 @@ Resources:
               Value: datasource_jndi_name=java:jboss/datasources/KeycloakDS
             - Name: DISCOVER_IP
               Value: aws
+            - Name: NEW_RELIC_APP_NAME
+              Value: !Sub ${AWS::StackName} (${AWS::Region}) - ${AWS::AccountId} 
+            - Name: NEW_RELIC_AGENT_ENABLED
+              Value: !If [ EnableNewRelicAgent, 'true', 'false' ] 
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
+            - !If
+                - EnableNewRelicAgent
+                -
+                    Name: NEW_RELIC_LICENSE_KEY
+                    ValueFrom: !Ref NewRelicLicenseKeySsmArn
+                - !Ref "AWS::NoValue"
           EntryPoint:
             - /opt/jboss/tools/start.sh
             - "-Djboss.bind.address.management=0.0.0.0"
@@ -498,6 +519,8 @@ Resources:
               Value: postgres
             - Name: DB_DATABASE
               Value: postgres
+            - Name: NEW_RELIC_AGENT_ENABLED
+              Value: 'false'
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
