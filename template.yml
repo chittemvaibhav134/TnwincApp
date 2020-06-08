@@ -955,6 +955,54 @@ Resources:
         PubliclyAccessible: false
         BackupRetentionPeriod: 7
 
+  DatabaseCPUAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Database CPU utilization is over 80%.
+      Namespace: AWS/RDS
+      MetricName: CPUUtilization
+      Unit: Percent
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 2
+      Threshold: 80
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: DBInstanceIdentifier
+          Value: !If [Development, !Ref "DatabaseInstance", !Ref "DatabasePrimaryInstance" ]
+
+  DatabaseMemoryAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Database freeable memory is under 64MB.
+      Namespace: AWS/RDS
+      MetricName: FreeableMemory
+      Unit: Bytes
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 2
+      Threshold: 64000000
+      ComparisonOperator: LessThanOrEqualToThreshold
+      Dimensions:
+        - Name: DBInstanceIdentifier
+          Value: !If [Development, !Ref "DatabaseInstance", !Ref "DatabasePrimaryInstance" ]
+
+  DatabaseConnectionAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Database has a concerning amount of connections
+      Namespace: AWS/RDS
+      MetricName: DatabaseConnections
+      Unit: Count
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 2
+      Threshold: !If [ Development, 50, 150 ]
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: DBInstanceIdentifier
+          Value: !If [Development, !Ref "DatabaseInstance", !Ref "DatabasePrimaryInstance" ]
+
   KeyCloakDbSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
