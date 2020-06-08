@@ -22,6 +22,10 @@ Parameters:
     AllowedValues:
       - Production
       - Development
+  DesiredTaskCount:
+    Type: Number
+    Default: 1
+    MaxValue: 10
   KeyCloakImage:
     Type: String
   KeyCloakAdminApiDefaultSecret:
@@ -56,11 +60,9 @@ Mappings:
     Development:
       TaskMemory: 2048
       TaskCpu: 1024
-      DesiredTaskCount: 1
     Production:
       TaskMemory: 2048
       TaskCpu: 1024
-      DesiredTaskCount: 1
 
 Resources:
   ECSTaskRole:
@@ -375,7 +377,7 @@ Resources:
       - LoadBalancerWildFlyListener
     Properties:
       Cluster: !GetAtt Cluster.Arn
-      DesiredCount: !FindInMap [StageToContainerResources, !Ref "Stage", DesiredTaskCount]
+      DesiredCount: !Ref DesiredTaskCount
       TaskDefinition: !Ref TaskDefinition
       LaunchType: FARGATE
       NetworkConfiguration:
