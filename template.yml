@@ -981,7 +981,7 @@ Resources:
       Statistic: Average
       Period: 600
       EvaluationPeriods: 2
-      Threshold: 64000000
+      Threshold: 67108864
       ComparisonOperator: LessThanOrEqualToThreshold
       Dimensions:
         - Name: DBInstanceIdentifier
