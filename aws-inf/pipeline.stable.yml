@@ -892,7 +892,7 @@ Resources:
                         "Subdomain": "id3",
                         "DnsHostedZone": "navex-stage.com",
                         "Stage": "Production",
-                        "DesiredTaskCount": 2,
+                        "DesiredTaskCount": "2",
                         "DbaAccessCidr": "10.98.24.15/32"
                       },
                       "Tags": {"navex:deploy:context": "stageUS"} 
@@ -1135,7 +1135,7 @@ Resources:
                         "Subdomain": "id3",
                         "DnsHostedZone": "navexone.eu",
                         "Stage": "Production",
-                        "DesiredTaskCount": 2,
+                        "DesiredTaskCount": "2",
                         "DbaAccessCidr": "10.162.24.15/32"
                       },
                       "Tags": {"navex:deploy:context": "prodEU"} 
@@ -1371,7 +1371,7 @@ Resources:
                         "Subdomain": "id3",
                         "DnsHostedZone": "navexone.com",
                         "Stage": "Production",
-                        "DesiredTaskCount": 2,
+                        "DesiredTaskCount": "2",
                         "DbaAccessCidr": "10.98.24.15/32"
                       },
                       "Tags": {"navex:deploy:context": "prodUS"} 
