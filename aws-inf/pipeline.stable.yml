@@ -408,6 +408,7 @@ Resources:
                       "Parameters": {
                         "Subdomain": "id3",
                         "DnsHostedZone": "navex-int.com",
+                        "DnsHostedZoneId": "Z3KPLDK2FOBNKU",
                         "Stage": "Development"
                       },
                       "Tags": {"navex:deploy:context": "int-stable"} 
@@ -649,6 +650,7 @@ Resources:
                       "Parameters": {
                         "Subdomain": "id3",
                         "DnsHostedZone": "navex-stage.eu",
+                        "DnsHostedZoneId": "Z343M2SX2SYHUN",
                         "Stage": "Production",
                         "DbaAccessCidr": "10.162.24.15/32"
                       },
@@ -891,6 +893,7 @@ Resources:
                       "Parameters": {
                         "Subdomain": "id3",
                         "DnsHostedZone": "navex-stage.com",
+                        "DnsHostedZoneId": "Z1GXJLTUOO7LYC",
                         "Stage": "Production",
                         "DesiredTaskCount": "2",
                         "DbaAccessCidr": "10.98.24.15/32"
@@ -1134,6 +1137,7 @@ Resources:
                       "Parameters": {
                         "Subdomain": "id3",
                         "DnsHostedZone": "navexone.eu",
+                        "DnsHostedZoneId": "Z22ECC3Q0NT9H2",
                         "Stage": "Production",
                         "DesiredTaskCount": "2",
                         "DbaAccessCidr": "10.162.24.15/32"
@@ -1370,6 +1374,7 @@ Resources:
                       "Parameters": {
                         "Subdomain": "id3",
                         "DnsHostedZone": "navexone.com",
+                        "DnsHostedZoneId": "Z29CNCMQKCNU6I",
                         "Stage": "Production",
                         "DesiredTaskCount": "2",
                         "DbaAccessCidr": "10.98.24.15/32"

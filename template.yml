@@ -17,6 +17,10 @@ Parameters:
     Type: String
   DnsHostedZone:
     Type: String
+  DnsHostedZoneId:
+    Type: String
+    Default: None
+    Description: R53 hosted zone id; if supplied the ACM cert can be auto-approved from the deploy 
   Stage:
     Type: String
     AllowedValues:
@@ -52,6 +56,7 @@ Conditions:
   DbaAccess: !Not [!Equals [ !Ref DbaAccessCidr, "255.255.255.255/32" ] ]
   EuDeployment: !Equals [ !Ref "AWS::Region", 'eu-central-1' ]
   EnableNewRelicAgent: !Not [!Equals [ !Ref NewRelicLicenseKeySsmArn, "None" ] ]
+  AutoApproveCert: !Not [!Equals [ !Ref DnsHostedZoneId, "None" ] ]
 
 Mappings:
   StageToSubnets:
@@ -169,6 +174,12 @@ Resources:
       SubjectAlternativeNames:
         - !Sub "${Subdomain}.${DnsHostedZone}"
       ValidationMethod: DNS
+      DomainValidationOptions:
+        - !If
+          - AutoApproveCert
+          - DomainName: !Sub "*.${Subdomain}.${DnsHostedZone}"
+            HostedZoneId: !Ref DnsHostedZoneId
+          - !Ref AWS::NoValue
 
   LoadBalancerListenerHttps:
     Type: AWS::ElasticLoadBalancingV2::Listener
