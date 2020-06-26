@@ -324,6 +324,7 @@ Resources:
                       "Parameters": {
                         "Subdomain": "id3.psychic-potato",
                         "DnsHostedZone": "navex-int.com",
+                        "DnsHostedZoneId": "Z3KPLDK2FOBNKU",
                         "Stage": "Development"
                       },
                       "Tags": {"navex:deploy:context": "psychic-potato"} 
