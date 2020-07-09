@@ -1,0 +1,442 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: >
+  Pipeline for unstable keycloak deployments
+Parameters:
+  ProjectName:
+    Type: String
+    Default: keycloak
+  GitHubOwner:
+    Type: String
+    Default: tnwinc
+  GitHubRepo:
+    Type: String
+    Default: platform-auth-keycloak
+  GitHubBranch:
+    Type: String
+    Default: master
+  GitHubToken:
+    Type: String
+    NoEcho: true
+  RegionalPackageStackName:
+    Type: String
+  StageAccountId:
+    Type: String
+    Default: "403172096194"
+
+Resources:
+  NavexKcContainerRepository:
+    Type: AWS::ECR::Repository
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      RepositoryPolicyText: !Sub |
+        {
+          "Version": "2008-10-17",
+          "Statement": [
+            {
+              "Sid": "AllowCrossAccountPush",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": [
+                  "arn:aws:iam::${StageAccountId}:root"
+                ]
+              },
+              "Action": [
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:BatchGetImage"
+              ]
+            }
+          ]
+        }
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {"rules":[
+            {
+              "rulePriority":1,
+              "description":"Expire images older than 14 days",
+              "selection":{
+                "tagStatus":"untagged","countType":"sinceImagePushed","countUnit":"days","countNumber":14
+              },
+              "action":{"type":"expire"}
+            }
+          ]}
+
+  KCCodeBuild:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: "navex-codebuild"
+      EncryptionKey: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/navex-pipeline"
+      Description: Builds the keycloak project
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: aws-inf/buildspec.yml
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:4.0
+        Type: LINUX_CONTAINER
+        PrivilegedMode: True
+        EnvironmentVariables:
+          - Name: ECR_REGION
+            Value: !Ref AWS::Region
+          - Name: REPOSITORY_URI
+            Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${NavexKcContainerRepository}
+
+  TransformCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: "navex-codebuild"
+      EncryptionKey: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/navex-pipeline"
+      Description: Transforms / merges dc artifacts into template-configuration.json
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: app/aws-inf/buildspec.transform.yml
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:4.0
+        Type: LINUX_CONTAINER
+
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Sub ${GitHubRepo}-previewUS
+      RoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/navex-codepipeline
+      ArtifactStores:
+        - Region: us-east-1
+          ArtifactStore:
+            Type: S3
+            Location: !Sub navex-artifacts-${AWS::AccountId}-us-east-1
+            EncryptionKey: 
+              Id: !Sub "arn:aws:kms:us-east-1:${AWS::AccountId}:alias/navex-pipeline"
+              Type: KMS
+        - Region: us-west-2
+          ArtifactStore:
+            Type: S3
+            Location: !Sub navex-artifacts-${AWS::AccountId}-us-west-2
+            EncryptionKey: 
+              Id: !Sub "arn:aws:kms:us-west-2:${AWS::AccountId}:alias/navex-pipeline"
+              Type: KMS
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: App
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Version: "1"
+                Provider: GitHub
+              Configuration:
+                Owner: !Ref GitHubOwner
+                Repo: !Ref GitHubRepo
+                Branch: !Ref GitHubBranch
+                OAuthToken: !Ref GitHubToken
+                PollForSourceChanges: false
+              OutputArtifacts:
+                - Name: App
+              RunOrder: 1
+        - Name: Build
+          Actions:
+            - 
+              Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref KCCodeBuild
+              InputArtifacts:
+                - Name: App
+              OutputArtifacts:
+                - Name: BuildOutput
+              RunOrder: 1
+            - 
+              Name: PackageUsEast1
+              Region: us-east-1
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Sub ${RegionalPackageStackName}-${ProjectName}
+              InputArtifacts:
+                - Name: App
+              OutputArtifacts:
+                - Name: PackageUsEast1
+              RunOrder: 1
+            - 
+              Name: AuthPackageUsEast1
+              Region: us-east-1
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Sub ${RegionalPackageStackName}-${ProjectName}-auth
+              InputArtifacts:
+                - Name: App
+              OutputArtifacts:
+                - Name: AuthPackageUsEast1
+              RunOrder: 1
+            -
+              Name: PutProjVersion
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPPutProjectVersion
+                UserParameters: |
+                  {
+                    "DeploySpecFile": "App::aws-inf/deployspec.json",
+                    "OutputFile": "build-record.json"
+                  }
+              InputArtifacts:
+                - Name: App
+              OutputArtifacts:
+                - Name: ProjectVersion
+              RunOrder: 2
+        
+        - 
+          Name: StageAccount
+          Actions:
+            - 
+              Name: GetDcArt_PreviewUS
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPGetDCArtFromBuildInfo
+                UserParameters: !Sub |
+                  {
+                    "SourceProjectId": "${ProjectName}_navexstage_us-east-1",
+                    "DeploymentContext": "previewUS",
+                    "BuildInfoFile": "ProjectVersion::build-record.json",
+                    "ProjectIds": {"aws-inf": "aws-inf_platform_navexstage_us-east-1"}
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+              OutputArtifacts:
+                - Name: GetDcArt_PreviewUS
+              RunOrder: 1
+            -
+              Name: MergeArtifacts_PreviewUS
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPMergeArtifacts
+                UserParameters: |
+                  {
+                    "ArtifactPrefixMap":{
+                      "ProjectVersion": "build_info",
+                      "GetDcArt_PreviewUS": "dc_art",
+                      "App": "app"
+                    }
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+                - Name: GetDcArt_PreviewUS
+                - Name: App
+              OutputArtifacts:
+                - Name: MergeArtifacts_PreviewUS
+              RunOrder: 2
+            - 
+              Name: Transform_PreviewUS
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref TransformCodeBuildProject
+                EnvironmentVariables: |
+                  [
+                    {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "false", "type": "PLAINTEXT"}
+                  ]
+              InputArtifacts:
+                - Name: MergeArtifacts_PreviewUS
+              OutputArtifacts:
+                - Name: Transform_PreviewUS
+              RunOrder: 3
+            - 
+              Name: FinalizedCfnConfig_PreviewUS
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "BuildOutput::template-configuration.json", 
+                      "Transform_PreviewUS::template-configuration.json" 
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "Subdomain": "id3",
+                        "DnsHostedZone": "navex-preview.com",
+                        "DnsHostedZoneId": "ZHSK04F9B0JO4",
+                        "Stage": "Development"
+                      },
+                      "Tags": {"navex:deploy:context": "previewUS"} 
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: BuildOutput
+                - Name: Transform_PreviewUS
+              OutputArtifacts:
+                - Name: FinalizedCfnConfig_PreviewUS
+              RunOrder: 4
+            - 
+              Name: CfnDeploy_PreviewUS
+              Region: us-east-1
+              RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-previewUS
+                TemplatePath: "PackageUsEast1::app.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnConfig_PreviewUS::template-configuration.json"
+                OutputFileName: stack-outputs.json
+              InputArtifacts:
+                - Name: PackageUsEast1
+                - Name: FinalizedCfnConfig_PreviewUS
+              OutputArtifacts:
+                - Name: CfnDeploy_PreviewUS
+              RunOrder: 5
+            -
+              Name: ConfigUpload_PreviewUS          
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              InputArtifacts:
+                - Name: Transform_PreviewUS
+                - Name: CfnDeploy_PreviewUS
+              Configuration:
+                FunctionName: CPS3Deploy
+                UserParameters: !Sub |
+                  {
+                    "S3BucketName": "CfnDeploy_PreviewUS::stack-outputs.json:ConfigBucket",
+                    "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
+                    "ExcludeArtifactsFromUpload": ["CfnDeploy_PreviewUS"],
+                    "AccountId": "${StageAccountId}",
+                    "Region": "us-east-1"
+                  }
+              RunOrder: 6
+            - 
+              Name: CfnAuthDeploy_PreviewUS_UsEast1
+              Region: us-east-1
+              RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-auth-previewUS
+                TemplatePath: "AuthPackageUsEast1::auth.packaged.yml"
+                OutputFileName: stack-outputs.json
+                ParameterOverrides: |
+                  {
+                    "KCBaseUrl": {"Fn::GetParam" : [ "CfnDeploy_PreviewUS", "stack-outputs.json", "Domain" ] }
+                  }
+              InputArtifacts:
+                - Name: AuthPackageUsEast1
+                - Name: CfnDeploy_PreviewUS
+              OutputArtifacts:
+                - Name: CfnAuthDeploy_PreviewUS_UsEast1
+              RunOrder: 7
+            -
+              Name: ImportConfig_PreviewUS
+              RunOrder: 7
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_PreviewUS::stack-outputs.json:CpConfigImportLambdaArn",
+                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "AccountId": "${StageAccountId}",
+                    "Region": "us-east-1",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_PreviewUS
+            -
+              Name: PostDeployApiActions_PreviewUS
+              RunOrder: 8
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_PreviewUS::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
+                    "AccountId": "${StageAccountId}",
+                    "Region": "us-east-1",
+                    "InvocationType": "RequestResponse",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_PreviewUS
+            - 
+              Name: PublishDeployment_PreviewUS
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPSetDeploymentContext
+                UserParameters: !Sub |
+                  {
+                    "ProjectId": "${ProjectName}_navexstage_us-east-1",
+                    "BuildInfoFile": "ProjectVersion::build-record.json",
+                    "DeploymentContext": "previewUS",
+                    "JsonArtifactFiles": [
+                      "CfnDeploy_PreviewUS::stack-outputs.json",
+                      "CfnAuthDeploy_PreviewUS_UsEast1::stack-outputs.json"
+                    ]
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+                - Name: CfnDeploy_PreviewUS
+                - Name: CfnAuthDeploy_PreviewUS_UsEast1                 
+              RunOrder: 9
+
