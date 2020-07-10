@@ -14,21 +14,17 @@ Parameters:
     Default: platform-auth-keycloak
   GitHubBranch:
     Type: String
-    Default: psychic-potato
+    Default: master
   GitHubToken:
     Type: String
     NoEcho: true
   RegionalPackageStackName:
     Type: String
-  DevAccountId:
+  StageAccountId:
     Type: String
-    Default: "552242929734"
-  IntegrationAccountId:
-    Type: String
-    Default: "455920928861"
+    Default: "403172096194"
 
 Resources:
-
   NavexKcContainerRepository:
     Type: AWS::ECR::Repository
     DeletionPolicy: Retain
@@ -43,8 +39,7 @@ Resources:
               "Effect": "Allow",
               "Principal": {
                 "AWS": [
-                  "arn:aws:iam::${IntegrationAccountId}:root",
-                  "arn:aws:iam::${DevAccountId}:root"
+                  "arn:aws:iam::${StageAccountId}:root"
                 ]
               },
               "Action": [
@@ -104,28 +99,12 @@ Resources:
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:4.0
-        Type: LINUX_CONTAINER   
-
-  PipelineWebhook:
-    Type: AWS::CodePipeline::Webhook
-    Properties:
-      Authentication: GITHUB_HMAC
-      AuthenticationConfiguration:
-        SecretToken: !Ref GitHubToken
-      Filters:
-        - 
-          JsonPath: "$.ref"
-          MatchEquals: !Sub "refs/heads/${GitHubBranch}"
-      TargetPipeline: !Ref Pipeline
-      TargetAction: App
-      Name: !Ref AWS::StackName
-      TargetPipelineVersion: !GetAtt Pipeline.Version
-      RegisterWithThirdParty: true
+        Type: LINUX_CONTAINER
 
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
-      Name: !Sub ${GitHubRepo}-${GitHubBranch}
+      Name: !Sub ${GitHubRepo}-previewUS
       RoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/navex-codepipeline
       ArtifactStores:
         - Region: us-east-1
@@ -177,8 +156,8 @@ Resources:
                 - Name: BuildOutput
               RunOrder: 1
             - 
-              Name: PackageUsWest2
-              Region: us-west-2
+              Name: PackageUsEast1
+              Region: us-east-1
               ActionTypeId:
                 Category: Build
                 Owner: AWS
@@ -189,22 +168,7 @@ Resources:
               InputArtifacts:
                 - Name: App
               OutputArtifacts:
-                - Name: PackageUsWest2
-              RunOrder: 1
-            - 
-              Name: AuthPackageUsWest2
-              Region: us-west-2
-              ActionTypeId:
-                Category: Build
-                Owner: AWS
-                Version: "1"
-                Provider: CodeBuild
-              Configuration:
-                ProjectName: !Sub ${RegionalPackageStackName}-${ProjectName}-auth
-              InputArtifacts:
-                - Name: App
-              OutputArtifacts:
-                - Name: AuthPackageUsWest2
+                - Name: PackageUsEast1
               RunOrder: 1
             - 
               Name: AuthPackageUsEast1
@@ -240,11 +204,12 @@ Resources:
               OutputArtifacts:
                 - Name: ProjectVersion
               RunOrder: 2
+        
         - 
-          Name: IntegrationAccount
+          Name: StageAccount
           Actions:
             - 
-              Name: GetDcArt_PsyPot
+              Name: GetDcArt_PreviewUS
               ActionTypeId:
                 Category: Invoke
                 Owner: AWS
@@ -254,17 +219,18 @@ Resources:
                 FunctionName: CPGetDCArtFromBuildInfo
                 UserParameters: !Sub |
                   {
-                    "SourceProjectId": "${ProjectName}_navexint_us-west-2",
-                    "DeploymentContext": "psychic-potato",
-                    "BuildInfoFile": "ProjectVersion::build-record.json"
+                    "SourceProjectId": "${ProjectName}_navexstage_us-east-1",
+                    "DeploymentContext": "previewUS",
+                    "BuildInfoFile": "ProjectVersion::build-record.json",
+                    "ProjectIds": {"aws-inf": "aws-inf_platform_navexstage_us-east-1"}
                   }
               InputArtifacts:
                 - Name: ProjectVersion
               OutputArtifacts:
-                - Name: GetDcArt_PsyPot
+                - Name: GetDcArt_PreviewUS
               RunOrder: 1
             -
-              Name: MergeArtifacts_PsyPot
+              Name: MergeArtifacts_PreviewUS
               ActionTypeId:
                 Category: Invoke
                 Owner: AWS
@@ -276,19 +242,19 @@ Resources:
                   {
                     "ArtifactPrefixMap":{
                       "ProjectVersion": "build_info",
-                      "GetDcArt_PsyPot": "dc_art",
+                      "GetDcArt_PreviewUS": "dc_art",
                       "App": "app"
                     }
                   }
               InputArtifacts:
                 - Name: ProjectVersion
-                - Name: GetDcArt_PsyPot
+                - Name: GetDcArt_PreviewUS
                 - Name: App
               OutputArtifacts:
-                - Name: MergeArtifacts_PsyPot
+                - Name: MergeArtifacts_PreviewUS
               RunOrder: 2
             - 
-              Name: Transform_PsyPot
+              Name: Transform_PreviewUS
               ActionTypeId:
                 Category: Build
                 Owner: AWS
@@ -298,15 +264,15 @@ Resources:
                 ProjectName: !Ref TransformCodeBuildProject
                 EnvironmentVariables: |
                   [
-                    {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "true", "type": "PLAINTEXT"}
+                    {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "false", "type": "PLAINTEXT"}
                   ]
               InputArtifacts:
-                - Name: MergeArtifacts_PsyPot
+                - Name: MergeArtifacts_PreviewUS
               OutputArtifacts:
-                - Name: Transform_PsyPot
+                - Name: Transform_PreviewUS
               RunOrder: 3
             - 
-              Name: FinalizedCfnConfig_PsyPot
+              Name: FinalizedCfnConfig_PreviewUS
               ActionTypeId:
                 Category: Invoke
                 Owner: AWS
@@ -318,29 +284,29 @@ Resources:
                   {
                     "JsonFiles": [
                       "BuildOutput::template-configuration.json", 
-                      "Transform_PsyPot::template-configuration.json" 
+                      "Transform_PreviewUS::template-configuration.json" 
                     ],
                     "Json": {
                       "Parameters": {
-                        "Subdomain": "id3.psychic-potato",
-                        "DnsHostedZone": "navex-int.com",
-                        "DnsHostedZoneId": "Z3KPLDK2FOBNKU",
+                        "Subdomain": "id3",
+                        "DnsHostedZone": "navex-preview.com",
+                        "DnsHostedZoneId": "ZHSK04F9B0JO4",
                         "Stage": "Development"
                       },
-                      "Tags": {"navex:deploy:context": "psychic-potato"} 
+                      "Tags": {"navex:deploy:context": "previewUS"} 
                     },
                     "OutputFile": "template-configuration.json"
                   }
               InputArtifacts:
                 - Name: BuildOutput
-                - Name: Transform_PsyPot
+                - Name: Transform_PreviewUS
               OutputArtifacts:
-                - Name: FinalizedCfnConfig_PsyPot
+                - Name: FinalizedCfnConfig_PreviewUS
               RunOrder: 4
             - 
-              Name: CfnDeploy_PsyPot
-              Region: us-west-2
-              RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-codepipelineassume
+              Name: CfnDeploy_PreviewUS
+              Region: us-east-1
+              RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
@@ -349,43 +315,43 @@ Resources:
               Configuration:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
-                StackName: !Sub ${ProjectName}-psychic-potato
-                TemplatePath: "PackageUsWest2::app.packaged.yml"
-                TemplateConfiguration: "FinalizedCfnConfig_PsyPot::template-configuration.json"
+                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-previewUS
+                TemplatePath: "PackageUsEast1::app.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnConfig_PreviewUS::template-configuration.json"
                 OutputFileName: stack-outputs.json
               InputArtifacts:
-                - Name: PackageUsWest2
-                - Name: FinalizedCfnConfig_PsyPot
+                - Name: PackageUsEast1
+                - Name: FinalizedCfnConfig_PreviewUS
               OutputArtifacts:
-                - Name: CfnDeploy_PsyPot
+                - Name: CfnDeploy_PreviewUS
               RunOrder: 5
             -
-              Name: ConfigUpload_PsyPot          
+              Name: ConfigUpload_PreviewUS          
               ActionTypeId:
                 Category: Invoke
                 Owner: AWS
                 Version: "1"
                 Provider: Lambda
               InputArtifacts:
-                - Name: Transform_PsyPot
-                - Name: CfnDeploy_PsyPot
+                - Name: Transform_PreviewUS
+                - Name: CfnDeploy_PreviewUS
               Configuration:
                 FunctionName: CPS3Deploy
                 UserParameters: !Sub |
                   {
-                    "S3BucketName": "CfnDeploy_PsyPot::stack-outputs.json:ConfigBucket",
+                    "S3BucketName": "CfnDeploy_PreviewUS::stack-outputs.json:ConfigBucket",
                     "BaseDirectory": "transformed-import",
                     "PurgeDirectories": "enabled",
-                    "ExcludeArtifactsFromUpload": ["CfnDeploy_PsyPot"],
-                    "AccountId": "${IntegrationAccountId}",
-                    "Region": "us-west-2"
+                    "ExcludeArtifactsFromUpload": ["CfnDeploy_PreviewUS"],
+                    "AccountId": "${StageAccountId}",
+                    "Region": "us-east-1"
                   }
               RunOrder: 6
             - 
-              Name: CfnAuthDeploy_PsyPot_UsWest2
-              Region: us-west-2
-              RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-codepipelineassume
+              Name: CfnAuthDeploy_PreviewUS_UsEast1
+              Region: us-east-1
+              RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
@@ -394,22 +360,22 @@ Resources:
               Configuration:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
-                StackName: !Sub ${ProjectName}-auth-psychic-potato
-                TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
+                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-auth-previewUS
+                TemplatePath: "AuthPackageUsEast1::auth.packaged.yml"
                 OutputFileName: stack-outputs.json
                 ParameterOverrides: |
                   {
-                    "KCBaseUrl": {"Fn::GetParam" : [ "CfnDeploy_PsyPot", "stack-outputs.json", "Domain" ] }
+                    "KCBaseUrl": {"Fn::GetParam" : [ "CfnDeploy_PreviewUS", "stack-outputs.json", "Domain" ] }
                   }
               InputArtifacts:
-                - Name: AuthPackageUsWest2
-                - Name: CfnDeploy_PsyPot
+                - Name: AuthPackageUsEast1
+                - Name: CfnDeploy_PreviewUS
               OutputArtifacts:
-                - Name: CfnAuthDeploy_PsyPot_UsWest2
+                - Name: CfnAuthDeploy_PreviewUS_UsEast1
               RunOrder: 7
             -
-              Name: ImportConfig_PsyPot
+              Name: ImportConfig_PreviewUS
               RunOrder: 7
               ActionTypeId:
                 Category: Invoke
@@ -420,16 +386,16 @@ Resources:
                 FunctionName: CPInvokeLambda
                 UserParameters: !Sub |
                   {
-                    "TargetFunctionName": "CfnDeploy_PsyPot::stack-outputs.json:CpConfigImportLambdaArn",
+                    "TargetFunctionName": "CfnDeploy_PreviewUS::stack-outputs.json:CpConfigImportLambdaArn",
                     "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
-                    "AccountId": "${IntegrationAccountId}",
-                    "Region": "us-west-2",
+                    "AccountId": "${StageAccountId}",
+                    "Region": "us-east-1",
                     "ParseResponse": true
                   }
               InputArtifacts:
-                - Name: CfnDeploy_PsyPot
+                - Name: CfnDeploy_PreviewUS
             -
-              Name: PostDeployApiActions_PsyPot
+              Name: PostDeployApiActions_PreviewUS
               RunOrder: 8
               ActionTypeId:
                 Category: Invoke
@@ -440,17 +406,17 @@ Resources:
                 FunctionName: CPInvokeLambda
                 UserParameters: !Sub |
                   {
-                    "TargetFunctionName": "CfnDeploy_PsyPot::stack-outputs.json:CpPostDeployLambdaArn",
+                    "TargetFunctionName": "CfnDeploy_PreviewUS::stack-outputs.json:CpPostDeployLambdaArn",
                     "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
-                    "AccountId": "${IntegrationAccountId}",
-                    "Region": "us-west-2",
+                    "AccountId": "${StageAccountId}",
+                    "Region": "us-east-1",
                     "InvocationType": "RequestResponse",
                     "ParseResponse": true
                   }
               InputArtifacts:
-                - Name: CfnDeploy_PsyPot
+                - Name: CfnDeploy_PreviewUS
             - 
-              Name: PublishDeployment_PsyPot
+              Name: PublishDeployment_PreviewUS
               ActionTypeId:
                 Category: Invoke
                 Owner: AWS
@@ -460,16 +426,17 @@ Resources:
                 FunctionName: CPSetDeploymentContext
                 UserParameters: !Sub |
                   {
-                    "ProjectId": "${ProjectName}_navexint_us-west-2",
+                    "ProjectId": "${ProjectName}_navexstage_us-east-1",
                     "BuildInfoFile": "ProjectVersion::build-record.json",
-                    "DeploymentContext": "psychic-potato",
+                    "DeploymentContext": "previewUS",
                     "JsonArtifactFiles": [
-                      "CfnDeploy_PsyPot::stack-outputs.json",
-                      "CfnAuthDeploy_PsyPot_UsWest2::stack-outputs.json"
+                      "CfnDeploy_PreviewUS::stack-outputs.json",
+                      "CfnAuthDeploy_PreviewUS_UsEast1::stack-outputs.json"
                     ]
                   }
               InputArtifacts:
                 - Name: ProjectVersion
-                - Name: CfnDeploy_PsyPot
-                - Name: CfnAuthDeploy_PsyPot_UsWest2                 
+                - Name: CfnDeploy_PreviewUS
+                - Name: CfnAuthDeploy_PreviewUS_UsEast1                 
               RunOrder: 9
+
