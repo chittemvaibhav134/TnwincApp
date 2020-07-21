@@ -82,6 +82,15 @@
       ]
     },
     {
+      "Project": "risk-rate",
+      "Artifacts": [
+        {
+          "Name": "BaseUrl",
+          "Required": false
+        }
+      ]
+    },
+    {
       "Project": "global-configuration",
       "Artifacts": [
         {
