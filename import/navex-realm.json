@@ -1401,64 +1401,7 @@
       "authenticationFlowBindingOverrides": {},
       "bearerOnly": false,
       "clientAuthenticatorType": "client-secret",
-      "clientId": "riskrate-frontend",
-      "consentRequired": false,
-      "defaultClientScopes": [
-        "doorman-mappings",
-        "email",
-        "profile",
-        "role_list",
-        "roles",
-        "web-origins"
-      ],
-      "directAccessGrantsEnabled": false,
-      "enabled": true,
-      "frontchannelLogout": false,
-      "fullScopeAllowed": true,
-      "id": "b7d18982-972c-4664-9678-f40c77553ed",
-      "implicitFlowEnabled": false,
-      "name": "RiskRate",
-      "nodeReRegistrationTimeout": -1,
-      "notBefore": 0,
-      "optionalClientScopes": [
-        "address",
-        "microprofile-jwt",
-        "offline_access",
-        "phone"
-      ],
-      "protocol": "openid-connect",
-      "publicClient": true,
-      "redirectUris": [
-        "https://navex.dev.rr.local/Admin/*"
-      ],
-      "secret": "C68E5F25-241E-4556-8BC7-8FC46C180FD3",
-      "serviceAccountsEnabled": false,
-      "standardFlowEnabled": true,
-      "surrogateAuthRequired": false,
-      "webOrigins": [
-        "*"
-      ]
-    },
-	{
-      "attributes": {
-        "display.on.consent.screen": "false",
-        "exclude.session.state.from.auth.response": "false",
-        "saml.assertion.signature": "false",
-        "saml.authnstatement": "false",
-        "saml.client.signature": "false",
-        "saml.encrypt": "false",
-        "saml.force.post.binding": "false",
-        "saml.multivalued.roles": "false",
-        "saml.onetimeuse.condition": "false",
-        "saml.server.signature": "false",
-        "saml.server.signature.keyinfo.ext": "false",
-        "saml_force_name_id_format": "false",
-        "tls.client.certificate.bound.access.tokens": "false"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "bearerOnly": false,
-      "clientAuthenticatorType": "client-secret",
-      "clientId": "riskrate-backend",
+      "clientId": "riskrate",
       "consentRequired": false,
       "defaultClientScopes": [
         "doorman-mappings",
@@ -1486,7 +1429,7 @@
       "protocol": "openid-connect",
       "publicClient": false,
       "redirectUris": [
-        "https://navex.dev.rr.local/Admin/*"
+        "https://auth.dev.rr.local/*"
       ],
       "secret": "2F2A09DD-EF9B-4081-BBC2-0568CA4EB0B1",
       "serviceAccountsEnabled": false,
