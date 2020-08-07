@@ -45,9 +45,8 @@ phases:
           InsightsApiBaseUrlDefault="https://api.dev.insights.local"
           InsightsApiBaseUrl=$(jq --arg DEFAULT "$InsightsApiBaseUrlDefault" -r '.ApiFriendlyBaseUrl // $DEFAULT' "$DC_ART_DIR/insights" || echo "$InsightsApiBaseUrlDefault")
       - |
-          RiskRateBaseUrlDefault="https://{0}.dev.rr.local"
-          RiskRateBaseUrl=$(jq --arg DEFAULT "$RiskRateBaseUrlDefault" -r '.BaseUrl // $DEFAULT' "$DC_ART_DIR/risk-rate" || echo "$RiskRateBaseUrlDefault")
-          RiskRateUrl=${RiskRateBaseUrl/\{0\}/navex}
+          RiskRateAuthRedirectUrlDefault="https://auth.dev.rr.local"
+          RiskRateAuthRedirectUrl=$(jq --arg DEFAULT "$RiskRateAuthRedirectUrlDefault" -r '.AuthRedirectUrl // $DEFAULT' "$DC_ART_DIR/risk-rate" || echo "$RiskRateAuthRedirectUrlDefault")
       - |
           NewRelicLicenseKeySsmArnDefault='None'
           NewRelicLicenseKeySsmArn=$(jq --arg DEFAULT "$NewRelicLicenseKeySsmArnDefault" -r '.NewRelicenseKeySsmArn // $DEFAULT' "$DC_ART_DIR/global-configuration" || echo "$NewRelicLicenseKeySsmArnDefault")
@@ -89,8 +88,7 @@ phases:
           jq --arg CSP_HEADER "$CSP_HEADER" '(.browserSecurityHeaders.contentSecurityPolicy) |= $CSP_HEADER' |
           jq --arg COIREDIRECTURI "${CoiAuthRedirectUrl}/*" '(.clients[] | select(.clientId == "coi") | .redirectUris[0]) |= $COIREDIRECTURI' |
           jq --arg INREDIRECTURI "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" '(.clients[] | select(.clientId == "insights") | .redirectUris[0]) |= $INREDIRECTURI' |
-          jq --arg RRREDIRECTURI "${RiskRateUrl}/Admin/*" '(.clients[] | select(.clientId == "riskrate") | .redirectUris[0]) |= $RRREDIRECTURI' |
-          jq --arg RRREDIRECTURI "${RiskRateUrl}/Admin" '(.clients[] | select(.clientId == "riskrate") | .rootUrl) |= $RRREDIRECTURI' |
+          jq --arg RRREDIRECTURI "${RiskRateAuthRedirectUrl}/*" '(.clients[] | select(.clientId == "riskrate") | .redirectUris[0]) |= $RRREDIRECTURI' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.attributes."_browser_header.contentSecurityPolicy") |= $CSP_HEADER' > transformed-import/navex-realm.json
       - |
         jq --null-input \

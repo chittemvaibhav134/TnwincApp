@@ -85,7 +85,7 @@
       "Project": "risk-rate",
       "Artifacts": [
         {
-          "Name": "BaseUrl",
+          "Name": "AuthRedirectUrl",
           "Required": false
         }
       ]
