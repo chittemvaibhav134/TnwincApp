@@ -82,7 +82,7 @@
       ]
     },
     {
-      "Project": "risk-rate",
+      "Project": "riskrate",
       "Artifacts": [
         {
           "Name": "AuthRedirectUrl",
