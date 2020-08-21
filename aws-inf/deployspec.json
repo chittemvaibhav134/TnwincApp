@@ -82,6 +82,15 @@
       ]
     },
     {
+      "Project": "riskrate",
+      "Artifacts": [
+        {
+          "Name": "AuthRedirectUrl",
+          "Required": false
+        }
+      ]
+    },
+    {
       "Project": "global-configuration",
       "Artifacts": [
         {
