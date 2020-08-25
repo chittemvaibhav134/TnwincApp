@@ -82,7 +82,7 @@ phases:
           jq --arg APPSHELL_USER "$AppshellUserAppUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL_USER' |
           jq --arg CMDUIROOTDOMAIN "$CmdUiRootDomain" --arg CMDUIROOTDOMAINDEFAULT "$CmdUiRootDomainDefault" '(.clients[] | select(.name == "Content Management and Distribution") | .redirectUris[]) |= sub($CMDUIROOTDOMAINDEFAULT;$CMDUIROOTDOMAIN)' |
           jq --arg CMDUIROOTDOMAIN "$CmdUiRootDomain" --arg CMDUIROOTDOMAINDEFAULT "$CmdUiRootDomainDefault" '(.clients[] | select(.name == "Content Management and Distribution") | .webOrigins[]) |= sub($CMDUIROOTDOMAINDEFAULT;$CMDUIROOTDOMAIN)' |
-          jq --arg CMD_DOORMAN_REDIRECT "${DoormanBaseUrl}/*" '(.clients[] | select(.name == "cmd-frontend") | .redirectUris[2]) |= $DOORMAN_REDIRECT' |
+          jq --arg CMD_DOORMAN_REDIRECT "${DoormanBaseUrl}/*" '(.clients[] | select(.name == "cmd-frontend") | .redirectUris[2]) |= $CMD_DOORMAN_REDIRECT' |
           jq --arg EPIMIEMADMINURL "https://${EpimIemRootDomain}/" '(.clients[] | select(.clientId == "epim-iem") | .adminUrl) |= $EPIMIEMADMINURL' |
           jq --arg EPIMIEMREDIRECTURI "https://${EpimIemRootDomain}/*" '(.clients[] | select(.clientId == "epim-iem") | .redirectUris[0]) |= $EPIMIEMREDIRECTURI' |
           jq --arg EPIMIEMWEBORIGIN "https://${EpimIemRootDomain}" '(.clients[] | select(.clientId == "epim-iem") | .webOrigins[0]) |= $EPIMIEMWEBORIGIN' |
