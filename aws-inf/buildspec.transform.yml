@@ -46,7 +46,7 @@ phases:
           InsightsApiBaseUrl=$(jq --arg DEFAULT "$InsightsApiBaseUrlDefault" -r '.ApiFriendlyBaseUrl // $DEFAULT' "$DC_ART_DIR/insights" || echo "$InsightsApiBaseUrlDefault")
       - |
           RiskRateAuthRedirectUrlDefault="https://auth.dev.rr.local"
-          RiskRateAuthRedirectUrl=$(jq --arg DEFAULT "$RiskRateAuthRedirectUrlDefault" -r '.AuthRedirectUrl // $DEFAULT' "$DC_ART_DIR/risk-rate" || echo "$RiskRateAuthRedirectUrlDefault")
+          RiskRateAuthRedirectUrl=$(jq --arg DEFAULT "$RiskRateAuthRedirectUrlDefault" -r '.AuthRedirectUrl // $DEFAULT' "$DC_ART_DIR/riskrate" || echo "$RiskRateAuthRedirectUrlDefault")
       - |
           NewRelicLicenseKeySsmArnDefault='None'
           NewRelicLicenseKeySsmArn=$(jq --arg DEFAULT "$NewRelicLicenseKeySsmArnDefault" -r '.NewRelicenseKeySsmArn // $DEFAULT' "$DC_ART_DIR/global-configuration" || echo "$NewRelicLicenseKeySsmArnDefault")
