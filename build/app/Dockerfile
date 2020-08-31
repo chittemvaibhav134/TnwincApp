@@ -1,7 +1,7 @@
 FROM jboss/keycloak:8.0.2
 USER root
 RUN microdnf install -y unzip && microdnf clean all
-RUN curl -O https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java.zip
+RUN curl -O https://download.newrelic.com/newrelic/java-agent/newrelic-agent/5.9.0/newrelic-java.zip
 RUN unzip newrelic-java.zip -d /opt
 USER 1000
 ENV NEW_RELIC_BROWSER_MONITORING_AUTO_INSTRUMENT false
