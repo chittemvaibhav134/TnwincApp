@@ -1372,7 +1372,8 @@
       "redirectUris": [
         "http://admin.devlocal.navex-pe.com:3000/*",
         "http://navexadmin.devlocal.navex-pe.com:3000/*",
-        "http://user.app.devlocal.navex-pe.com:3000/*"
+        "http://user.app.devlocal.navex-pe.com:3000/*",
+        "https://doorman.dev.gw.local/*"
       ],
       "secret": "3d4ca889-bbdc-43e8-8092-6a2ce1f27782",
       "serviceAccountsEnabled": false,
