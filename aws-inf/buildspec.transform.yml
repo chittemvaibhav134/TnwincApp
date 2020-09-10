@@ -79,15 +79,17 @@ phases:
           jq --arg APPSHELL_PLATFORMINATOR_REDIRECT "$AppshellPlatforminatorUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[1]) |= $APPSHELL_PLATFORMINATOR_REDIRECT' |
           jq --arg APPSHELL_PLATFORMINATOR "$AppshellPlatforminatorUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL_PLATFORMINATOR' |
           jq --arg APPSHELL_USER_REDIRECT "$AppshellUserAppUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[2]) |= $APPSHELL_USER_REDIRECT' |
+          jq --arg APPSHELL_DOORMAN_REDIRECT "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "appshell") | .redirectUris[3]) |= $APPSHELL_DOORMAN_REDIRECT' |
           jq --arg APPSHELL_USER "$AppshellUserAppUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL_USER' |
           jq --arg CMDUIROOTDOMAIN "$CmdUiRootDomain" --arg CMDUIROOTDOMAINDEFAULT "$CmdUiRootDomainDefault" '(.clients[] | select(.name == "Content Management and Distribution") | .redirectUris[]) |= sub($CMDUIROOTDOMAINDEFAULT;$CMDUIROOTDOMAIN)' |
           jq --arg CMDUIROOTDOMAIN "$CmdUiRootDomain" --arg CMDUIROOTDOMAINDEFAULT "$CmdUiRootDomainDefault" '(.clients[] | select(.name == "Content Management and Distribution") | .webOrigins[]) |= sub($CMDUIROOTDOMAINDEFAULT;$CMDUIROOTDOMAIN)' |
-          jq --arg CMD_DOORMAN_REDIRECT "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "cmd-frontend") | .redirectUris[2]) |= $CMD_DOORMAN_REDIRECT' |
+          jq --arg CMD_DOORMAN_REDIRECT "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "cmd-frontend") | .redirectUris[2]) |= $CMD_DOORMAN_REDIRECT' |          
           jq --arg EPIMIEMADMINURL "https://${EpimIemRootDomain}/" '(.clients[] | select(.clientId == "epim-iem") | .adminUrl) |= $EPIMIEMADMINURL' |
           jq --arg EPIMIEMREDIRECTURI "https://${EpimIemRootDomain}/*" '(.clients[] | select(.clientId == "epim-iem") | .redirectUris[0]) |= $EPIMIEMREDIRECTURI' |
           jq --arg EPIMIEMWEBORIGIN "https://${EpimIemRootDomain}" '(.clients[] | select(.clientId == "epim-iem") | .webOrigins[0]) |= $EPIMIEMWEBORIGIN' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.browserSecurityHeaders.contentSecurityPolicy) |= $CSP_HEADER' |
           jq --arg COIREDIRECTURI "${CoiAuthRedirectUrl}/*" '(.clients[] | select(.clientId == "coi") | .redirectUris[0]) |= $COIREDIRECTURI' |
+          jq --arg COI_DOORMAN_REDIRECTURI "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "coi") | .redirectUris[2]) |= $COI_DOORMAN_REDIRECTURI' |
           jq --arg INREDIRECTURI "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" '(.clients[] | select(.clientId == "insights") | .redirectUris[0]) |= $INREDIRECTURI' |
           jq --arg RRREDIRECTURI "${RiskRateAuthRedirectUrl}/*" '(.clients[] | select(.clientId == "riskrate") | .redirectUris[0]) |= $RRREDIRECTURI' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.attributes."_browser_header.contentSecurityPolicy") |= $CSP_HEADER' > transformed-import/navex-realm.json
