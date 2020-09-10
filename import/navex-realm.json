@@ -1263,7 +1263,8 @@
       "protocol": "openid-connect",
       "publicClient": false,
       "redirectUris": [
-        "https://dev.ep.local/*"
+        "https://dev.ep.local/*",
+        "https://doorman.dev.gw.local/*"
       ],
       "rootUrl": "https://dev.ep.local/",
       "secret": "9923b91d-4706-4ca0-8e97-1493e3956f5a",

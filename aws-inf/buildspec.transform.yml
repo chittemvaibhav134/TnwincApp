@@ -86,6 +86,7 @@ phases:
           jq --arg CMD_DOORMAN_REDIRECT "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "cmd-frontend") | .redirectUris[2]) |= $CMD_DOORMAN_REDIRECT' |          
           jq --arg EPIMIEMADMINURL "https://${EpimIemRootDomain}/" '(.clients[] | select(.clientId == "epim-iem") | .adminUrl) |= $EPIMIEMADMINURL' |
           jq --arg EPIMIEMREDIRECTURI "https://${EpimIemRootDomain}/*" '(.clients[] | select(.clientId == "epim-iem") | .redirectUris[0]) |= $EPIMIEMREDIRECTURI' |
+          jq --arg EPIM_DOORMAN_REDIRECT "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "epim-iem") | .redirectUris[1]) |= $EPIM_DOORMAN_REDIRECT' |
           jq --arg EPIMIEMWEBORIGIN "https://${EpimIemRootDomain}" '(.clients[] | select(.clientId == "epim-iem") | .webOrigins[0]) |= $EPIMIEMWEBORIGIN' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.browserSecurityHeaders.contentSecurityPolicy) |= $CSP_HEADER' |
           jq --arg COIREDIRECTURI "${CoiAuthRedirectUrl}/*" '(.clients[] | select(.clientId == "coi") | .redirectUris[0]) |= $COIREDIRECTURI' |
