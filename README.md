@@ -21,7 +21,7 @@ docker network create navexdev
 docker-compose up -d --build
 ```
 
-**It is important that you run the `network create` step. Keycloak now relies on an external network, so that it can be accessed by other containerized apps within Navex Platform.**
+**It is important that you run the `network create` step. Keycloak now relies on an external network, so that it can be accessed by other containerized apps within the Navex Platform.**
 
 KeyCloak is now installed and accessible at https://localhost:8443.
 
