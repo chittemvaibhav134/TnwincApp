@@ -4,7 +4,9 @@ volumes:
   db:
 
 networks:
-  keycloak:
+  navexdev:
+    external:
+      name: navexdev
 
 services:
   app:
@@ -30,7 +32,7 @@ services:
     links:
       - db
     networks:
-      keycloak:
+      navexdev:
     restart: always
     volumes:
       - ./import:/import:rw
@@ -48,7 +50,7 @@ services:
       - '5432'
     image: postgres:11.5
     networks:
-      keycloak:
+      navexdev:
     restart: always
     volumes:
       - db:/var/lib/postgresql/data:rw

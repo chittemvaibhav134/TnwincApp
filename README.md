@@ -17,10 +17,15 @@ This process should only need to be performed once, unless the KeyCloak shared c
 From the repo root:
 
 ```shell
+docker network create navexdev
 docker-compose up -d --build
 ```
 
+**It is important that you run the `network create` step. Keycloak now relies on an external network, so that it can be accessed by other containerized apps within Navex Platform.**
+
 KeyCloak is now installed and accessible at https://localhost:8443.
+
+Alternatively, you can run dev-deploy on this repo and it will perform all the steps mentioned above.
 
 ## Removal
 
@@ -31,6 +36,7 @@ From the repo root:
 ```shell
 docker-compose down
 docker volume rm platform-auth-keycloak_db
+docker network rm navexdev
 ```
 
 KeyCloak has now been completely removed.
