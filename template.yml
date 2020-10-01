@@ -403,7 +403,7 @@ Resources:
       TaskDefinition: !Ref TaskDefinition
       LaunchType: FARGATE
       NetworkConfiguration:
-        AwsvpcConfiguration:
+        AwsVpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
             - !Ref AppSecurityGroup

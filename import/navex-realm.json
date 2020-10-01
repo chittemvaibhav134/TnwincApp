@@ -1263,7 +1263,8 @@
       "protocol": "openid-connect",
       "publicClient": false,
       "redirectUris": [
-        "https://dev.ep.local/*"
+        "https://dev.ep.local/*",
+        "https://doorman.dev.gw.local/*"
       ],
       "rootUrl": "https://dev.ep.local/",
       "secret": "9923b91d-4706-4ca0-8e97-1493e3956f5a",
@@ -1372,7 +1373,8 @@
       "redirectUris": [
         "http://admin.devlocal.navex-pe.com:3000/*",
         "http://navexadmin.devlocal.navex-pe.com:3000/*",
-        "http://user.app.devlocal.navex-pe.com:3000/*"
+        "http://user.app.devlocal.navex-pe.com:3000/*",
+        "https://doorman.dev.gw.local/*"
       ],
       "secret": "3d4ca889-bbdc-43e8-8092-6a2ce1f27782",
       "serviceAccountsEnabled": false,
@@ -1820,7 +1822,8 @@
       "publicClient": true,
       "redirectUris": [
         "https://maint.pt.dev.local/oidc/coderedirector/*",
-        "https://maint.pt.dev.local/oidc/silentchecksso/*"
+        "https://maint.pt.dev.local/oidc/silentchecksso/*",
+        "https://doorman.dev.gw.local/*"
       ],
       "secret": "2605c91b-0722-424d-b530-8cb49951d37f",
       "serviceAccountsEnabled": false,
@@ -1884,7 +1887,8 @@
       "publicClient": true,
       "redirectUris": [
         "https://auth.coi.devlocal.navex-pe.com:18443/*",
-        "https://auth.coi.devlocal.navex-pe.com:8443/*"
+        "https://auth.coi.devlocal.navex-pe.com:8443/*",
+        "https://doorman.dev.gw.local/*"
       ],
       "secret": "9bcd2fa1-b504-4949-89ca-5ab076dcc6f8",
       "serviceAccountsEnabled": false,
