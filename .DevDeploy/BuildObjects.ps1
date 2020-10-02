@@ -19,6 +19,13 @@ New-ExecutableToCall -Name "Start Keycloak" -WorkingDirectory $repoRoot -Tag Pre
 		throw "Local Keycloak requires Docker Desktop to be installed"
 	}
 
+	#create external navexdev network. This way containerized platform apps can share a network with 
+	#keycloak 
+	$dockerNetworks = docker network ls
+	if (-Not ($dockerNetworks -match 'navexdev')){
+		docker network create navexdev
+	}
+
 	# remove existing instance if it exists
 	docker-compose down;
 	docker volume rm platform-auth-keycloak_db;
