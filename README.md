@@ -24,8 +24,22 @@ docker-compose up -d --build
 **It is important that you run the `network create` step. Keycloak now relies on an external network, so that it can be accessed by other containerized apps within the Navex Platform.**
 
 KeyCloak is now installed and accessible at https://localhost:8443.
+KeyCloak (IdP) is also installed and accessible at https://localhost:8444.
 
 Alternatively, you can run dev-deploy on this repo and it will perform all the steps mentioned above.
+
+## Adding user for KeyCloak (IdP)
+
+Get the container ID for the Keycloak (IdP) process.
+You can get a list of running processes with **docker ps**.
+
+Look for the process which is running on port 8444. Remember this container ID.
+
+In the **/opt/jboss/keycloak/bin/** folder there is a script called **add-user-keycloak.sh**
+Run the add-user-keycloak shell script, by from the root of the repo, using the following command: docker exec [CONTAINER_ID] /opt/jboss/keycloak/bin/add-user-keycloak.sh -u [userName] -p [password]
+
+Now you have a user you can log in on.
+Navigate to https://localhost:8444 and log in with the new user/password you created above, and you should be able to use Keycloak as an IdP.
 
 ## Removal
 
