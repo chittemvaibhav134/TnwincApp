@@ -18,7 +18,8 @@ From the repo root:
 
 ```shell
 docker network create navexdev
-docker-compose up -d --build
+docker-compose -f docker-compose.yml up -d --build
+docker-compose -f docker-compose-idp.yml up -d --build
 ```
 
 **It is important that you run the `network create` step. Keycloak now relies on an external network, so that it can be accessed by other containerized apps within the Navex Platform.**
@@ -48,7 +49,8 @@ This process is destructive to any existing KeyCloak configuration. If you've ma
 From the repo root:
 
 ```shell
-docker-compose down
+docker-compose -f docker-compose.yml down
+docker-compose -f docker-compose-idp.yml down
 docker volume rm platform-auth-keycloak_db
 docker network rm navexdev
 ```
@@ -60,7 +62,8 @@ KeyCloak has now been completely removed.
 From the repo root, in PowerShell:
 
 ```powershell
-.\Export-KeyCloakConfig.ps1
+.\Export-KeyCloakConfig.ps1 -containerName keycloak-app -composeFilePath .\docker-compose.yml
+.\Export-KeyCloakConfig.ps1 -containerName keycloak-idp -composeFilePath .\docker-compose-idp.yml
 ```
 
 The exported configuration is now in the `import` directory. It should be committed to source control if any important changes have been made. NOTE: KeyCloak generates new IDs for most config elements during export. They will show up as diffs. This is annoying, but normal.
