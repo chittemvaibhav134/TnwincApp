@@ -58,10 +58,10 @@ phases:
           # remove any users in the master realm with hard coded credentials
           # should probably do this in navex-realm as well
           echo "Disabling hard coded users from master realm..."
-          jq '(.users[] | select(.credentials != []) | .enabled) |= false' $APP_DIR/import/master-realm.json > master-realm.temp.json
-          mv master-realm.temp.json $APP_DIR/import/master-realm.json
+          jq '(.users[] | select(.credentials != []) | .enabled) |= false' $APP_DIR/import/variants/keycloak-app/master-realm.json > master-realm.temp.json
+          mv master-realm.temp.json $APP_DIR/import/variants/keycloak-app/master-realm.json
         fi
-      - cp $APP_DIR/import/master-realm.json transformed-import/
+      - cp $APP_DIR/import/variants/keycloak-app/master-realm.json transformed-import/
       - |
         # TODO: Learn how to actually use either sed or xml with namespaces...
         curl -k $DoormanMetadataUrl | sed 's/xmlns="urn:oasis:names:tc:SAML:2.0:metadata"//g' | sed 's/xmlns="http:\/\/www.w3.org\/2000\/09\/xmldsig#"//g' > doorman-metadata.xml
@@ -71,7 +71,7 @@ phases:
         CSP_HEADER="frame-src 'self'; frame-ancestors 'self' $DoormanBaseUrl; object-src 'none';"
       - |
         # TODO: Figure out a less dumb way to update the json file  
-        jq --arg CERT "$CERT" '(.identityProviders[] | select(.alias == "doorman") | .config.signingCertificate) |= $CERT' $APP_DIR/import/navex-realm.json |
+        jq --arg CERT "$CERT" '(.identityProviders[] | select(.alias == "doorman") | .config.signingCertificate) |= $CERT' $APP_DIR/import/variants/keycloak-app/navex-realm.json |
           jq --arg LOGOUT_URL "$LOGOUT_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleLogoutServiceUrl) |= $LOGOUT_URL' |
           jq --arg LOGIN_URL "$LOGIN_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleSignOnServiceUrl) |= $LOGIN_URL' | 
           jq --arg APPSHELL_ADMIN_REDIRECT "$AppshellAdminUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[0]) |= $APPSHELL_ADMIN_REDIRECT' |

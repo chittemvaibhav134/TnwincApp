@@ -1,13 +1,15 @@
 . (Join-Path $PSScriptRoot "Watch-Process.ps1")
 
 function Invoke-KeyCloakMigration {
+    
     param (
         [Parameter(Mandatory = $true)]
         [ValidateSet("import", "export")]
         [string]$action,
         [Parameter(Mandatory = $true)]
         [string]$composeFilePath,
-        [bool]$showOutput
+        [bool]$showOutput,
+        [string]$containerName
     )
 
     Write-Host "Starting another KeyCloak instance with migration action [$action]."
@@ -15,7 +17,7 @@ function Invoke-KeyCloakMigration {
         '-Djboss.socket.binding.port-offset=100',
         "-Dkeycloak.migration.action=$action",
         '-Dkeycloak.migration.provider=dir',
-        '-Dkeycloak.migration.dir=/import'
+        "-Dkeycloak.migration.dir=/import/$containerName"
     )
     if ($action -eq 'export') {
         $systemProps += '-Dkeycloak.migration.usersExportStrategy=REALM_FILE'
@@ -24,7 +26,7 @@ function Invoke-KeyCloakMigration {
     $argumentList = @(
         'exec',
         '-it',
-        'keycloak-app',
+        $containerName,
         'opt/jboss/tools/docker-entrypoint.sh',
         "$systemPropsQuoteEncapsulated"
     )
@@ -42,14 +44,16 @@ function Restart-KeyCloak {
     )
 
     Write-Host "Restarting KeyCloak."
-    docker-compose -f $composeFilePath down
+    docker-compose -f $composeFilePath rm -svf $containerName
+    docker-compose -f $composeFilePath rm -svf "$containerName-db"
     docker-compose -f $composeFilePath up -d
 
     $argumentList = @(
         'logs',
         '-f',
-        'keycloak-app'
+        $containerName
     )
+    
     Wait-KeyCloakStartup -showOutput $showOutput -argumentList $argumentList
 
     Write-Host "Finished KeyCloak restart."
