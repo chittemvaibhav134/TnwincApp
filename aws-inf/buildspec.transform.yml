@@ -93,6 +93,7 @@ phases:
           jq --arg COI_DOORMAN_REDIRECTURI "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "coi") | .redirectUris[2]) |= $COI_DOORMAN_REDIRECTURI' |
           jq --arg INREDIRECTURI "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" '(.clients[] | select(.clientId == "insights") | .redirectUris[0]) |= $INREDIRECTURI' |
           jq --arg RRREDIRECTURI "${RiskRateAuthRedirectUrl}/*" '(.clients[] | select(.clientId == "riskrate") | .redirectUris[0]) |= $RRREDIRECTURI' |
+          jq --arg RRDOORMANREDIRECTURI "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "riskrate") | .redirectUris[1]) |= $RRDOORMANREDIRECTURI' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.attributes."_browser_header.contentSecurityPolicy") |= $CSP_HEADER' > transformed-import/navex-realm.json
       - |
         jq --null-input \
