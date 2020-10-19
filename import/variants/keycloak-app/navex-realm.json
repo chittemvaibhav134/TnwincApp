@@ -1596,7 +1596,8 @@
       ],
       "publicClient": false,
       "redirectUris": [
-        "https://api.dev.insights.local/public/v2/BrowserAuthorization.FinishBrowserAuthorization"
+        "https://api.dev.insights.local/public/v2/BrowserAuthorization.FinishBrowserAuthorization",
+        "https://doorman.dev.gw.local/*"
       ],
       "secret": "b902d50a-0725-4b33-a5c0-20554605c9a9",
       "serviceAccountsEnabled": true,
