@@ -43,6 +43,14 @@ Run the add-user-keycloak shell script, by from the root of the repo, using the 
 Now you have a user you can log in on.
 Navigate to https://localhost:8444 and log in with the new user/password you created above, and you should be able to use Keycloak as an IdP.
 
+## Getting metadata
+To get the metadata, ensure you have an entry which loops back to localhost for 
+https://keycloak.devlocal.navex-pe.com
+
+Then navigate to 
+https://keycloak.devlocal.navex-pe.com:8444/auth/realms/master/protocol/saml/descriptor
+and you should be ready to add an IdP in Platform.
+
 ## Removal
 
 This process is destructive to any existing KeyCloak configuration. If you've made any local KeyCloak configuration changes that should be preserved, [export](#export-configuration) and commit them first.
