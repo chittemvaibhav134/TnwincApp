@@ -36,6 +36,7 @@ You can get a list of running processes with **docker ps**.
 
 Look for the process which is running on port 8444. Remember this container ID.
 
+First, get into the docker container using the ID you just obtained, with the command **docker exec -it <container name> /bin/bash** to get a bash shell
 In the **/opt/jboss/keycloak/bin/** folder there is a script called **add-user-keycloak.sh**
 Run the add-user-keycloak shell script, by from the root of the repo, using the following command: docker exec [CONTAINER_ID] /opt/jboss/keycloak/bin/add-user-keycloak.sh -u [userName] -p [password]
 
