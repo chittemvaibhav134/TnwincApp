@@ -143,6 +143,9 @@ Resources:
     Type: AWS::ECS::Cluster
     Properties:
       ClusterName: !Ref AWS::StackName
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
 
   AlbSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
