@@ -54,7 +54,6 @@ Conditions:
   Development: !Equals [ !Ref Stage, "Development" ]
   NotDevelopment: !Not [!Equals [ !Ref Stage, "Development" ] ]
   DbaAccess: !Not [!Equals [ !Ref DbaAccessCidr, "255.255.255.255/32" ] ]
-  EuDeployment: !Equals [ !Ref "AWS::Region", 'eu-central-1' ]
   EnableNewRelicAgent: !Not [!Equals [ !Ref NewRelicLicenseKeySsmArn, "None" ] ]
   AutoApproveCert: !Not [!Equals [ !Ref DnsHostedZoneId, "None" ] ]
 
@@ -263,7 +262,7 @@ Resources:
       # Adding the newrelic agent was the straw that broke the camels back for the us deploys
       # with the agent it takes almost exactly two minutes to stabilize and that is too much.
       # Sans agent it takes like 10 seconds less
-      UnhealthyThresholdCount: !If [ EuDeployment, 4, 3 ]
+      UnhealthyThresholdCount: 3
       TargetType: "ip"
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
@@ -402,6 +401,8 @@ Resources:
       DesiredCount: !Ref DesiredTaskCount
       TaskDefinition: !Ref TaskDefinition
       LaunchType: FARGATE
+      PlatformVersion: 1.4.0
+      HealthCheckGracePeriodSeconds: 150
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
