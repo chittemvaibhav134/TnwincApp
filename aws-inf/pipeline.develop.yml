@@ -320,7 +320,6 @@ Resources:
                 UserParameters: |
                   {
                     "ArtifactPrefixMap":{
-                      "ProjectVersion": "build_info",
                       "GetDcArt_AutoValid": "dc_art",
                       "App": "app"
                     }
@@ -362,6 +361,7 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
+                      "App::aws-inf/template-configuration.json",
                       "BuildOutput::template-configuration.json", 
                       "Transform_AutoValid::template-configuration.json" 
                     ],
@@ -372,12 +372,17 @@ Resources:
                         "DnsHostedZoneId": "Z3KPLDK2FOBNKU",
                         "Stage": "Development"
                       },
-                      "Tags": {"navex:deploy:context": "autovalidation"} 
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "autovalidation",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      } 
                     },
                     "OutputFile": "template-configuration.json"
                   }
               InputArtifacts:
+                - Name: App
                 - Name: BuildOutput
+                - Name: ProjectVersion
                 - Name: Transform_AutoValid
               OutputArtifacts:
                 - Name: FinalizedCfnConfig_AutoValid
@@ -553,7 +558,6 @@ Resources:
                 UserParameters: |
                   {
                     "ArtifactPrefixMap":{
-                      "ProjectVersion": "build_info",
                       "GetDcArt_Wobbly": "dc_art",
                       "App": "app"
                     }
@@ -595,6 +599,7 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
+                      "App::aws-inf/template-configuration.json",
                       "BuildOutput::template-configuration.json", 
                       "Transform_Wobbly::template-configuration.json" 
                     ],
@@ -605,12 +610,17 @@ Resources:
                         "DnsHostedZoneId": "Z3KPLDK2FOBNKU",
                         "Stage": "Development"
                       },
-                      "Tags": {"navex:deploy:context": "wobbly"} 
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "wobbly",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      } 
                     },
                     "OutputFile": "template-configuration.json"
                   }
               InputArtifacts:
+                - Name: App
                 - Name: BuildOutput
+                - Name: ProjectVersion
                 - Name: Transform_Wobbly
               OutputArtifacts:
                 - Name: FinalizedCfnConfig_Wobbly
@@ -783,7 +793,6 @@ Resources:
                 UserParameters: |
                   {
                     "ArtifactPrefixMap":{
-                      "ProjectVersion": "build_info",
                       "GetDcArt_Rickety": "dc_art",
                       "App": "app"
                     }
@@ -825,6 +834,7 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
+                      "App::aws-inf/template-configuration.json",
                       "BuildOutput::template-configuration.json", 
                       "Transform_Rickety::template-configuration.json" 
                     ],
@@ -835,12 +845,17 @@ Resources:
                         "DnsHostedZoneId": "Z3KPLDK2FOBNKU",
                         "Stage": "Development"
                       },
-                      "Tags": {"navex:deploy:context": "rickety"} 
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "rickety",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      }
                     },
                     "OutputFile": "template-configuration.json"
                   }
               InputArtifacts:
+                - Name: App
                 - Name: BuildOutput
+                - Name: ProjectVersion
                 - Name: Transform_Rickety
               OutputArtifacts:
                 - Name: FinalizedCfnConfig_Rickety

@@ -275,7 +275,6 @@ Resources:
                 UserParameters: |
                   {
                     "ArtifactPrefixMap":{
-                      "ProjectVersion": "build_info",
                       "GetDcArt_PsyPot": "dc_art",
                       "App": "app"
                     }
@@ -317,6 +316,7 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
+                      "App::aws-inf/template-configuration.json",
                       "BuildOutput::template-configuration.json", 
                       "Transform_PsyPot::template-configuration.json" 
                     ],
@@ -327,12 +327,17 @@ Resources:
                         "DnsHostedZoneId": "Z3KPLDK2FOBNKU",
                         "Stage": "Development"
                       },
-                      "Tags": {"navex:deploy:context": "psychic-potato"} 
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "psychic-potato",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      } 
                     },
                     "OutputFile": "template-configuration.json"
                   }
               InputArtifacts:
+                - Name: App
                 - Name: BuildOutput
+                - Name: ProjectVersion
                 - Name: Transform_PsyPot
               OutputArtifacts:
                 - Name: FinalizedCfnConfig_PsyPot
