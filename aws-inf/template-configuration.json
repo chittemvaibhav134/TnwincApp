@@ -1,0 +1,12 @@
+{
+    "Tags" : {
+      "Navex:Owner:Team" : "Komodo / Gadavri / GilaMonster",
+      "Navex:Owner:Product": "KeyCloak",
+      "Navex:Owner:RequirementsArea": "CIA - Customer Information Identity and Access",
+      "Navex:Owner:SlackChannel": "https://tnw-dev-labs.slack.com/archives/CAS347UPK / https://tnw-dev-labs.slack.com/archives/CPM8AM49G / https://tnw-dev-labs.slack.com/archives/CLJUSAW05",
+      "Navex:Owner:Organization": "PE",
+      "Navex:Technical:Repo": "platform-auth-keycloak",
+      "Navex:Technical:Documentation": "https://confluence.navexglobal.com/display/PE/Navex+Project+Inventory",
+      "Navex:Hosting:ApplicationCode": "KC"
+    }
+  }

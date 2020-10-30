@@ -359,7 +359,6 @@ Resources:
                 UserParameters: |
                   {
                     "ArtifactPrefixMap":{
-                      "ProjectVersion": "build_info",
                       "GetDcArt_IntStable": "dc_art",
                       "App": "app"
                     }
@@ -401,6 +400,7 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
+                      "App::aws-inf/template-configuration.json",
                       "BuildOutput::template-configuration.json", 
                       "Transform_IntStable::template-configuration.json" 
                     ],
@@ -411,12 +411,17 @@ Resources:
                         "DnsHostedZoneId": "Z3KPLDK2FOBNKU",
                         "Stage": "Development"
                       },
-                      "Tags": {"navex:deploy:context": "int-stable"} 
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "int-stable",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      }
                     },
                     "OutputFile": "template-configuration.json"
                   }
               InputArtifacts:
+                - Name: App
                 - Name: BuildOutput
+                - Name: ProjectVersion
                 - Name: Transform_IntStable
               OutputArtifacts:
                 - Name: FinalizedCfnConfig_IntStable
@@ -601,7 +606,6 @@ Resources:
                 UserParameters: |
                   {
                     "ArtifactPrefixMap":{
-                      "ProjectVersion": "build_info",
                       "GetDcArt_StageEU": "dc_art",
                       "App": "app"
                     }
@@ -643,6 +647,7 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
+                      "App::aws-inf/template-configuration.json",
                       "BuildOutput::template-configuration.json", 
                       "Transform_StageEU::template-configuration.json" 
                     ],
@@ -654,12 +659,17 @@ Resources:
                         "Stage": "Production",
                         "DbaAccessCidr": "10.162.24.15/32"
                       },
-                      "Tags": {"navex:deploy:context": "stageEU"} 
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "stageEU",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      } 
                     },
                     "OutputFile": "template-configuration.json"
                   }
               InputArtifacts:
+                - Name: App
                 - Name: BuildOutput
+                - Name: ProjectVersion
                 - Name: Transform_StageEU
               OutputArtifacts:
                 - Name: FinalizedCfnConfig_StageEU
@@ -844,7 +854,6 @@ Resources:
                 UserParameters: |
                   {
                     "ArtifactPrefixMap":{
-                      "ProjectVersion": "build_info",
                       "GetDcArt_StageUS": "dc_art",
                       "App": "app"
                     }
@@ -886,6 +895,7 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
+                      "App::template-configuration.json",
                       "BuildOutput::template-configuration.json", 
                       "Transform_StageUS::template-configuration.json" 
                     ],
@@ -898,12 +908,17 @@ Resources:
                         "DesiredTaskCount": "2",
                         "DbaAccessCidr": "10.98.24.15/32"
                       },
-                      "Tags": {"navex:deploy:context": "stageUS"} 
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "stageUS",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      }
                     },
                     "OutputFile": "template-configuration.json"
                   }
               InputArtifacts:
+                - Name: App
                 - Name: BuildOutput
+                - Name: ProjectVersion
                 - Name: Transform_StageUS
               OutputArtifacts:
                 - Name: FinalizedCfnConfig_StageUS
@@ -1088,7 +1103,6 @@ Resources:
                 UserParameters: |
                   {
                     "ArtifactPrefixMap":{
-                      "ProjectVersion": "build_info",
                       "GetDcArt_ProdEU": "dc_art",
                       "App": "app"
                     }
@@ -1130,6 +1144,7 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
+                      "App::aws-inf/template-configuration.json",
                       "BuildOutput::template-configuration.json", 
                       "Transform_ProdEU::template-configuration.json" 
                     ],
@@ -1142,12 +1157,17 @@ Resources:
                         "DesiredTaskCount": "2",
                         "DbaAccessCidr": "10.162.24.15/32"
                       },
-                      "Tags": {"navex:deploy:context": "prodEU"} 
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "prodEU",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      }
                     },
                     "OutputFile": "template-configuration.json"
                   }
               InputArtifacts:
+                - Name: App
                 - Name: BuildOutput
+                - Name: ProjectVersion
                 - Name: Transform_ProdEU
               OutputArtifacts:
                 - Name: FinalizedCfnConfig_ProdEU
@@ -1325,7 +1345,6 @@ Resources:
                 UserParameters: |
                   {
                     "ArtifactPrefixMap":{
-                      "ProjectVersion": "build_info",
                       "GetDcArt_ProdUS": "dc_art",
                       "App": "app"
                     }
@@ -1367,6 +1386,7 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
+                      "App::aws-inf/template-configuration.json",
                       "BuildOutput::template-configuration.json", 
                       "Transform_ProdUS::template-configuration.json" 
                     ],
@@ -1379,12 +1399,17 @@ Resources:
                         "DesiredTaskCount": "2",
                         "DbaAccessCidr": "10.98.24.15/32"
                       },
-                      "Tags": {"navex:deploy:context": "prodUS"} 
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "prodUS",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      }
                     },
                     "OutputFile": "template-configuration.json"
                   }
               InputArtifacts:
+                - Name: App
                 - Name: BuildOutput
+                - Name: ProjectVersion
                 - Name: Transform_ProdUS
               OutputArtifacts:
                 - Name: FinalizedCfnConfig_ProdUS
