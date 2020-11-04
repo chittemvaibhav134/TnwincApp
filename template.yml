@@ -48,10 +48,6 @@ Parameters:
   NewRelicLicenseKeySsmArn:
     Type: String
     Default: None
-  PagerDutySysLowUrgencyTopicArn:
-    Type: String
-    Default: None
-    Description: "Arn of an sns topic that sends a low level alert to pager duty for system engineers"
 
 Conditions:
   CreateInstanceCert: !Equals [ !Ref InstanceCertificateArn, "None"]
@@ -60,7 +56,6 @@ Conditions:
   DbaAccess: !Not [!Equals [ !Ref DbaAccessCidr, "255.255.255.255/32" ] ]
   EnableNewRelicAgent: !Not [!Equals [ !Ref NewRelicLicenseKeySsmArn, "None" ] ]
   AutoApproveCert: !Not [!Equals [ !Ref DnsHostedZoneId, "None" ] ]
-  PagerDutyTopics: !Not [!Equals [ !Ref PagerDutySysLowUrgencyTopicArn, "None" ] ]
 
 Mappings:
   StageToSubnets:
@@ -369,8 +364,6 @@ Resources:
   DuplicateUserIdAttemptedLoginAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
-      AlarmActions:
-        - !If [ PagerDutyTopics, !Ref PagerDutySysLowUrgencyTopicArn, !Ref "AWS::NoValue" ]
       AlarmDescription: Alarm on logs that contain the federated_identity_account_exists keycloak error
       ComparisonOperator: GreaterThanThreshold
       Threshold: 0
