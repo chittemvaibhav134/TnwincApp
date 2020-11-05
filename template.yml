@@ -341,6 +341,40 @@ Resources:
     Properties:
       LogGroupName: !Sub /ecs/${AWS::StackName}
 
+  CustomMetricConstants:
+    Type: Custom::VariableHack
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
+
+      Namespace: !Sub NAVEX/${AWS::StackName}
+      DuplicateUserIdAttemptedLoginMetricName: DuplicateUserIdAttemptedLogin
+
+  DuplicateUserIdAttemptedLoginMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref LogGroup
+      # filter pattern could be a lot more nifty but I'm not sure it buys us anything.
+      FilterPattern: '"federated_identity_account_exists"'
+      MetricTransformations:
+        -
+          MetricValue: '1'
+          MetricNamespace: !GetAtt CustomMetricConstants.Namespace
+          MetricName: !GetAtt CustomMetricConstants.DuplicateUserIdAttemptedLoginMetricName
+
+  DuplicateUserIdAttemptedLoginAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Alarm on logs that contain the federated_identity_account_exists keycloak error
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 0
+      DatapointsToAlarm: 1
+      EvaluationPeriods: 1
+      MetricName: !GetAtt CustomMetricConstants.DuplicateUserIdAttemptedLoginMetricName
+      Namespace: !GetAtt CustomMetricConstants.Namespace
+      Period: 60
+      Statistic: Sum
+      TreatMissingData: ignore
+
 
   # Will reintroduce whenever i can get scaling reliably working :/
   # Seemed okay till stage and then caused itself a bit of a broadcast storm
