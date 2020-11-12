@@ -241,7 +241,6 @@ Resources:
                 UserParameters: |
                   {
                     "ArtifactPrefixMap":{
-                      "ProjectVersion": "build_info",
                       "GetDcArt_PreviewUS": "dc_art",
                       "App": "app"
                     }
@@ -283,6 +282,7 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
+                      "App::aws-inf/template-configuration.json",
                       "BuildOutput::template-configuration.json", 
                       "Transform_PreviewUS::template-configuration.json" 
                     ],
@@ -293,12 +293,17 @@ Resources:
                         "DnsHostedZoneId": "ZHSK04F9B0JO4",
                         "Stage": "Development"
                       },
-                      "Tags": {"navex:deploy:context": "previewUS"} 
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "previewUS",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      }
                     },
                     "OutputFile": "template-configuration.json"
                   }
               InputArtifacts:
+                - Name: App
                 - Name: BuildOutput
+                - Name: ProjectVersion
                 - Name: Transform_PreviewUS
               OutputArtifacts:
                 - Name: FinalizedCfnConfig_PreviewUS

@@ -1,7 +1,8 @@
 param(
     [string]$workingDir = $PSScriptRoot,
     [string]$composeFilePath = (Join-Path $PSScriptRoot 'docker-compose.yml'),
-    [switch]$showOutput
+    [switch]$showOutput,
+    [string]$containerName = 'keycloak-app'
 )
 . (Join-Path $workingDir "KeyCloakUtils.ps1")
 
@@ -12,7 +13,7 @@ catch [System.Management.Automation.CommandNotFoundException] {
     throw "jq (https://stedolan.github.io/jq/) is not on the path, but is required for proper operation. Please install with Chocolatey or Scoop and try again."
 }
 
-$importDir = Join-Path $workingDir "import"
+$importDir = Join-Path $workingDir "import/variants/$containerName"
 
 Write-Host "Cleaning export destination."
 if (Test-Path (Join-Path $importDir "master-realm.json")) { Remove-Item (Join-Path $importDir "master-realm.json") }
@@ -21,7 +22,7 @@ if (Test-Path (Join-Path $importDir "navex-realm.json")) { Remove-Item (Join-Pat
 if (Test-Path (Join-Path $importDir "navex-users-0.json")) { Remove-Item (Join-Path $importDir "navex-users-0.json") }
 
 Write-Host "Exporting KeyCloak configuration to $importDir."
-Invoke-KeyCloakMigration -action "export" -composeFilePath $composeFilePath -showOutput $showOutput
+Invoke-KeyCloakMigration -action "export" -composeFilePath $composeFilePath -showOutput $showOutput -containerName $containerName
 
 Write-Host "Sorting export files."
 Get-ChildItem -Path $importDir -File | ForEach-Object {

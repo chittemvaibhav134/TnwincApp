@@ -6,8 +6,6 @@ env:
     APP_DIR: "app"
     # contains json files with the name of the projects listed in deployspec DependsOn
     DC_ART_DIR: "dc_art"
-    # Deployspec file with the generated Version tacked on
-    BUILD_INFO_FILE: "build_info/build-record.json"
     # determines if master-users-0.json is included in the transformed input 
     INCLUDE_ADMIN_USER_IMPORT: "false"
 
@@ -17,8 +15,6 @@ phases:
       nodejs: 12
   pre_build:
     commands:
-      - ProjectName=$(jq -r '.Project' $BUILD_INFO_FILE)
-      - ProjectVersion=$(jq -r '.Version' $BUILD_INFO_FILE)
       - echo "loading values from deployment context artifacts $DC_ART_DIR/aws-inf"
       - InfStackName=$(jq -r '.StackName' "$DC_ART_DIR/aws-inf")
       - DoormanMetadataUrl=$(jq -r '.MetadataPublicMirrorUrl' "$DC_ART_DIR/doorman")
@@ -58,10 +54,10 @@ phases:
           # remove any users in the master realm with hard coded credentials
           # should probably do this in navex-realm as well
           echo "Disabling hard coded users from master realm..."
-          jq '(.users[] | select(.credentials != []) | .enabled) |= false' $APP_DIR/import/master-realm.json > master-realm.temp.json
-          mv master-realm.temp.json $APP_DIR/import/master-realm.json
+          jq '(.users[] | select(.credentials != []) | .enabled) |= false' $APP_DIR/import/variants/keycloak-app/master-realm.json > master-realm.temp.json
+          mv master-realm.temp.json $APP_DIR/import/variants/keycloak-app/master-realm.json
         fi
-      - cp $APP_DIR/import/master-realm.json transformed-import/
+      - cp $APP_DIR/import/variants/keycloak-app/master-realm.json transformed-import/
       - |
         # TODO: Learn how to actually use either sed or xml with namespaces...
         curl -k $DoormanMetadataUrl | sed 's/xmlns="urn:oasis:names:tc:SAML:2.0:metadata"//g' | sed 's/xmlns="http:\/\/www.w3.org\/2000\/09\/xmldsig#"//g' > doorman-metadata.xml
@@ -71,7 +67,7 @@ phases:
         CSP_HEADER="frame-src 'self'; frame-ancestors 'self' $DoormanBaseUrl; object-src 'none';"
       - |
         # TODO: Figure out a less dumb way to update the json file  
-        jq --arg CERT "$CERT" '(.identityProviders[] | select(.alias == "doorman") | .config.signingCertificate) |= $CERT' $APP_DIR/import/navex-realm.json |
+        jq --arg CERT "$CERT" '(.identityProviders[] | select(.alias == "doorman") | .config.signingCertificate) |= $CERT' $APP_DIR/import/variants/keycloak-app/navex-realm.json |
           jq --arg LOGOUT_URL "$LOGOUT_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleLogoutServiceUrl) |= $LOGOUT_URL' |
           jq --arg LOGIN_URL "$LOGIN_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleSignOnServiceUrl) |= $LOGIN_URL' | 
           jq --arg APPSHELL_ADMIN_REDIRECT "$AppshellAdminUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[0]) |= $APPSHELL_ADMIN_REDIRECT' |
@@ -92,23 +88,18 @@ phases:
           jq --arg COIREDIRECTURI "${CoiAuthRedirectUrl}/*" '(.clients[] | select(.clientId == "coi") | .redirectUris[0]) |= $COIREDIRECTURI' |
           jq --arg COI_DOORMAN_REDIRECTURI "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "coi") | .redirectUris[2]) |= $COI_DOORMAN_REDIRECTURI' |
           jq --arg INREDIRECTURI "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" '(.clients[] | select(.clientId == "insights") | .redirectUris[0]) |= $INREDIRECTURI' |
+          jq --arg INDOORMANREDIRECTURI "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "insights") | .redirectUris[1]) |= $INDOORMANREDIRECTURI' |
           jq --arg RRREDIRECTURI "${RiskRateAuthRedirectUrl}/*" '(.clients[] | select(.clientId == "riskrate") | .redirectUris[0]) |= $RRREDIRECTURI' |
+          jq --arg RRDOORMANREDIRECTURI "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "riskrate") | .redirectUris[1]) |= $RRDOORMANREDIRECTURI' |
           jq --arg CSP_HEADER "$CSP_HEADER" '(.attributes."_browser_header.contentSecurityPolicy") |= $CSP_HEADER' > transformed-import/navex-realm.json
       - |
         jq --null-input \
           --arg InfrastructureStackName "$InfStackName" \
           --arg NewRelicLicenseKeySsmArn "$NewRelicLicenseKeySsmArn" \
-          --arg ProjectName "$ProjectName" \
-          --arg ProjectVersion "$ProjectVersion" \
           '{
             "Parameters": {
               "InfrastructureStackName": $InfrastructureStackName,
               "NewRelicLicenseKeySsmArn": $NewRelicLicenseKeySsmArn
-            },
-            "Tags": {
-              "navex:project:name": $ProjectName,
-              "navex:project:version": $ProjectVersion,
-              "navex:project:owner": "cia"
             }
           }' > \
           ./template-configuration.json

@@ -54,7 +54,6 @@ Conditions:
   Development: !Equals [ !Ref Stage, "Development" ]
   NotDevelopment: !Not [!Equals [ !Ref Stage, "Development" ] ]
   DbaAccess: !Not [!Equals [ !Ref DbaAccessCidr, "255.255.255.255/32" ] ]
-  EuDeployment: !Equals [ !Ref "AWS::Region", 'eu-central-1' ]
   EnableNewRelicAgent: !Not [!Equals [ !Ref NewRelicLicenseKeySsmArn, "None" ] ]
   AutoApproveCert: !Not [!Equals [ !Ref DnsHostedZoneId, "None" ] ]
 
@@ -144,6 +143,9 @@ Resources:
     Type: AWS::ECS::Cluster
     Properties:
       ClusterName: !Ref AWS::StackName
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
 
   AlbSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
@@ -263,7 +265,7 @@ Resources:
       # Adding the newrelic agent was the straw that broke the camels back for the us deploys
       # with the agent it takes almost exactly two minutes to stabilize and that is too much.
       # Sans agent it takes like 10 seconds less
-      UnhealthyThresholdCount: !If [ EuDeployment, 4, 3 ]
+      UnhealthyThresholdCount: 3
       TargetType: "ip"
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
@@ -339,6 +341,40 @@ Resources:
     Properties:
       LogGroupName: !Sub /ecs/${AWS::StackName}
 
+  CustomMetricConstants:
+    Type: Custom::VariableHack
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
+
+      Namespace: !Sub NAVEX/${AWS::StackName}
+      DuplicateUserIdAttemptedLoginMetricName: DuplicateUserIdAttemptedLogin
+
+  DuplicateUserIdAttemptedLoginMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref LogGroup
+      # filter pattern could be a lot more nifty but I'm not sure it buys us anything.
+      FilterPattern: '"federated_identity_account_exists"'
+      MetricTransformations:
+        -
+          MetricValue: '1'
+          MetricNamespace: !GetAtt CustomMetricConstants.Namespace
+          MetricName: !GetAtt CustomMetricConstants.DuplicateUserIdAttemptedLoginMetricName
+
+  DuplicateUserIdAttemptedLoginAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Alarm on logs that contain the federated_identity_account_exists keycloak error
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 0
+      DatapointsToAlarm: 1
+      EvaluationPeriods: 1
+      MetricName: !GetAtt CustomMetricConstants.DuplicateUserIdAttemptedLoginMetricName
+      Namespace: !GetAtt CustomMetricConstants.Namespace
+      Period: 60
+      Statistic: Sum
+      TreatMissingData: ignore
+
 
   # Will reintroduce whenever i can get scaling reliably working :/
   # Seemed okay till stage and then caused itself a bit of a broadcast storm
@@ -402,8 +438,10 @@ Resources:
       DesiredCount: !Ref DesiredTaskCount
       TaskDefinition: !Ref TaskDefinition
       LaunchType: FARGATE
+      PlatformVersion: 1.4.0
+      HealthCheckGracePeriodSeconds: 150
       NetworkConfiguration:
-        AwsVpcConfiguration:
+        AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
             - !Ref AppSecurityGroup

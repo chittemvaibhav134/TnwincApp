@@ -1,0 +1,56 @@
+version: '2.0'
+
+volumes:
+  keycloak-idp-db:
+
+networks:
+  navexdev:
+    external:
+      name: navexdev
+
+services:
+  keycloak-idp:
+    container_name: keycloak-idp
+    depends_on:
+      - keycloak-idp-db
+    environment:
+      NEW_RELIC_APP_NAME: keycloak-idp (dev)
+      NEW_RELIC_AGENT_ENABLED: 'false'
+      NEW_RELIC_LICENSE_KEY: 'fake'
+      DB_ADDR: keycloak-idp-db
+      DB_DATABASE: keycloak-idp
+      DB_PASSWORD: keycloak-idp
+      DB_PORT: '5432'
+      DB_USER: keycloak-idp
+      DB_VENDOR: postgres
+    ports:
+      - '8444:8443'
+      - '9991:9990'
+    build:
+      context: ./build/app
+    image: navex/keycloak:8.0.2
+    links:
+      - keycloak-idp-db
+    networks:
+      navexdev:
+    restart: always
+    volumes:
+      - ./import/variants/keycloak-idp:/import/variants/keycloak-idp:rw
+    entrypoint:
+      - /opt/jboss/tools/start.sh
+      - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import/variants/keycloak-idp -Djboss.bind.address.management=0.0.0.0"
+
+  keycloak-idp-db:
+    container_name: keycloak-idp-db
+    environment:
+      POSTGRES_DB: keycloak-idp
+      POSTGRES_PASSWORD: keycloak-idp
+      POSTGRES_USER: keycloak-idp
+    expose:
+      - '5432'
+    image: postgres:11.5
+    networks:
+      navexdev:
+    restart: always
+    volumes:
+      - keycloak-idp-db:/var/lib/postgresql/data:rw
