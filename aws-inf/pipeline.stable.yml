@@ -895,7 +895,7 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
-                      "App::template-configuration.json",
+                      "App::aws-inf/template-configuration.json",
                       "BuildOutput::template-configuration.json", 
                       "Transform_StageUS::template-configuration.json" 
                     ],
