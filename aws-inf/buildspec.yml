@@ -1,5 +1,10 @@
 version: 0.2
 
+env:
+  parameter-store:
+    DockerhubUsername: /codebuild/dockerhub/username
+    DockerhubPassword: /codebuild/dockerhub/password
+
 phases:
   install:
     runtime-versions:
@@ -16,6 +21,7 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - $(aws ecr get-login --region $ECR_REGION --no-include-email)
+      - echo $DockerhubPassword | docker login --username $DockerhubUsername --password-stdin
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       
   build:
