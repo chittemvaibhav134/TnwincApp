@@ -1,5 +1,10 @@
 version: 0.2
 
+env:
+  parameter-store:
+    DockerhubUsername: /codebuild/dockerhub/username
+    DockerhubPassword: /codebuild/dockerhub/password
+
 phases:
   install:
     runtime-versions:
@@ -7,6 +12,9 @@ phases:
       docker: 19
     commands:
       - pip install --upgrade cfn-lint
+  pre_build:
+    commands:
+      - echo $DockerhubPassword | docker login --username $DockerhubUsername --password-stdin
   build:
     commands:
       - echo Running cfn-lint to validate cfn templates
