@@ -1,0 +1,17 @@
+embed-server --server-config=standalone-ha.xml --std-out=echo
+
+batch
+
+/subsystem=undertow/server=default-server/host=default-host/filter-ref=portAccess:add()
+/subsystem=undertow/server=default-server/host=default-host/filter-ref=portAccess2:add()
+/subsystem=undertow/server=default-server/host=default-host/filter-ref=portAccess3:add()
+/subsystem=undertow/server=default-server/host=default-host/filter-ref=portAccess4:add()
+
+/subsystem=undertow/configuration=filter/expression-filter=portAccess:add(expression="path('/auth/admin/navex/console') -> response-code(404)")
+/subsystem=undertow/configuration=filter/expression-filter=portAccess2:add(expression="path('/auth/admin/master/console') -> response-code(404)")
+/subsystem=undertow/configuration=filter/expression-filter=portAccess3:add(expression="path('/auth/admin') -> response-code(404)")
+/subsystem=undertow/configuration=filter/expression-filter=portAccess4:add(expression="path('/auth') -> response-code(404)")
+
+run-batch
+
+stop-embedded-server

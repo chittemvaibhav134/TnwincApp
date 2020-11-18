@@ -1,0 +1,11 @@
+embed-server --server-config=standalone-ha.xml --std-out=echo
+
+batch
+
+/subsystem=keycloak-server/spi=clientValidation:add()
+/subsystem=keycloak-server/spi=clientValidation/provider=default:add()
+/subsystem=keycloak-server/spi=clientValidation/provider=default:write-attribute(name=enabled, value=false)
+
+run-batch
+
+stop-embedded-server
