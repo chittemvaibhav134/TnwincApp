@@ -550,9 +550,6 @@
                     </properties>
                 </provider>
             </spi>
-            <spi name="clientValidation">
-                <provider name="default" enabled="false"/>
-            </spi>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:mail:3.0">
             <mail-session name="default" jndi-name="java:jboss/mail/Default">

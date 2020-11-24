@@ -521,6 +521,12 @@ Resources:
               Value: !Sub ${AWS::StackName} (${AWS::Region}) - ${AWS::AccountId} 
             - Name: NEW_RELIC_AGENT_ENABLED
               Value: !If [ EnableNewRelicAgent, 'true', 'false' ] 
+            - !If
+              - NotDevelopment
+              -
+                Name: HIDE_CONSOLE
+                Value: yes-please
+              - !Ref AWS::NoValue
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
