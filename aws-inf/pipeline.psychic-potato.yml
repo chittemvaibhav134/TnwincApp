@@ -399,11 +399,11 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json",
+                      "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_PsyPot::stack-outputs.json:Domain" ] 
+                        "KCBaseUrl": "CfnDeploy_PsyPot::stack-outputs.json:Domain"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "psychc-potato",
@@ -435,6 +435,7 @@ Resources:
                 StackName: !Sub ${ProjectName}-auth-psychic-potato
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_PsyPot::template-configuration.json"
+                OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageUsWest2
                 - Name: FinalizedCfnAuthConfig_PsyPot

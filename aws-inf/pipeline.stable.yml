@@ -483,11 +483,11 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json",
+                      "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_IntStable::stack-outputs.json:Domain" ] 
+                        "KCBaseUrl": "CfnDeploy_IntStable::stack-outputs.json:Domain"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "int-stable",
@@ -760,11 +760,11 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json",
+                      "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_IntStable::stack-outputs.json:Domain" ] 
+                        "KCBaseUrl": "CfnDeploy_IntStable::stack-outputs.json:Domain"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "stageEU",
@@ -1038,11 +1038,11 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json",
+                      "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_StageUS::stack-outputs.json:Domain" ] 
+                        "KCBaseUrl": "CfnDeploy_StageUS::stack-outputs.json:Domain"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "stageUS",
@@ -1316,11 +1316,11 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json",
+                      "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_ProdEU::stack-outputs.json:Domain" ] 
+                        "KCBaseUrl": "CfnDeploy_ProdEU::stack-outputs.json:Domain"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "prodEU",
@@ -1587,11 +1587,11 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json",
+                      "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_ProdUS::stack-outputs.json:Domain" ] 
+                        "KCBaseUrl": "CfnDeploy_ProdUS::stack-outputs.json:Domain"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "prodUS",

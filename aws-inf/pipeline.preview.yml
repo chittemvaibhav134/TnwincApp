@@ -365,11 +365,11 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json",
+                      "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_PreviewUS::stack-outputs.json:Domain" ] 
+                        "KCBaseUrl": "CfnDeploy_PreviewUS::stack-outputs.json:Domain"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "previewUS",

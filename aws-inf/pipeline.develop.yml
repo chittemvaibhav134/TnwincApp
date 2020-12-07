@@ -444,11 +444,11 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json",
+                      "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_AutoValid::stack-outputs.json:Domain" ] 
+                        "KCBaseUrl": "CfnDeploy_AutoValid::stack-outputs.json:Domain"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "autovalidation",
@@ -711,11 +711,11 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json",
+                      "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_Wobbly::stack-outputs.json:Domain" ] 
+                        "KCBaseUrl": "CfnDeploy_Wobbly::stack-outputs.json:Domain"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "wobbly",
@@ -975,11 +975,11 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json",
+                      "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_Rickety::stack-outputs.json:Domain" ] 
+                        "KCBaseUrl": "CfnDeploy_Rickety::stack-outputs.json:Domain"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "rickety",
@@ -1239,11 +1239,11 @@ Resources:
                 UserParameters: |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json",
+                      "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_Squirrelly::stack-outputs.json:Domain" ] 
+                        "KCBaseUrl": "CfnDeploy_Squirrelly::stack-outputs.json:Domain"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "squirrelly",
