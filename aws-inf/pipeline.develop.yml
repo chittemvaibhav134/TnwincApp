@@ -433,6 +433,38 @@ Resources:
                   }
               RunOrder: 6
             - 
+              Name: FinalizedCfnAuthConfig_AutoValid
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json"
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "KCBaseUrl": "CfnDeploy_AutoValid::stack-outputs.json:Domain"
+                      },
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "autovalidation",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      } 
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: ProjectVersion
+                - Name: CfnDeploy_AutoValid
+              OutputArtifacts:
+                - Name: FinalizedCfnAuthConfig_AutoValid
+              RunOrder: 6
+            - 
               Name: CfnAuthDeploy_AutoValid_UsWest2
               Region: us-west-2
               RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-codepipelineassume
@@ -447,14 +479,11 @@ Resources:
                 RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
                 StackName: !Sub ${ProjectName}-auth-autovalidation
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnAuthConfig_AutoValid::template-configuration.json"
                 OutputFileName: stack-outputs.json
-                ParameterOverrides: |
-                  {
-                    "KCBaseUrl": {"Fn::GetParam" : [ "CfnDeploy_AutoValid", "stack-outputs.json", "Domain" ] }
-                  }
               InputArtifacts:
                 - Name: AuthPackageUsWest2
-                - Name: CfnDeploy_AutoValid
+                - Name: FinalizedCfnAuthConfig_AutoValid
               OutputArtifacts:
                 - Name: CfnAuthDeploy_AutoValid_UsWest2
               RunOrder: 7
@@ -671,6 +700,38 @@ Resources:
                   }
               RunOrder: 6
             - 
+              Name: FinalizedCfnAuthConfig_Wobbly
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json"
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "KCBaseUrl": "CfnDeploy_Wobbly::stack-outputs.json:Domain"
+                      },
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "wobbly",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      } 
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: ProjectVersion
+                - Name: CfnDeploy_Wobbly
+              OutputArtifacts:
+                - Name: FinalizedCfnAuthConfig_Wobbly
+              RunOrder: 6
+            - 
               Name: CfnAuthDeploy_Wobbly_UsWest2
               Region: us-west-2
               RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-codepipelineassume
@@ -685,14 +746,11 @@ Resources:
                 RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
                 StackName: !Sub ${ProjectName}-auth-wobbly
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnAuthConfig_Wobbly::template-configuration.json"
                 OutputFileName: stack-outputs.json
-                ParameterOverrides: |
-                  {
-                    "KCBaseUrl": {"Fn::GetParam" : [ "CfnDeploy_Wobbly", "stack-outputs.json", "Domain" ] }
-                  }
               InputArtifacts:
                 - Name: AuthPackageUsWest2
-                - Name: CfnDeploy_Wobbly
+                - Name: FinalizedCfnAuthConfig_Wobbly
               OutputArtifacts:
                 - Name: CfnAuthDeploy_Wobbly_UsWest2
               RunOrder: 7
@@ -906,6 +964,38 @@ Resources:
                   }
               RunOrder: 6
             - 
+              Name: FinalizedCfnAuthConfig_Rickety
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json"
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "KCBaseUrl": "CfnDeploy_Rickety::stack-outputs.json:Domain"
+                      },
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "rickety",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      } 
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: ProjectVersion
+                - Name: CfnDeploy_Rickety
+              OutputArtifacts:
+                - Name: FinalizedCfnAuthConfig_Rickety
+              RunOrder: 6
+            - 
               Name: CfnAuthDeploy_Rickety_UsWest2
               Region: us-west-2
               RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-codepipelineassume
@@ -920,20 +1010,17 @@ Resources:
                 RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
                 StackName: !Sub ${ProjectName}-auth-rickety
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnAuthConfig_Rickety::template-configuration.json"
                 OutputFileName: stack-outputs.json
-                ParameterOverrides: |
-                  {
-                    "KCBaseUrl": {"Fn::GetParam" : [ "CfnDeploy_Rickety", "stack-outputs.json", "Domain" ] }
-                  }
               InputArtifacts:
                 - Name: AuthPackageUsWest2
-                - Name: CfnDeploy_Rickety
+                - Name: FinalizedCfnAuthConfig_Rickety
               OutputArtifacts:
                 - Name: CfnAuthDeploy_Rickety_UsWest2
               RunOrder: 7
             -
               Name: ImportConfig_Rickety
-              RunOrder: 7
+              RunOrder: 11
               ActionTypeId:
                 Category: Invoke
                 Owner: AWS
@@ -953,7 +1040,7 @@ Resources:
                 - Name: CfnDeploy_Rickety
             -
               Name: PostDeployApiActions_Rickety
-              RunOrder: 8
+              RunOrder: 12
               ActionTypeId:
                 Category: Invoke
                 Owner: AWS
@@ -995,4 +1082,268 @@ Resources:
                 - Name: ProjectVersion
                 - Name: CfnDeploy_Rickety
                 - Name: CfnAuthDeploy_Rickety_UsWest2                 
+              RunOrder: 13
+            - 
+              Name: GetDcArt_Squirrelly
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPGetDCArtFromBuildInfo
+                UserParameters: !Sub |
+                  {
+                    "SourceProjectId": "${ProjectName}_navexint_us-west-2",
+                    "DeploymentContext": "squirrelly",
+                    "BuildInfoFile": "ProjectVersion::build-record.json"
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+              OutputArtifacts:
+                - Name: GetDcArt_Squirrelly
+              RunOrder: 1
+            -
+              Name: MergeArtifacts_Squirrelly
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPMergeArtifacts
+                UserParameters: |
+                  {
+                    "ArtifactPrefixMap":{
+                      "GetDcArt_Squirrelly": "dc_art",
+                      "App": "app"
+                    }
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+                - Name: GetDcArt_Squirrelly
+                - Name: App
+              OutputArtifacts:
+                - Name: MergeArtifacts_Squirrelly
+              RunOrder: 2
+            - 
+              Name: Transform_Squirrelly
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref TransformCodeBuildProject
+                EnvironmentVariables: |
+                  [
+                    {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "true", "type": "PLAINTEXT"}
+                  ]
+              InputArtifacts:
+                - Name: MergeArtifacts_Squirrelly
+              OutputArtifacts:
+                - Name: Transform_Squirrelly
+              RunOrder: 3
+            - 
+              Name: FinalizedCfnConfig_Squirrelly
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json",
+                      "BuildOutput::template-configuration.json", 
+                      "Transform_Squirrelly::template-configuration.json" 
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "Subdomain": "id3.squirrelly",
+                        "DnsHostedZone": "navex-int.com",
+                        "DnsHostedZoneId": "Z3KPLDK2FOBNKU",
+                        "Stage": "Development"
+                      },
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "squirrelly",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      }
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: BuildOutput
+                - Name: ProjectVersion
+                - Name: Transform_Squirrelly
+              OutputArtifacts:
+                - Name: FinalizedCfnConfig_Squirrelly
+              RunOrder: 4
+            - 
+              Name: CfnDeploy_Squirrelly
+              Region: us-west-2
+              RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-squirrelly
+                TemplatePath: "PackageUsWest2::app.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnConfig_Squirrelly::template-configuration.json"
+                OutputFileName: stack-outputs.json
+              InputArtifacts:
+                - Name: PackageUsWest2
+                - Name: FinalizedCfnConfig_Squirrelly
+              OutputArtifacts:
+                - Name: CfnDeploy_Squirrelly
+              RunOrder: 5
+            -
+              Name: ConfigUpload_Squirrelly          
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              InputArtifacts:
+                - Name: Transform_Squirrelly
+                - Name: CfnDeploy_Squirrelly
+              Configuration:
+                FunctionName: CPS3Deploy
+                UserParameters: !Sub |
+                  {
+                    "S3BucketName": "CfnDeploy_Squirrelly::stack-outputs.json:ConfigBucket",
+                    "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
+                    "ExcludeArtifactsFromUpload": ["CfnDeploy_Squirrelly"],
+                    "AccountId": "${IntegrationAccountId}",
+                    "Region": "us-west-2"
+                  }
+              RunOrder: 6
+            - 
+              Name: FinalizedCfnAuthConfig_Squirrelly
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json"
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "KCBaseUrl": "CfnDeploy_Squirrelly::stack-outputs.json:Domain"
+                      },
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "squirrelly",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      } 
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: ProjectVersion
+                - Name: CfnDeploy_Squirrelly
+              OutputArtifacts:
+                - Name: FinalizedCfnAuthConfig_Squirrelly
+              RunOrder: 6
+            - 
+              Name: CfnAuthDeploy_Squirrelly_UsWest2
+              Region: us-west-2
+              RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-auth-squirrelly
+                TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnAuthConfig_Squirrelly::template-configuration.json"
+                OutputFileName: stack-outputs.json
+              InputArtifacts:
+                - Name: AuthPackageUsWest2
+                - Name: FinalizedCfnAuthConfig_Squirrelly
+              OutputArtifacts:
+                - Name: CfnAuthDeploy_Squirrelly_UsWest2
+              RunOrder: 7
+            -
+              Name: ImportConfig_Squirrelly
+              RunOrder: 7
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_Squirrelly::stack-outputs.json:CpConfigImportLambdaArn",
+                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "AccountId": "${IntegrationAccountId}",
+                    "Region": "us-west-2",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_Squirrelly
+            -
+              Name: PostDeployApiActions_Squirrelly
               RunOrder: 9
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_Squirrelly::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
+                    "AccountId": "${IntegrationAccountId}",
+                    "Region": "us-west-2",
+                    "InvocationType": "RequestResponse",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_Squirrelly
+            - 
+              Name: PublishDeployment_Squirrelly
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPSetDeploymentContext
+                UserParameters: !Sub |
+                  {
+                    "ProjectId": "${ProjectName}_navexint_us-west-2",
+                    "BuildInfoFile": "ProjectVersion::build-record.json",
+                    "DeploymentContext": "squirrelly",
+                    "JsonArtifactFiles": [
+                      "CfnDeploy_Squirrelly::stack-outputs.json",
+                      "CfnAuthDeploy_Squirrelly_UsWest2::stack-outputs.json"
+                    ]
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+                - Name: CfnDeploy_Squirrelly
+                - Name: CfnAuthDeploy_Squirrelly_UsWest2                 
+              RunOrder: 10

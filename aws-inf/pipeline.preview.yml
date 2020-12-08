@@ -354,6 +354,38 @@ Resources:
                   }
               RunOrder: 6
             - 
+              Name: FinalizedCfnAuthConfig_PreviewUS
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json"
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "KCBaseUrl": "CfnDeploy_PreviewUS::stack-outputs.json:Domain"
+                      },
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "previewUS",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      } 
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: ProjectVersion
+                - Name: CfnDeploy_PreviewUS
+              OutputArtifacts:
+                - Name: FinalizedCfnAuthConfig_PreviewUS
+              RunOrder: 6
+            - 
               Name: CfnAuthDeploy_PreviewUS_UsEast1
               Region: us-east-1
               RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
@@ -368,14 +400,11 @@ Resources:
                 RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
                 StackName: !Sub ${ProjectName}-auth-previewUS
                 TemplatePath: "AuthPackageUsEast1::auth.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnAuthConfig_PreviewUS::template-configuration.json"
                 OutputFileName: stack-outputs.json
-                ParameterOverrides: |
-                  {
-                    "KCBaseUrl": {"Fn::GetParam" : [ "CfnDeploy_PreviewUS", "stack-outputs.json", "Domain" ] }
-                  }
               InputArtifacts:
                 - Name: AuthPackageUsEast1
-                - Name: CfnDeploy_PreviewUS
+                - Name: FinalizedCfnAuthConfig_PreviewUS
               OutputArtifacts:
                 - Name: CfnAuthDeploy_PreviewUS_UsEast1
               RunOrder: 7
