@@ -66,6 +66,10 @@ docker network rm navexdev
 
 KeyCloak has now been completely removed.
 
+## Upgrade
+
+Pull the branch that contains the desired version. Run DevDeploy.
+
 ## Configuration Export
 
 From the repo root, in PowerShell:
@@ -111,6 +115,6 @@ docker logs -f keycloak-app
 
 #### Users
 
-|username|password|purpose|
-|---|---|---|
-|`dvader`|`password`|Admin user|
+| username | password   | purpose    |
+| -------- | ---------- | ---------- |
+| `dvader` | `password` | Admin user |
