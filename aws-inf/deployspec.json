@@ -19,7 +19,7 @@
       "Project": "doorman",
       "Artifacts": [
         {
-          "Name": "MetadataPublicMirrorUrl",
+          "Name": "MetadataUrl",
           "Required": true
         },
         {

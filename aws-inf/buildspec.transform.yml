@@ -17,7 +17,7 @@ phases:
     commands:
       - echo "loading values from deployment context artifacts $DC_ART_DIR/aws-inf"
       - InfStackName=$(jq -r '.StackName' "$DC_ART_DIR/aws-inf")
-      - DoormanMetadataUrl=$(jq -r '.MetadataPublicMirrorUrl' "$DC_ART_DIR/doorman")
+      - DoormanMetadataUrl=$(jq -r '.MetadataUrl' "$DC_ART_DIR/doorman")
       - DoormanBaseUrl=$(jq -r '.BaseUrl' "$DC_ART_DIR/doorman")
       - |
           # I think this handles a default value if the artifact is missing or if the entire json file is
