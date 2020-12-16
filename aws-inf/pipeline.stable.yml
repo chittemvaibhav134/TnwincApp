@@ -14,7 +14,7 @@ Parameters:
     Default: platform-auth-keycloak
   GitHubBranch:
     Type: String
-    Default: master
+    Default: stable
   GitHubToken:
     Type: String
     NoEcho: true
@@ -1431,7 +1431,14 @@ Resources:
                 - Name: CfnDeploy_ProdEU
                 - Name: CfnAuthDeploy_ProdEU_EuCentral1                 
               RunOrder: 9
-            
+            -
+              Name: ManualGate_ProdEU
+              ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Version: "1"
+                Provider: Manual
+              RunOrder: 10
         - 
           Name: ProdUS
           Actions:
