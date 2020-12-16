@@ -14,7 +14,7 @@ Parameters:
     Default: platform-auth-keycloak
   GitHubBranch:
     Type: String
-    Default: master
+    Default: stable
   GitHubToken:
     Type: String
     NoEcho: true
