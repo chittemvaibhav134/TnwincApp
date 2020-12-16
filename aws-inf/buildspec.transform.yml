@@ -67,7 +67,10 @@ phases:
         LOGIN_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleSignOnService/@Location)' doorman-metadata.xml )
       - | 
         # Allow navex root domains in csp
-        CSP_DOMAINS=$($APP_DIR/aws-inf/domain_csp_transform.py $NavexRootDomains)
+        TransformScript="$APP_DIR/aws-inf/domain_csp_transform.py"
+        echo "Running '$TransformScript $NavexRootDomains'"
+        chmod +x $TransformScript
+        CSP_DOMAINS=$($TransformScript $NavexRootDomains)
         CSP_HEADER="frame-src 'self'; frame-ancestors 'self' $CSP_DOMAINS; object-src 'none';"
       - |
         # TODO: Figure out a less dumb way to update the json file  
