@@ -96,6 +96,10 @@
         {
           "Name": "NewRelicenseKeySsmArn",
           "Required": false
+        },
+        {
+          "Name": "NavexRootDomains",
+          "Required": true
         }
       ]
     }
