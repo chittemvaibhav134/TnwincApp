@@ -19,6 +19,7 @@ phases:
       - InfStackName=$(jq -r '.StackName' "$DC_ART_DIR/aws-inf")
       - DoormanMetadataUrl=$(jq -r '.MetadataUrl' "$DC_ART_DIR/doorman")
       - DoormanBaseUrl=$(jq -r '.BaseUrl' "$DC_ART_DIR/doorman")
+      - NavexRootDomains=$(jq -r '.NavexRootDomains' "$DC_ART_DIR/global-configuration")
       - |
           # I think this handles a default value if the artifact is missing or if the entire json file is
           AppshellAdminUrlDefault="http://admin.devlocal.navex-pe.com:3000"
@@ -64,7 +65,13 @@ phases:
         CERT=$(xmllint --xpath '/EntityDescriptor/IDPSSODescriptor/KeyDescriptor/KeyInfo/X509Data/X509Certificate/text()' doorman-metadata.xml )
         LOGOUT_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleLogoutService/@Location)' doorman-metadata.xml )
         LOGIN_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleSignOnService/@Location)' doorman-metadata.xml )
-        CSP_HEADER="frame-src 'self'; frame-ancestors 'self' $DoormanBaseUrl; object-src 'none';"
+      - | 
+        # Allow navex root domains in csp
+        TransformScript="$APP_DIR/aws-inf/domain_csp_transform.py"
+        echo "Running '$TransformScript $NavexRootDomains'"
+        chmod +x $TransformScript
+        CSP_DOMAINS=$($TransformScript $NavexRootDomains)
+        CSP_HEADER="frame-src 'self'; frame-ancestors 'self' $CSP_DOMAINS; object-src 'none';"
       - |
         # TODO: Figure out a less dumb way to update the json file  
         jq --arg CERT "$CERT" '(.identityProviders[] | select(.alias == "doorman") | .config.signingCertificate) |= $CERT' $APP_DIR/import/variants/keycloak-app/navex-realm.json |
