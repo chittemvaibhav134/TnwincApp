@@ -820,7 +820,6 @@ Resources:
           AdminDefaultSecret: !Ref KeyCloakAdminApiDefaultSecret
           AdminSecretSsmPath: !GetAtt ClientSecretRotationConstants.AdminSecretSsmPath
           TaskDefinitionArn: !Ref TaskDefinition
-          SearchMinutesAgo: 5
 
   RemoveDuplicateUsersCloudwatchAlarmEvent:
     Type: AWS::Events::Rule

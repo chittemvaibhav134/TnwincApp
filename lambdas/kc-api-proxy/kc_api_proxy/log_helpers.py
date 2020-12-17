@@ -29,6 +29,7 @@ def get_log_locations_from_task_definition(ecs_client, task_definition_arn: str)
 
 
 def get_duplicate_user_log_messages(logs_client, group: str, stream_prefix: str, start_time: datetime, end_time: datetime = None ) -> List[dict]:
+    end_time = end_time or datetime.now()
     start_time_epoch_ms = get_epoch_time_ms(start_time)
     end_time_epoch_ms = get_epoch_time_ms(end_time)
     filter_pattern = '"federated_identity_account_exists"'
@@ -70,6 +71,6 @@ def parse_user_location_from_log_message(message: str) -> Tuple[str,str]:
 def get_duplicate_user_locations(ecs_client, logs_client, task_definition_arn: str, start_time: datetime, end_time: datetime = None ):
     user_locations = [ ]
     for log_group,log_prefix in get_log_locations_from_task_definition(ecs_client, task_definition_arn):
-        duplicate_user_messages = get_duplicate_user_log_messages(logs_client, log_group, log_prefix, start_time)
+        duplicate_user_messages = get_duplicate_user_log_messages(logs_client, log_group, log_prefix, start_time, end_time)
         user_locations = user_locations + [ parse_user_location_from_log_message(message) for message in duplicate_user_messages ]
     return dedup_simple_list(user_locations)

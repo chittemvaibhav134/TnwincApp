@@ -10,8 +10,8 @@ from .api_helpers import (
 )
 
 ssm_client = boto3.client('ssm')
-logs_client = boto3.client('ecs')
-ecs_client = boto3.client('logs')
+logs_client = boto3.client('logs')
+ecs_client = boto3.client('ecs')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
@@ -57,9 +57,9 @@ def cwe_remove_duplicant_users_handler(event, context):
             pass
 
 def get_search_times_from_alarm_event(event):
-    current_state_time = event['detail']['state']['timestamp'].rstrip('+0')
-    last_state_time = event['detail'].get('previousState',{}).get('timestamp', current_state_time).rstrip('+0')
-    return ( datetime.isoformat(last_state_time), datetime.isoformat(current_state_time) )
+    current_state_time = event['detail']['state']['timestamp']
+    last_state_time = event['detail'].get('previousState',{}).get('timestamp', current_state_time)
+    return ( datetime.strptime(last_state_time, "%Y-%m-%dT%H:%M:%S.%f+0000"), datetime.strptime(current_state_time, "%Y-%m-%dT%H:%M:%S.%f+0000") )
     
 
 def cwe_remove_duplicant_users_alarm_handler(event, context):
