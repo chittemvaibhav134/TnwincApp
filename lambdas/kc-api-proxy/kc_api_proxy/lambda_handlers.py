@@ -2,16 +2,17 @@ import os, boto3, logging
 from datetime import datetime,timedelta
 from .apiproxy import KeyCloakApiProxy
 from .cpresponse import CodePipelineHelperResponse
-from .task_helpers import (
+from .log_helpers import get_duplicate_user_locations
+from .api_helpers import (
     assemble_ssm_path, 
     rotate_and_store_client_secrets, 
-    clear_all_users_cache,
-    get_duplicate_user_locations
+    clear_all_users_cache
 )
 
 ssm_client = boto3.client('ssm')
 logs_client = boto3.client('ecs')
 ecs_client = boto3.client('logs')
+
 logger = logging.getLogger(__name__)
 logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
@@ -58,13 +59,16 @@ def cwe_remove_duplicant_users_handler(event, context):
 def get_search_times_from_alarm_event(event):
     current_state_time = event['detail']['state']['timestamp'].rstrip('+0')
     last_state_time = event['detail'].get('previousState',{}).get('timestamp', current_state_time).rstrip('+0')
-    return ( last_state_time, current_state_time )
+    return ( datetime.isoformat(last_state_time), datetime.isoformat(current_state_time) )
     
 
 def cwe_remove_duplicant_users_alarm_handler(event, context):
+    if event.get('detail-type') != 'CloudWatch Alarm State Change':
+        logger.warn("Unexpected event type triggered lambda..")
+        logger.warn(event)
+        return
     logger.info("Searching for duplicate users in logs..")
     keycloak_app_task_definition_arn = os.environ['TaskDefinitionArn']
-    search_minutes_ago = int(os.environ.get('SearchMinutesAgo', 5))
     start_time, end_time = get_search_times_from_alarm_event(event)
     duplicate_user_locations = get_duplicate_user_locations(ecs_client, logs_client, keycloak_app_task_definition_arn, start_time, end_time)
     logger.info(f"Found {len(duplicate_user_locations)} duplicate username blocking logins")
