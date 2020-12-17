@@ -5,6 +5,12 @@
             "port": "8443",
             "adminUsername": "dvader",
             "adminPassword": "password"
+        },
+        "navexdev": {
+            "hostname": "navex.mock.keycloak.navex-dev.com",
+            "port": "443",
+            "adminUsername": "dvader",
+            "adminPassword": "password"
         }
     }
 }
