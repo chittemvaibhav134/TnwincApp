@@ -812,7 +812,7 @@ Resources:
       Role: !GetAtt CweRemoveDuplicateUsersRole.Arn
       MemorySize: 256
       Timeout: 60
-      Handler: kc_api_proxy.cwe_remove_duplicant_users_handler
+      Handler: kc_api_proxy.cwe_remove_duplicant_users_alarm_handler
       Environment:
         Variables:
           KeyCloakBaseUrl: !Sub "https://navex.${Subdomain}.${DnsHostedZone}"
