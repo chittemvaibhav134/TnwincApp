@@ -40,22 +40,6 @@ def cwe_rotate_handler(event, context):
     rotate_and_store_client_secrets(kc, ssm_client, os.environ['SsmPrefix'])
     logger.info("Cloudwatch scheduled secret rotation finished")
 
-def cwe_remove_duplicant_users_handler(event, context):
-    logger.info("Searching for duplicate users in logs..")
-    keycloak_app_task_definition_arn = os.environ['TaskDefinitionArn']
-    search_minutes_ago = int(os.environ.get('SearchMinutesAgo', 5))
-    start_time = datetime.now() - timedelta(minutes=search_minutes_ago)
-    duplicate_user_locations = get_duplicate_user_locations(ecs_client, logs_client, keycloak_app_task_definition_arn, start_time)
-    logger.info(f"Found {len(duplicate_user_locations)} duplicate username blocking logins")
-    kc = get_keycloak_api_proxy_from_env()
-    for realm_name, username in duplicate_user_locations:
-        try:
-            kc.remove_user_by_username(realm_name, username)
-        except Exception as e:
-            logger.error(f"Failed to remove {username} from {realm_name}")
-            logger.exception(e)
-            pass
-
 def get_search_times_from_alarm_event(event):
     current_state_time = event['detail']['state']['timestamp']
     last_state_time = event['detail'].get('previousState',{}).get('timestamp', current_state_time)
