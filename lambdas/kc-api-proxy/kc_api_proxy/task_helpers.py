@@ -105,7 +105,7 @@ def parse_user_location_from_log_message(message: str) -> Tuple[str,str]:
     log_dict = convert_log_message_to_dict(message)
     return (log_dict['realmId'], log_dict['userId'])
 
-def get_duplicate_user_locations(ecs_client, logs_client, task_definition_arn: str, search_minutes_ago: int = 5):
+def get_duplicate_user_locations(ecs_client, logs_client, task_definition_arn: str, start_time: datetime, end_time: datetime = None ):
     start_time = datetime.now() - timedelta(minutes=search_minutes_ago)
     user_locations = [ ]
     for log_group,log_prefix in get_log_locations_from_task_definition(ecs_client, task_definition_arn):

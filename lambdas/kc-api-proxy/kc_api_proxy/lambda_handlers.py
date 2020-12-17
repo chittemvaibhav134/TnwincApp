@@ -1,4 +1,5 @@
 import os, boto3, logging
+from datetime import datetime,timedelta
 from .apiproxy import KeyCloakApiProxy
 from .cpresponse import CodePipelineHelperResponse
 from .task_helpers import (
@@ -42,7 +43,30 @@ def cwe_remove_duplicant_users_handler(event, context):
     logger.info("Searching for duplicate users in logs..")
     keycloak_app_task_definition_arn = os.environ['TaskDefinitionArn']
     search_minutes_ago = int(os.environ.get('SearchMinutesAgo', 5))
-    duplicate_user_locations = get_duplicate_user_locations(ecs_client, logs_client, keycloak_app_task_definition_arn, search_minutes_ago)
+    start_time = datetime.now() - timedelta(minutes=search_minutes_ago)
+    duplicate_user_locations = get_duplicate_user_locations(ecs_client, logs_client, keycloak_app_task_definition_arn, start_time)
+    logger.info(f"Found {len(duplicate_user_locations)} duplicate username blocking logins")
+    kc = get_keycloak_api_proxy_from_env()
+    for realm_name, username in duplicate_user_locations:
+        try:
+            kc.remove_user_by_username(realm_name, username)
+        except Exception as e:
+            logger.error(f"Failed to remove {username} from {realm_name}")
+            logger.exception(e)
+            pass
+
+def get_search_times_from_alarm_event(event):
+    current_state_time = event['detail']['state']['timestamp'].rstrip('+0')
+    last_state_time = event['detail'].get('previousState',{}).get('timestamp', current_state_time).rstrip('+0')
+    return ( last_state_time, current_state_time )
+    
+
+def cwe_remove_duplicant_users_alarm_handler(event, context):
+    logger.info("Searching for duplicate users in logs..")
+    keycloak_app_task_definition_arn = os.environ['TaskDefinitionArn']
+    search_minutes_ago = int(os.environ.get('SearchMinutesAgo', 5))
+    start_time, end_time = get_search_times_from_alarm_event(event)
+    duplicate_user_locations = get_duplicate_user_locations(ecs_client, logs_client, keycloak_app_task_definition_arn, start_time, end_time)
     logger.info(f"Found {len(duplicate_user_locations)} duplicate username blocking logins")
     kc = get_keycloak_api_proxy_from_env()
     for realm_name, username in duplicate_user_locations:
