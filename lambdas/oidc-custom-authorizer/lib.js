@@ -18,20 +18,55 @@ const getPolicyDocument = (effect, resource) => {
 
 // extract and return the Bearer Token from the Lambda event parameters
 const getToken = (params) => {
-    if (!params.type || params.type !== 'TOKEN') {
+    if (!params.type) {
         throw new Error('Expected "event.type" parameter to have value "TOKEN"');
     }
 
-    const tokenString = params.authorizationToken;
-    if (!tokenString) {
-        throw new Error('Expected "event.headers.Authorization" parameter to be set');
+    const eventType = params.type;
+
+    if (eventType === 'TOKEN') {
+        const tokenString = params.authorizationToken;
+        if (!tokenString) {
+            throw new Error('Expected "event.headers.Authorization" parameter to be set');
+        }
+
+        const match = tokenString.match(/^Bearer (.*)$/);
+        if (!match || match.length < 2) {
+            throw new Error(`Invalid Authorization token - ${tokenString} does not match "Bearer .*"`);
+        }
+        return match[1];
+    } else if (eventType === 'REQUEST') {
+        return getWebSocketRequestToken(params);
+    } else {
+        throw new Error('Expected "event.type" parameter to have value "TOKEN"');
+    }
+}
+
+const getWebSocketRequestToken = (request) => {
+    const headers = request.headers;
+    if (!headers) {
+        throw new Error('Expected "event.headers" parameter to be set');
     }
 
-    const match = tokenString.match(/^Bearer (.*)$/);
-    if (!match || match.length < 2) {
-        throw new Error(`Invalid Authorization token - ${tokenString} does not match "Bearer .*"`);
+    if (headers.Connection === "upgrade" && headers.Upgrade === "websocket") {
+        let token = null;
+        subProtocolIsValid(headers['Sec-WebSocket-Protocol'], 
+            tokenString => token = tokenString, 
+            () => { throw new Error('Invalid sub protocol.'); }
+        );
+        return token?.trim();
+    } else {
+        throw new Error('Invalid WebSocket request because not all required headers are present: connection, upgrade, sec-websocket-protocol.');
     }
-    return match[1];
+}
+
+const subProtocolIsValid = (subProtocolHeader, setTokenString, onerror) => {
+    const subProtocols = subProtocolHeader.split(',')
+    if (subProtocols.indexOf('bearer') >= 0) {
+        setTokenString(subProtocols[1]);
+    } else {
+        onerror();
+    }
 }
 
 const getClientKey = (decodedToken) => {
