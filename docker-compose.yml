@@ -9,15 +9,15 @@ networks:
       name: navexdev
 
 services:
-  keycloak-app:
+  app:
     container_name: keycloak-app
     depends_on:
-      - keycloak-app-db
+      - db
     environment:
       NEW_RELIC_APP_NAME: keycloak (dev)
       NEW_RELIC_AGENT_ENABLED: 'false'
       NEW_RELIC_LICENSE_KEY: 'fake'
-      DB_ADDR: keycloak-app-db
+      DB_ADDR: db
       DB_DATABASE: keycloak
       DB_PASSWORD: keycloak
       DB_PORT: '5432'
@@ -30,17 +30,17 @@ services:
       context: ./build/app
     image: navex/keycloak:11.0.3
     links:
-      - keycloak-app-db
+      - db
     networks:
       navexdev:
     restart: always
     volumes:
-      - ./import/variants/keycloak-app:/import/variants/keycloak-app:rw
+      - ./import/variants/keycloak-app:/import:rw
     entrypoint:
       - /opt/jboss/tools/start.sh
-      - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import/variants/keycloak-app -Djboss.bind.address.management=0.0.0.0"
+      - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import -Djboss.bind.address.management=0.0.0.0"
 
-  keycloak-app-db:
+  db:
     container_name: keycloak-app-db
     environment:
       POSTGRES_DB: keycloak
