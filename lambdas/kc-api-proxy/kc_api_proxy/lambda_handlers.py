@@ -4,10 +4,13 @@ from .cpresponse import CodePipelineHelperResponse
 from .task_helpers import (
     assemble_ssm_path, 
     rotate_and_store_client_secrets, 
-    clear_all_users_cache
+    clear_all_users_cache,
+    get_duplicate_user_locations
 )
 
 ssm_client = boto3.client('ssm')
+logs_client = boto3.client('ecs')
+ecs_client = boto3.client('logs')
 logger = logging.getLogger(__name__)
 logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
@@ -34,6 +37,21 @@ def cwe_rotate_handler(event, context):
     kc = get_keycloak_api_proxy_from_env()
     rotate_and_store_client_secrets(kc, ssm_client, os.environ['SsmPrefix'])
     logger.info("Cloudwatch scheduled secret rotation finished")
+
+def cwe_remove_duplicant_users_handler(event, context):
+    logger.info("Searching for duplicate users in logs..")
+    keycloak_app_task_definition_arn = os.environ['TaskDefinitionArn']
+    search_minutes_ago = int(os.environ.get('SearchMinutesAgo', 5))
+    duplicate_user_locations = get_duplicate_user_locations(ecs_client, logs_client, keycloak_app_task_definition_arn, search_minutes_ago)
+    logger.info(f"Found {len(duplicate_user_locations)} duplicate username blocking logins")
+    kc = get_keycloak_api_proxy_from_env()
+    for realm_name, username in duplicate_user_locations:
+        try:
+            kc.remove_user_by_username(realm_name, username)
+        except Exception as e:
+            logger.error(f"Failed to remove {username} from {realm_name}")
+            logger.exception(e)
+            pass
 
 # This entry point will be called by codepipeline directly to cause
 # client secrets to rotate immediately following a deployment since they 

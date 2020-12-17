@@ -165,3 +165,22 @@ class KeyCloakApiProxy( ):
         endpoint = f"/admin/realms"
         r = self._make_request('GET', endpoint)
         return r.json()
+
+    def get_user_by_username(self, realm_name, username) -> dict:
+        self.logger(f"Getting user '{username}' from realm '{realm_name}'")
+        endpoint = f"/admin/realms/navex/users"
+        query_params = {'username':username}
+        r = self._make_request('GET', endpoint, query_params)
+        return r.json()
+
+    def remove_user_by_id(self, realm_name: str, user_id: str):
+        self.logger.info(f"Removing user '{user_id}' from realm '{realm_name}'")
+        endpoint = f"/admin/realms/navex/users/{user_id}"
+        r = self._make_request('DELETE', endpoint)
+        r.raise_for_status()
+
+    def remove_user_by_username(self, realm_name, username):
+        user = self.get_user_by_username(realm_name, username)
+        if user:
+            self.logger.info(f"username '{username}' has kc user id '{user['id']}'")
+            self.remove_user_by_id(realm_name, user['id'])

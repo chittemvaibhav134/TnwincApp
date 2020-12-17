@@ -373,7 +373,7 @@ Resources:
       Namespace: !GetAtt CustomMetricConstants.Namespace
       Period: 60
       Statistic: Sum
-      TreatMissingData: ignore
+      TreatMissingData: notBreaching
 
 
   # Will reintroduce whenever i can get scaling reliably working :/
@@ -721,7 +721,7 @@ Resources:
       AdminClientId: admin-api-proxy
       AdminSecretSsmPath: !Sub /${AWS::StackName}/client-keys/master/admin-api-proxy
       SsmPrefix: !Sub /${AWS::StackName}/client-keys
-      
+
   ClientSecretRotateLambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -768,6 +768,80 @@ Resources:
           AdminDefaultSecret: !Ref KeyCloakAdminApiDefaultSecret
           AdminSecretSsmPath: !GetAtt ClientSecretRotationConstants.AdminSecretSsmPath
           SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
+
+  CweRemoveDuplicateUsersRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: SsmParameterAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Resource: 
+                  - !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm" 
+                Effect: Allow
+                Action: 
+                  - kms:Encrypt
+                  - kms:Decrypt
+              - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.AdminSecretSsmPath}"
+                Effect: Allow
+                Action: ssm:GetParameter
+              - Resource: "*"
+                Effect: Allow
+                Action: 
+                  - ecs:DescribeTaskDefinition
+              - Resource: !GetAtt LogGroup.Arn
+                Action: logs:FilterLogEvents
+                Effect: Allow
+                  
+  CweRemoveDuplicateUsersLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ./lambdas/kc-api-proxy/
+      Runtime: python3.8
+      Role: !GetAtt CweRemoveDuplicateUsersRole.Arn
+      MemorySize: 256
+      Timeout: 60
+      Handler: kc_api_proxy.cwe_remove_duplicant_users_handler
+      Environment:
+        Variables:
+          KeyCloakBaseUrl: !Sub "https://navex.${Subdomain}.${DnsHostedZone}"
+          AdminClientId: !GetAtt ClientSecretRotationConstants.AdminClientId
+          AdminDefaultSecret: !Ref KeyCloakAdminApiDefaultSecret
+          AdminSecretSsmPath: !GetAtt ClientSecretRotationConstants.AdminSecretSsmPath
+          TaskDefinitionArn: !Ref TaskDefinition
+          SearchMinutesAgo: 5
+
+  RemoveDuplicateUsersCloudwatchEvent:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Schedule keycloak client secret rotation"
+      # more frequent rotation in lower environments so that we catch
+      # clients who don't support the rotation scheme long before
+      # stage/prod
+      ScheduleExpression: "rate(5 minutes)"
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt CweRemoveDuplicateUsersLambda.Arn
+          Id: "CweRemoveDuplicateUsersLambda"
+
+  PermissionForEventsToInvokeCweRemoveDuplicateUsersLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref CweRemoveDuplicateUsersLambda
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt RemoveDuplicateUsersCloudwatchEvent.Arn
 
   CpPostDeployLambda:
     Type: AWS::Lambda::Function
