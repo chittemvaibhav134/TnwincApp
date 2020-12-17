@@ -1,5 +1,5 @@
 import os, boto3, logging
-from datetime import datetime,timedelta
+from datetime import datetime
 from .apiproxy import KeyCloakApiProxy
 from .cpresponse import CodePipelineHelperResponse
 from .log_helpers import get_duplicate_user_locations
