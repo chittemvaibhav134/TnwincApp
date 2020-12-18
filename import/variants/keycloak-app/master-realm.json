@@ -8,12 +8,7 @@
   "actionTokenGeneratedByUserLifespan": 300,
   "adminEventsDetailsEnabled": false,
   "adminEventsEnabled": false,
-  "attributes": {
-    "clientOfflineSessionIdleTimeout": "0",
-    "clientOfflineSessionMaxLifespan": "0",
-    "clientSessionIdleTimeout": "0",
-    "clientSessionMaxLifespan": "0"
-  },
+  "attributes": {},
   "authenticationFlows": [
     {
       "alias": "Handle Existing Account",
@@ -42,7 +37,7 @@
       ],
       "builtIn": true,
       "description": "Handle what to do if there is existing account with same email/username like authenticated identity provider",
-      "id": "2bfd2728-6059-4203-85a7-c89afc818f05",
+      "id": "1adcb42b-b775-4d2e-9155-a52d558cfb87",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -66,7 +61,7 @@
       ],
       "builtIn": true,
       "description": "Reauthentication of existing account",
-      "id": "3877b2b8-636c-4cb0-8673-98730feead25",
+      "id": "3cc788a1-c133-40a6-bfd6-3142ad231d3f",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -90,7 +85,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the auth-otp-form authenticator should be used or not.",
-      "id": "0aebba6f-a792-42e9-83b5-29675084dc92",
+      "id": "e1e29f9a-4000-4289-8d1d-6127a16617af",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -128,7 +123,7 @@
       ],
       "builtIn": true,
       "description": "browser based authentication",
-      "id": "c7ecbace-a34c-4428-b1e3-7bad386a3f08",
+      "id": "5e283dba-6964-4831-8365-d9bf1ad77ada",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -166,7 +161,7 @@
       ],
       "builtIn": true,
       "description": "Base authentication for clients",
-      "id": "5b8efa76-4258-49f0-8922-c53d3badea2b",
+      "id": "057eb96d-ce26-440a-8343-a71228077526",
       "providerId": "client-flow",
       "topLevel": true
     },
@@ -197,7 +192,7 @@
       ],
       "builtIn": true,
       "description": "OpenID Connect Resource Owner Grant",
-      "id": "8b9ac48f-652e-49ca-9b2d-63c9fc1bdc90",
+      "id": "caa8511f-6238-4ba5-b9e6-6b5f493fd50c",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -221,7 +216,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the direct-grant-validate-otp authenticator should be used or not.",
-      "id": "2f3d21b6-4ee5-4da4-9156-2f0d3cb637d0",
+      "id": "0836a84a-c088-4989-9a08-cf4a4a6348de",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -238,7 +233,7 @@
       ],
       "builtIn": true,
       "description": "Used by Docker clients to authenticate against the IDP",
-      "id": "27d67e9f-38ab-4a41-b6d4-afe2f87c65a8",
+      "id": "4923d35c-fbea-4038-b980-f3d6bafce9f6",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -271,7 +266,7 @@
       ],
       "builtIn": true,
       "description": "Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account",
-      "id": "17e01da3-336f-4872-b0ef-1fd999649537",
+      "id": "cd2ac3c2-ccd2-409e-8720-300de5018ca3",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -295,7 +290,7 @@
       ],
       "builtIn": true,
       "description": "Username, password, otp and other auth forms.",
-      "id": "6b59fe4a-69b3-427a-abd2-a8a8ecec9fff",
+      "id": "e0645d51-41d3-42b5-8fef-a5d2896b058d",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -319,7 +314,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the auth-otp-form authenticator should be used or not.",
-      "id": "c7002cb1-7b7c-49ea-aa60-ba3b73ed4dc3",
+      "id": "28c94f32-bff8-407c-84a6-c645827b16c4",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -357,7 +352,7 @@
       ],
       "builtIn": true,
       "description": "An authentication flow based on challenge-response HTTP Authentication Schemes",
-      "id": "c189b36e-883f-4839-a25b-0d8f6da38e94",
+      "id": "b124bdc8-6baf-49b8-b5f5-2febcaa8d4fb",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -375,7 +370,7 @@
       ],
       "builtIn": true,
       "description": "registration flow",
-      "id": "62b43515-09a9-4ac7-a7ef-18c2c7465e2c",
+      "id": "3d5a9794-9157-4f17-9600-00f2f1fc91d3",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -413,7 +408,7 @@
       ],
       "builtIn": true,
       "description": "registration form",
-      "id": "28ce2816-5835-45d1-8280-8aecf56e5e0d",
+      "id": "2cde2fef-cc0d-4f74-bb66-78864f281fc2",
       "providerId": "form-flow",
       "topLevel": false
     },
@@ -451,7 +446,7 @@
       ],
       "builtIn": true,
       "description": "Reset credentials for a user if they forgot their password or something",
-      "id": "6f9adc1c-207c-424d-b3d3-f1a1d2cbf668",
+      "id": "e126054b-5e13-4cfb-a264-3ca49214e105",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -475,7 +470,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the reset-otp authenticator should be used or not.",
-      "id": "5116463e-4162-4b8b-9eba-73d1481f0b26",
+      "id": "3448a871-506a-4644-8459-3fd521df5966",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -492,7 +487,7 @@
       ],
       "builtIn": true,
       "description": "SAML ECP Profile Authentication Flow",
-      "id": "0bd2805c-04ab-4c0c-8cbb-a23d8ce9aac5",
+      "id": "8e42201c-c3c3-4883-a0de-7f6c64ff1f12",
       "providerId": "basic-flow",
       "topLevel": true
     }
@@ -503,14 +498,14 @@
       "config": {
         "require.password.update.after.registration": "false"
       },
-      "id": "527af4a3-ecc4-4591-ad09-04fefc5b9174"
+      "id": "291f1e84-60e1-4307-b1d0-b1bc4f1cdde1"
     },
     {
       "alias": "review profile config",
       "config": {
         "update.profile.on.first.login": "missing"
       },
-      "id": "5a8ab20e-acf6-4272-91b3-9a4ad23cda63"
+      "id": "dce799b0-d72b-4859-af62-86ecc197e6d5"
     }
   ],
   "browserFlow": "browser",
@@ -1172,7 +1167,7 @@
       "enabled": true,
       "frontchannelLogout": false,
       "fullScopeAllowed": false,
-      "id": "20838640-48f6-47a1-92d1-a7699399e344",
+      "id": "77240c2a-cf80-4a1d-81f7-4955cd4305f3",
       "implicitFlowEnabled": false,
       "name": "${client_account-console}",
       "nodeReRegistrationTimeout": 0,
@@ -1188,7 +1183,7 @@
         {
           "config": {},
           "consentRequired": false,
-          "id": "65827c0b-a7ac-44a7-b13f-6435592b175d",
+          "id": "02704d28-4310-4aa9-96d0-a778f3ccb039",
           "name": "audience resolve",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-audience-resolve-mapper"
@@ -1199,7 +1194,7 @@
         "/realms/master/account/*"
       ],
       "rootUrl": "${authBaseUrl}",
-      "secret": "2c0fabdd-968e-4573-a03a-82701b0c39ab",
+      "secret": "c35e8999-fbfc-4dba-a9cb-297f96a5d265",
       "serviceAccountsEnabled": false,
       "standardFlowEnabled": true,
       "surrogateAuthRequired": false,
@@ -1726,7 +1721,7 @@
           },
           "containerId": "68560423-4010-4445-9ea0-399b92605b69",
           "description": "${role_manage-consent}",
-          "id": "c8097235-da79-4240-9627-29dfafef7ed0",
+          "id": "3620adac-58ac-4ade-9b91-784ea902802f",
           "name": "manage-consent"
         },
         {
@@ -1744,7 +1739,7 @@
           "composite": false,
           "containerId": "68560423-4010-4445-9ea0-399b92605b69",
           "description": "${role_view-applications}",
-          "id": "dd2c4b05-6e6c-457f-8fca-aeafec91f086",
+          "id": "53405ae0-e3f8-47df-b474-eff49189be06",
           "name": "view-applications"
         },
         {
@@ -1753,7 +1748,7 @@
           "composite": false,
           "containerId": "68560423-4010-4445-9ea0-399b92605b69",
           "description": "${role_view-consent}",
-          "id": "7d010cf0-43db-42c8-bbaf-64369bdf3819",
+          "id": "627c77e0-13ee-4cc2-9483-d68665502748",
           "name": "view-consent"
         },
         {
