@@ -1,0 +1,31 @@
+{
+    "version":  "0",
+    "id":  "880c49b1-a18b-a0e8-5c44-a5ac7485c88b",
+    "detail-type":  "CloudWatch Alarm State Change",
+    "source":  "aws.cloudwatch",
+    "account":  "455920928861",
+    "time":  "2020-12-17T03:01:24Z",
+    "region":  "us-west-2",
+    "resources":  [
+                      "arn:aws:cloudwatch:us-west-2:455920928861:alarm:keycloak-psychic-potato-DuplicateUserIdAttemptedLoginAlarm-1JU9VVU2NSC86"
+                  ],
+    "detail":  {
+                   "alarmName":  "keycloak-psychic-potato-DuplicateUserIdAttemptedLoginAlarm-1JU9VVU2NSC86",
+                   "state":  {
+                                 "value":  "OK",
+                                 "reason":  "Threshold Crossed: no datapoints were received for 1 period and 1 missing datapoint was treated as [NonBreaching].",
+                                 "reasonData":  "{\"version\":\"1.0\",\"queryDate\":\"2020-12-17T03:01:24.862+0000\",\"statistic\":\"Sum\",\"period\":60,\"recentDatapoints\":[],\"threshold\":0.0}",
+                                 "timestamp":  "2020-12-17T03:01:24.864+0000"
+                             },
+                   "previousState":  {
+                                         "value":  "ALARM",
+                                         "reason":  "Threshold Crossed: 1 out of the last 1 datapoints [1.0 (17/12/20 02:54:00)] was greater than the threshold (0.0) (minimum 1 datapoint for OK -\u003e ALARM transition).",
+                                         "reasonData":  "{\"version\":\"1.0\",\"queryDate\":\"2020-12-17T02:57:24.860+0000\",\"startDate\":\"2020-12-17T02:54:00.000+0000\",\"statistic\":\"Sum\",\"period\":60,\"recentDatapoints\":[1.0],\"threshold\":0.0}",
+                                         "timestamp":  "2020-12-17T02:57:24.865+0000"
+                                     },
+                   "configuration":  {
+                                         "description":  "Alarm on logs that contain the federated_identity_account_exists keycloak error",
+                                         "metrics":  ""
+                                     }
+               }
+}

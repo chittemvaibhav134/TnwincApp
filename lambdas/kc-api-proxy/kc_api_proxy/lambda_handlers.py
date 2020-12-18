@@ -1,13 +1,18 @@
 import os, boto3, logging
+from datetime import datetime
 from .apiproxy import KeyCloakApiProxy
 from .cpresponse import CodePipelineHelperResponse
-from .task_helpers import (
+from .log_helpers import get_duplicate_user_locations
+from .api_helpers import (
     assemble_ssm_path, 
     rotate_and_store_client_secrets, 
     clear_all_users_cache
 )
 
 ssm_client = boto3.client('ssm')
+logs_client = boto3.client('logs')
+ecs_client = boto3.client('ecs')
+
 logger = logging.getLogger(__name__)
 logger.setLevel(os.environ.get('LOG_LEVEL', 'INFO'))
 
@@ -34,6 +39,31 @@ def cwe_rotate_handler(event, context):
     kc = get_keycloak_api_proxy_from_env()
     rotate_and_store_client_secrets(kc, ssm_client, os.environ['SsmPrefix'])
     logger.info("Cloudwatch scheduled secret rotation finished")
+
+def get_search_times_from_alarm_event(event):
+    current_state_time = event['detail']['state']['timestamp']
+    last_state_time = event['detail'].get('previousState',{}).get('timestamp', current_state_time)
+    return ( datetime.strptime(last_state_time, "%Y-%m-%dT%H:%M:%S.%f+0000"), datetime.strptime(current_state_time, "%Y-%m-%dT%H:%M:%S.%f+0000") )
+    
+
+def cwe_remove_duplicant_users_alarm_handler(event, context):
+    if event.get('detail-type') != 'CloudWatch Alarm State Change':
+        logger.warn("Unexpected event type triggered lambda..")
+        logger.warn(event)
+        return
+    logger.info("Searching for duplicate users in logs..")
+    keycloak_app_task_definition_arn = os.environ['TaskDefinitionArn']
+    start_time, end_time = get_search_times_from_alarm_event(event)
+    duplicate_user_locations = get_duplicate_user_locations(ecs_client, logs_client, keycloak_app_task_definition_arn, start_time, end_time)
+    logger.info(f"Found {len(duplicate_user_locations)} duplicate user id(s) blocked from loggin in")
+    kc = get_keycloak_api_proxy_from_env()
+    for realm_name, user_id in duplicate_user_locations:
+        try:
+            kc.remove_user_by_id(realm_name, user_id)
+        except Exception as e:
+            logger.error(f"Failed to remove '{user_id}' from '{realm_name}'")
+            logger.exception(e)
+            pass
 
 # This entry point will be called by codepipeline directly to cause
 # client secrets to rotate immediately following a deployment since they 
