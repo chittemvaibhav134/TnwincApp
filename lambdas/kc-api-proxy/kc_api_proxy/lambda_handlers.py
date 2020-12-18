@@ -55,13 +55,13 @@ def cwe_remove_duplicant_users_alarm_handler(event, context):
     keycloak_app_task_definition_arn = os.environ['TaskDefinitionArn']
     start_time, end_time = get_search_times_from_alarm_event(event)
     duplicate_user_locations = get_duplicate_user_locations(ecs_client, logs_client, keycloak_app_task_definition_arn, start_time, end_time)
-    logger.info(f"Found {len(duplicate_user_locations)} duplicate username blocking logins")
+    logger.info(f"Found {len(duplicate_user_locations)} duplicate user id(s) blocked from loggin in")
     kc = get_keycloak_api_proxy_from_env()
-    for realm_name, username in duplicate_user_locations:
+    for realm_name, user_id in duplicate_user_locations:
         try:
-            kc.remove_user_by_username(realm_name, username)
+            kc.remove_user_by_id(realm_name, user_id)
         except Exception as e:
-            logger.error(f"Failed to remove {username} from {realm_name}")
+            logger.error(f"Failed to remove '{user_id}' from '{realm_name}'")
             logger.exception(e)
             pass
 

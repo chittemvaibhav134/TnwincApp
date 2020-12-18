@@ -62,8 +62,6 @@ def convert_log_message_to_dict(message: str) -> dict:
         log_dict[k] = v
     return log_dict
 
-# Need to double check, but i think what is logged as userId is actually the username
-# and there is a seperate userId that kc uses internally :/
 def parse_user_location_from_log_message(message: str) -> Tuple[str,str]:
     log_dict = convert_log_message_to_dict(message)
     return (log_dict['realmId'], log_dict['userId'])
