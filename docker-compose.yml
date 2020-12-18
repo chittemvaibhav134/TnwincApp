@@ -1,7 +1,7 @@
 version: '2.0'
 
 volumes:
-  keycloak-app-db:
+  db:
 
 networks:
   navexdev:
@@ -28,12 +28,12 @@ services:
       - '9990:9990'
     build:
       context: ./build/app
-    image: navex/keycloak:11.0.3
+    image: navex/keycloak:8.0.2
     links:
       - db
     networks:
       navexdev:
-    restart: always
+    restart: 'no'
     volumes:
       - ./import/variants/keycloak-app:/import:rw
     entrypoint:
@@ -51,6 +51,6 @@ services:
     image: postgres:11.5
     networks:
       navexdev:
-    restart: always
+    restart: 'no'
     volumes:
-      - keycloak-app-db:/var/lib/postgresql/data:rw
+      - db:/var/lib/postgresql/data:rw
