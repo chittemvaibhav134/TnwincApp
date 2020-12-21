@@ -36,11 +36,20 @@ You can get a list of running processes with **docker ps**.
 
 Look for the process which is running on port 8444. Remember this container ID.
 
+First, get into the docker container using the ID you just obtained, with the command **docker exec -it <container name> /bin/bash** to get a bash shell
 In the **/opt/jboss/keycloak/bin/** folder there is a script called **add-user-keycloak.sh**
 Run the add-user-keycloak shell script, by from the root of the repo, using the following command: docker exec [CONTAINER_ID] /opt/jboss/keycloak/bin/add-user-keycloak.sh -u [userName] -p [password]
 
 Now you have a user you can log in on.
 Navigate to https://localhost:8444 and log in with the new user/password you created above, and you should be able to use Keycloak as an IdP.
+
+## Getting metadata
+To get the metadata, ensure you have an hostfile entry (C:\Windows\system32\drivers\etc\hosts) which loops back to localhost for 
+https://keycloak.devlocal.navex-pe.com
+
+Then navigate to 
+https://keycloak.devlocal.navex-pe.com:8444/auth/realms/master/protocol/saml/descriptor
+and you should be ready to add an IdP in Platform.
 
 ## Removal
 
@@ -50,12 +59,17 @@ From the repo root:
 
 ```shell
 docker-compose -f docker-compose.yml down
+docker volume rm platform-auth-keycloak_keycloak-app-db	
 docker-compose -f docker-compose-idp.yml down
-docker volume rm platform-auth-keycloak_db
+docker volume rm platform-auth-keycloak_keycloak-idp-db	
 docker network rm navexdev
 ```
 
 KeyCloak has now been completely removed.
+
+## Upgrade
+
+Pull the branch that contains the desired version. Run DevDeploy.
 
 ## Configuration Export
 
@@ -102,6 +116,6 @@ docker logs -f keycloak-app
 
 #### Users
 
-|username|password|purpose|
-|---|---|---|
-|`dvader`|`password`|Admin user|
+| username | password   | purpose    |
+| -------- | ---------- | ---------- |
+| `dvader` | `password` | Admin user |

@@ -11,13 +11,13 @@ function Invoke-KeyCloakMigration {
         [bool]$showOutput,
         [string]$containerName
     )
-
+    
     Write-Host "Starting another KeyCloak instance with migration action [$action]."
     $systemProps = @(
         '-Djboss.socket.binding.port-offset=100',
         "-Dkeycloak.migration.action=$action",
         '-Dkeycloak.migration.provider=dir',
-        "-Dkeycloak.migration.dir=/import/$containerName"
+        "-Dkeycloak.migration.dir=/import"
     )
     if ($action -eq 'export') {
         $systemProps += '-Dkeycloak.migration.usersExportStrategy=REALM_FILE'
@@ -33,7 +33,7 @@ function Invoke-KeyCloakMigration {
 
     Wait-KeyCloakStartup -showOutput $showOutput -argumentList $argumentList
 
-    Restart-KeyCloak $composeFilePath
+    Restart-KeyCloak -composeFilePath $composeFilePath -showOutput $showOutput
 }
 
 function Restart-KeyCloak {
@@ -44,8 +44,7 @@ function Restart-KeyCloak {
     )
 
     Write-Host "Restarting KeyCloak."
-    docker-compose -f $composeFilePath rm -svf $containerName
-    docker-compose -f $composeFilePath rm -svf "$containerName-db"
+    docker-compose -f $composeFilePath down
     docker-compose -f $composeFilePath up -d
 
     $argumentList = @(
@@ -66,5 +65,5 @@ function Wait-KeyCloakStartup {
         [bool]$showOutput
     )
 
-    Watch-Process -showOutput $showOutput -fileName "docker" -argumentList $argumentList -watchForRegex "Keycloak \d\.\d\.\d \(WildFly Core \d+\.\d\.\d\.Final\) started" -watchCountLimit 3 -description "KeyCloak start"
+    Watch-Process -showOutput $showOutput -fileName "docker" -argumentList $argumentList -watchForRegex "Admin console listening on" -watchCountLimit 1 -description "KeyCloak start"
 }

@@ -40,6 +40,9 @@ class KeyCloakApiProxy( ):
     def _token_expired(self, from_time: datetime.datetime = datetime.datetime.utcnow()) -> bool:
         return self.token_expiration < from_time
 
+    def _invalid_client_secret_response(self, response) -> bool:
+        return response.status_code in [400,401] and response.json()['error_description'] == 'Invalid client secret'
+
     def _get_auth_header( self ) -> dict:
         endpoint = '/realms/master/protocol/openid-connect/token'
         request_args = {
@@ -105,7 +108,7 @@ class KeyCloakApiProxy( ):
             r = requests.request(**request_args)
             r.raise_for_status()
         except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 400 and e.response.json()['error_description'] == 'Invalid client secret':
+            if self._invalid_client_secret_response(e.response):
                 if self._refresh_credentials( ):
                     r = self._make_request(method, endpoint, query_params, body, headers)
                     pass
@@ -165,3 +168,24 @@ class KeyCloakApiProxy( ):
         endpoint = f"/admin/realms"
         r = self._make_request('GET', endpoint)
         return r.json()
+
+    def get_user_by_username(self, realm_name, username) -> dict:
+        self.logger.info(f"Getting user '{username}' from realm '{realm_name}'")
+        endpoint = f"/admin/realms/navex/users"
+        query_params = {'username':username}
+        r = self._make_request('GET', endpoint, query_params)
+        return r.json()
+
+    def remove_user_by_id(self, realm_name: str, user_id: str):
+        self.logger.info(f"Removing user '{user_id}' from realm '{realm_name}'")
+        endpoint = f"/admin/realms/navex/users/{user_id}"
+        r = self._make_request('DELETE', endpoint)
+        r.raise_for_status()
+
+    def remove_user_by_username(self, realm_name, username):
+        user = self.get_user_by_username(realm_name, username)
+        if user:
+            self.logger.info(f"username '{username}' has kc user id '{user[0]['id']}'")
+            self.remove_user_by_id(realm_name, user[0]['id'])
+        else:
+            self.logger.info(f"username '{username}' was not found in realm '{realm_name}''")
