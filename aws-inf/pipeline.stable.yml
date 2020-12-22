@@ -771,7 +771,7 @@ Resources:
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_IntStable::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_StageEU::stack-outputs.json:Domain"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "stageEU",
