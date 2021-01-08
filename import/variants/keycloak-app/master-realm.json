@@ -8,7 +8,38 @@
   "actionTokenGeneratedByUserLifespan": 300,
   "adminEventsDetailsEnabled": false,
   "adminEventsEnabled": false,
-  "attributes": {},
+  "attributes": {
+    "_browser_header.contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
+    "_browser_header.contentSecurityPolicyReportOnly": "",
+    "_browser_header.strictTransportSecurity": "max-age=31536000; includeSubDomains",
+    "_browser_header.xContentTypeOptions": "nosniff",
+    "_browser_header.xFrameOptions": "SAMEORIGIN",
+    "_browser_header.xRobotsTag": "none",
+    "_browser_header.xXSSProtection": "1; mode=block",
+    "actionTokenGeneratedByAdminLifespan": "43200",
+    "actionTokenGeneratedByUserLifespan": "300",
+    "bruteForceProtected": "false",
+    "displayName": "Keycloak",
+    "displayNameHtml": "<div class=\"kc-logo-text\"><span>Keycloak</span></div>",
+    "failureFactor": "30",
+    "maxDeltaTimeSeconds": "43200",
+    "maxFailureWaitSeconds": "900",
+    "minimumQuickLoginWaitSeconds": "60",
+    "offlineSessionMaxLifespan": "5184000",
+    "offlineSessionMaxLifespanEnabled": "false",
+    "permanentLockout": "false",
+    "quickLoginCheckMilliSeconds": "1000",
+    "waitIncrementSeconds": "60",
+    "webAuthnPolicyAttestationConveyancePreference": "not specified",
+    "webAuthnPolicyAuthenticatorAttachment": "not specified",
+    "webAuthnPolicyAvoidSameAuthenticatorRegister": "false",
+    "webAuthnPolicyCreateTimeout": "0",
+    "webAuthnPolicyRequireResidentKey": "not specified",
+    "webAuthnPolicyRpEntityName": "keycloak",
+    "webAuthnPolicyRpId": "",
+    "webAuthnPolicySignatureAlgorithms": "ES256",
+    "webAuthnPolicyUserVerificationRequirement": "not specified"
+  },
   "authenticationFlows": [
     {
       "alias": "Handle Existing Account",
@@ -37,7 +68,7 @@
       ],
       "builtIn": true,
       "description": "Handle what to do if there is existing account with same email/username like authenticated identity provider",
-      "id": "1adcb42b-b775-4d2e-9155-a52d558cfb87",
+      "id": "6bb03b4a-72f2-4627-ae2a-16937a523117",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -61,7 +92,7 @@
       ],
       "builtIn": true,
       "description": "Reauthentication of existing account",
-      "id": "3cc788a1-c133-40a6-bfd6-3142ad231d3f",
+      "id": "fcff441c-6a83-43b3-8632-64de87076d27",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -85,7 +116,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the auth-otp-form authenticator should be used or not.",
-      "id": "e1e29f9a-4000-4289-8d1d-6127a16617af",
+      "id": "f255b14f-d7b4-4295-975e-66d8ffc470d3",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -123,7 +154,7 @@
       ],
       "builtIn": true,
       "description": "browser based authentication",
-      "id": "5e283dba-6964-4831-8365-d9bf1ad77ada",
+      "id": "14003c96-dfcc-430f-beb6-016760850cba",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -161,7 +192,7 @@
       ],
       "builtIn": true,
       "description": "Base authentication for clients",
-      "id": "057eb96d-ce26-440a-8343-a71228077526",
+      "id": "77de7873-825c-4dd0-8075-a0c2f29164f1",
       "providerId": "client-flow",
       "topLevel": true
     },
@@ -192,7 +223,7 @@
       ],
       "builtIn": true,
       "description": "OpenID Connect Resource Owner Grant",
-      "id": "caa8511f-6238-4ba5-b9e6-6b5f493fd50c",
+      "id": "08dadaaa-913f-44b4-a203-1ecc7e8581db",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -216,7 +247,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the direct-grant-validate-otp authenticator should be used or not.",
-      "id": "0836a84a-c088-4989-9a08-cf4a4a6348de",
+      "id": "6e83f2e7-56ae-4bbf-a7ec-b8a3502172cd",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -233,7 +264,7 @@
       ],
       "builtIn": true,
       "description": "Used by Docker clients to authenticate against the IDP",
-      "id": "4923d35c-fbea-4038-b980-f3d6bafce9f6",
+      "id": "f6013dc8-2f4e-4d09-9975-c23dab786510",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -266,7 +297,7 @@
       ],
       "builtIn": true,
       "description": "Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account",
-      "id": "cd2ac3c2-ccd2-409e-8720-300de5018ca3",
+      "id": "db1988bd-3a53-40b9-b44a-a2fbd3cedccf",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -290,7 +321,7 @@
       ],
       "builtIn": true,
       "description": "Username, password, otp and other auth forms.",
-      "id": "e0645d51-41d3-42b5-8fef-a5d2896b058d",
+      "id": "630468f1-cfcd-4a01-88fb-480bd35276eb",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -314,7 +345,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the auth-otp-form authenticator should be used or not.",
-      "id": "28c94f32-bff8-407c-84a6-c645827b16c4",
+      "id": "4d79d4bc-d1b3-4f47-9916-ebbfd168bfab",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -352,7 +383,7 @@
       ],
       "builtIn": true,
       "description": "An authentication flow based on challenge-response HTTP Authentication Schemes",
-      "id": "b124bdc8-6baf-49b8-b5f5-2febcaa8d4fb",
+      "id": "fc088404-5649-4744-bed5-7cbb0b3f09e6",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -370,7 +401,7 @@
       ],
       "builtIn": true,
       "description": "registration flow",
-      "id": "3d5a9794-9157-4f17-9600-00f2f1fc91d3",
+      "id": "e6d90d03-35ae-47d6-9641-ed8b3dcfd852",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -408,7 +439,7 @@
       ],
       "builtIn": true,
       "description": "registration form",
-      "id": "2cde2fef-cc0d-4f74-bb66-78864f281fc2",
+      "id": "1ea63ab4-dccc-46e7-b79d-cf47c30b9982",
       "providerId": "form-flow",
       "topLevel": false
     },
@@ -446,7 +477,7 @@
       ],
       "builtIn": true,
       "description": "Reset credentials for a user if they forgot their password or something",
-      "id": "e126054b-5e13-4cfb-a264-3ca49214e105",
+      "id": "e2dc30c4-19fb-4931-951c-1286547d370a",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -470,7 +501,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the reset-otp authenticator should be used or not.",
-      "id": "3448a871-506a-4644-8459-3fd521df5966",
+      "id": "efe9e2d3-4950-4973-bb46-29dcc9f054cc",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -487,7 +518,7 @@
       ],
       "builtIn": true,
       "description": "SAML ECP Profile Authentication Flow",
-      "id": "8e42201c-c3c3-4883-a0de-7f6c64ff1f12",
+      "id": "30b40bfb-bb62-423a-aaed-c89bab0dae94",
       "providerId": "basic-flow",
       "topLevel": true
     }
@@ -498,14 +529,14 @@
       "config": {
         "require.password.update.after.registration": "false"
       },
-      "id": "291f1e84-60e1-4307-b1d0-b1bc4f1cdde1"
+      "id": "03b0cb25-2fcf-45ee-ae99-004931cc16a4"
     },
     {
       "alias": "review profile config",
       "config": {
         "update.profile.on.first.login": "missing"
       },
-      "id": "dce799b0-d72b-4859-af62-86ecc197e6d5"
+      "id": "8ed9b69d-052e-48ff-a105-edd426d8a094"
     }
   ],
   "browserFlow": "browser",
@@ -520,18 +551,6 @@
   },
   "bruteForceProtected": false,
   "clientAuthenticationFlow": "clients",
-  "clientOfflineSessionIdleTimeout": 0,
-  "clientOfflineSessionMaxLifespan": 0,
-  "clientScopeMappings": {
-    "account": [
-      {
-        "client": "account-console",
-        "roles": [
-          "manage-account"
-        ]
-      }
-    ]
-  },
   "clientScopes": [
     {
       "attributes": {
@@ -1018,11 +1037,8 @@
       ]
     }
   ],
-  "clientSessionIdleTimeout": 0,
-  "clientSessionMaxLifespan": 0,
   "clients": [
     {
-      "alwaysDisplayInConsole": false,
       "attributes": {},
       "authenticationFlowBindingOverrides": {},
       "baseUrl": "/realms/master/account/",
@@ -1069,11 +1085,9 @@
       "webOrigins": []
     },
     {
-      "alwaysDisplayInConsole": false,
       "attributes": {
         "display.on.consent.screen": "false",
         "exclude.session.state.from.auth.response": "false",
-        "pkce.code.challenge.method": "S256",
         "saml.assertion.signature": "false",
         "saml.authnstatement": "false",
         "saml.client.signature": "false",
@@ -1146,62 +1160,6 @@
       ]
     },
     {
-      "alwaysDisplayInConsole": false,
-      "attributes": {
-        "pkce.code.challenge.method": "S256"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "baseUrl": "/realms/master/account/",
-      "bearerOnly": false,
-      "clientAuthenticatorType": "client-secret",
-      "clientId": "account-console",
-      "consentRequired": false,
-      "defaultClientScopes": [
-        "email",
-        "profile",
-        "role_list",
-        "roles",
-        "web-origins"
-      ],
-      "directAccessGrantsEnabled": false,
-      "enabled": true,
-      "frontchannelLogout": false,
-      "fullScopeAllowed": false,
-      "id": "77240c2a-cf80-4a1d-81f7-4955cd4305f3",
-      "implicitFlowEnabled": false,
-      "name": "${client_account-console}",
-      "nodeReRegistrationTimeout": 0,
-      "notBefore": 0,
-      "optionalClientScopes": [
-        "address",
-        "microprofile-jwt",
-        "offline_access",
-        "phone"
-      ],
-      "protocol": "openid-connect",
-      "protocolMappers": [
-        {
-          "config": {},
-          "consentRequired": false,
-          "id": "02704d28-4310-4aa9-96d0-a778f3ccb039",
-          "name": "audience resolve",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-audience-resolve-mapper"
-        }
-      ],
-      "publicClient": true,
-      "redirectUris": [
-        "/realms/master/account/*"
-      ],
-      "rootUrl": "${authBaseUrl}",
-      "secret": "c35e8999-fbfc-4dba-a9cb-297f96a5d265",
-      "serviceAccountsEnabled": false,
-      "standardFlowEnabled": true,
-      "surrogateAuthRequired": false,
-      "webOrigins": []
-    },
-    {
-      "alwaysDisplayInConsole": false,
       "attributes": {},
       "authenticationFlowBindingOverrides": {},
       "bearerOnly": false,
@@ -1240,7 +1198,6 @@
       "webOrigins": []
     },
     {
-      "alwaysDisplayInConsole": false,
       "attributes": {},
       "authenticationFlowBindingOverrides": {},
       "bearerOnly": false,
@@ -1279,7 +1236,6 @@
       "webOrigins": []
     },
     {
-      "alwaysDisplayInConsole": false,
       "attributes": {},
       "authenticationFlowBindingOverrides": {},
       "bearerOnly": true,
@@ -1318,7 +1274,6 @@
       "webOrigins": []
     },
     {
-      "alwaysDisplayInConsole": false,
       "attributes": {},
       "authenticationFlowBindingOverrides": {},
       "bearerOnly": true,
@@ -1357,7 +1312,6 @@
       "webOrigins": []
     },
     {
-      "alwaysDisplayInConsole": false,
       "attributes": {
         "display.on.consent.screen": "false",
         "exclude.session.state.from.auth.response": "false",
@@ -1600,7 +1554,7 @@
   "groups": [],
   "id": "master",
   "internationalizationEnabled": false,
-  "keycloakVersion": "11.0.3",
+  "keycloakVersion": "8.0.2",
   "loginWithEmailAllowed": true,
   "maxDeltaTimeSeconds": 43200,
   "maxFailureWaitSeconds": 900,
@@ -1672,15 +1626,6 @@
       "name": "Terms and Conditions",
       "priority": 20,
       "providerId": "terms_and_conditions"
-    },
-    {
-      "alias": "update_user_locale",
-      "config": {},
-      "defaultAction": false,
-      "enabled": true,
-      "name": "Update User Locale",
-      "priority": 1000,
-      "providerId": "update_user_locale"
     }
   ],
   "requiredCredentials": [
@@ -1711,22 +1656,6 @@
         {
           "attributes": {},
           "clientRole": true,
-          "composite": true,
-          "composites": {
-            "client": {
-              "account": [
-                "view-consent"
-              ]
-            }
-          },
-          "containerId": "68560423-4010-4445-9ea0-399b92605b69",
-          "description": "${role_manage-consent}",
-          "id": "3620adac-58ac-4ade-9b91-784ea902802f",
-          "name": "manage-consent"
-        },
-        {
-          "attributes": {},
-          "clientRole": true,
           "composite": false,
           "containerId": "68560423-4010-4445-9ea0-399b92605b69",
           "description": "${role_manage-account-links}",
@@ -1738,30 +1667,11 @@
           "clientRole": true,
           "composite": false,
           "containerId": "68560423-4010-4445-9ea0-399b92605b69",
-          "description": "${role_view-applications}",
-          "id": "53405ae0-e3f8-47df-b474-eff49189be06",
-          "name": "view-applications"
-        },
-        {
-          "attributes": {},
-          "clientRole": true,
-          "composite": false,
-          "containerId": "68560423-4010-4445-9ea0-399b92605b69",
-          "description": "${role_view-consent}",
-          "id": "627c77e0-13ee-4cc2-9483-d68665502748",
-          "name": "view-consent"
-        },
-        {
-          "attributes": {},
-          "clientRole": true,
-          "composite": false,
-          "containerId": "68560423-4010-4445-9ea0-399b92605b69",
           "description": "${role_view-profile}",
           "id": "5f06dbad-8ef1-4571-9564-7ebac667118c",
           "name": "view-profile"
         }
       ],
-      "account-console": [],
       "admin-api-proxy": [],
       "admin-cli": [],
       "broker": [
@@ -2303,18 +2213,6 @@
   "webAuthnPolicyAuthenticatorAttachment": "not specified",
   "webAuthnPolicyAvoidSameAuthenticatorRegister": false,
   "webAuthnPolicyCreateTimeout": 0,
-  "webAuthnPolicyPasswordlessAcceptableAaguids": [],
-  "webAuthnPolicyPasswordlessAttestationConveyancePreference": "not specified",
-  "webAuthnPolicyPasswordlessAuthenticatorAttachment": "not specified",
-  "webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister": false,
-  "webAuthnPolicyPasswordlessCreateTimeout": 0,
-  "webAuthnPolicyPasswordlessRequireResidentKey": "not specified",
-  "webAuthnPolicyPasswordlessRpEntityName": "keycloak",
-  "webAuthnPolicyPasswordlessRpId": "",
-  "webAuthnPolicyPasswordlessSignatureAlgorithms": [
-    "ES256"
-  ],
-  "webAuthnPolicyPasswordlessUserVerificationRequirement": "not specified",
   "webAuthnPolicyRequireResidentKey": "not specified",
   "webAuthnPolicyRpEntityName": "keycloak",
   "webAuthnPolicyRpId": "",
