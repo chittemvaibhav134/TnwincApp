@@ -1641,6 +1641,7 @@ Resources:
               InputArtifacts:
                 - Name: AuthPackageUsEast1
                 - Name: CfnDeploy_ProdUS
+                - Name: FinalizedCfnAuthConfig_ProdUS
               OutputArtifacts:
                 - Name: CfnAuthDeploy_ProdUS_UsEast1
               RunOrder: 7
