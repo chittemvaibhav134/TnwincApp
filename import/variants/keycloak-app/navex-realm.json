@@ -2304,7 +2304,7 @@
         }
     ],
     "internationalizationEnabled": false,
-    "keycloakVersion": "8.0.2",
+    "keycloakVersion": "11.0.3",
     "loginWithEmailAllowed": false,
     "maxDeltaTimeSeconds": 43200,
     "maxFailureWaitSeconds": 900,
