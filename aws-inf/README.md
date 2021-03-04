@@ -38,6 +38,23 @@ Storing buildspecs with the code allows build/deploy processes to travel with th
 * I will probably duplicate this into pipeline.stable.yml soon and update the deploy accounts
   * This is a massive DRY problem, but templating this template has proved a bit terrible, and I can't tell which is the least bad solution
 ​
+
+### Gotchas
+If you run into the following error when running 
+`aws cloudformation package --template template.authorizer.yml --s3-bucket $BUCKET_NAME --output-template auth.packaged.yml`
+
+`Unable to upload artifact ./lambdas/oidc-custom-authorizer/ referenced by Code parameter of CustomOidcAuthorizerLambda resource.
+An error occurred (ExpiredToken) when calling the PutObject operation: The provided token has expired.`
+
+Then provide the `--profile navexdev` argument.
+
+If you run into the following error when running
+`aws cloudformation deploy --template-file C:\git\platform-auth-keycloak\auth.packaged.yml --stack-name $STACK_NAME --region $REGION_NAME  --profile navexdev`
+
+`An error occurred (InsufficientCapabilitiesException) when calling the CreateChangeSet operation: Requires capabilities : [CAPABILITY_IAM].`
+
+Then provide the `--capabilities CAPABILITY_IAM` parameter, and try again.
+
 ### README.md
 ​
 This very [README.md](./README.md).
