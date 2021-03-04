@@ -598,14 +598,6 @@ Resources:
                 - Name: CfnDeploy_IntStable
                 - Name: CfnAuthDeploy_IntStable_UsWest2                 
               RunOrder: 9
-            -
-              Name: ManualGate_IntStable
-              ActionTypeId:
-                Category: Approval
-                Owner: AWS
-                Version: "1"
-                Provider: Manual
-              RunOrder: 9
         - 
           Name: StageEU
           Actions:
