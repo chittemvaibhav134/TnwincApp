@@ -49,23 +49,15 @@ const getWebSocketRequestToken = (request) => {
     }
 
     if (headers.Connection === "upgrade" && headers.Upgrade === "websocket") {
-        let token = null;
-        subProtocolIsValid(headers['Sec-WebSocket-Protocol'], 
-            tokenString => token = tokenString, 
-            () => { throw new Error('Invalid sub protocol.'); }
-        );
-        return token?.trim();
+        const subProtocolHeader = headers['Sec-WebSocket-Protocol'];
+        const subProtocols = subProtocolHeader.split(',');
+        const match = subProtocols[0].match(/^bearer(.*)$/);
+        if (!match || match.length < 2) {
+            throw new Error('Invalid sub protocol.'); 
+        }
+        return match[1]; 
     } else {
         throw new Error('Invalid WebSocket request because not all required headers are present: connection, upgrade, sec-websocket-protocol.');
-    }
-}
-
-const subProtocolIsValid = (subProtocolHeader, setTokenString, onerror) => {
-    const subProtocols = subProtocolHeader.split(',')
-    if (subProtocols.indexOf('bearer') >= 0) {
-        setTokenString(subProtocols[1]);
-    } else {
-        onerror();
     }
 }
 
