@@ -24,7 +24,7 @@ services:
       DB_USER: keycloak-idp
       DB_VENDOR: postgres
     ports:
-      - '8444:8443'z
+      - '8444:8443'
       - '9991:9990'
     build:
       context: ./build/app
