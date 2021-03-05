@@ -441,7 +441,7 @@ Resources:
       PlatformVersion: 1.4.0
       HealthCheckGracePeriodSeconds: 150
       NetworkConfiguration:
-        AwsVpcConfiguration:
+        AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
             - !Ref AppSecurityGroup
