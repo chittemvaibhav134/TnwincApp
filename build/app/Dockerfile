@@ -1,4 +1,4 @@
-FROM jboss/keycloak:11.0.2
+FROM jboss/keycloak:11.0.3
 USER root
 RUN microdnf install -y unzip && microdnf clean all
 RUN curl -O https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java.zip
