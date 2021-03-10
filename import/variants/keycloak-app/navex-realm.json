@@ -1416,6 +1416,69 @@
                 "tls.client.certificate.bound.access.tokens": "false"
             },
             "authenticationFlowBindingOverrides": {},
+            "baseUrl": "",
+            "bearerOnly": false,
+            "clientAuthenticatorType": "client-secret",
+            "clientId": "appshell-bff",
+            "consentRequired": false,
+            "defaultClientScopes": [
+                "appshell_audience",
+                "doorman-mappings",
+                "email",
+                "profile",
+                "role_list",
+                "roles",
+                "web-origins"
+            ],
+            "description": "OIDC client used when appshell is running on aws cloudfront",
+            "directAccessGrantsEnabled": false,
+            "enabled": true,
+            "frontchannelLogout": false,
+            "fullScopeAllowed": true,
+            "id": "da2ef4a2-b211-4883-8a25-3a1866ef2c91",
+            "implicitFlowEnabled": false,
+            "name": "appshell-bff",
+            "nodeReRegistrationTimeout": -1,
+            "notBefore": 0,
+            "optionalClientScopes": [
+                "address",
+                "microprofile-jwt",
+                "offline_access",
+                "phone"
+            ],
+            "protocol": "openid-connect",
+            "publicClient": false,
+            "redirectUris": [
+                "http://admin.devlocal.navex-pe.com:3000/*",
+                "http://navexadmin.devlocal.navex-pe.com:3000/*",
+                "http://user.app.devlocal.navex-pe.com:3000/*",
+                "https://doorman.dev.gw.local/*"
+            ],
+            "secret": "9b630071-25ec-4089-b31b-483d8860cefa",
+            "serviceAccountsEnabled": false,
+            "standardFlowEnabled": true,
+            "surrogateAuthRequired": false,
+            "webOrigins": [
+                "+"
+            ]
+        },
+        {
+            "attributes": {
+                "display.on.consent.screen": "false",
+                "exclude.session.state.from.auth.response": "false",
+                "saml.assertion.signature": "false",
+                "saml.authnstatement": "false",
+                "saml.client.signature": "false",
+                "saml.encrypt": "false",
+                "saml.force.post.binding": "false",
+                "saml.multivalued.roles": "false",
+                "saml.onetimeuse.condition": "false",
+                "saml.server.signature": "false",
+                "saml.server.signature.keyinfo.ext": "false",
+                "saml_force_name_id_format": "false",
+                "tls.client.certificate.bound.access.tokens": "false"
+            },
+            "authenticationFlowBindingOverrides": {},
             "bearerOnly": false,
             "clientAuthenticatorType": "client-secret",
             "clientId": "riskrate",

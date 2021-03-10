@@ -9,6 +9,7 @@ Metadata:
     config:
       ignore_checks:
         - W3002
+        - I3042
 
 Parameters:
   InfrastructureStackName:
@@ -1208,3 +1209,5 @@ Outputs:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/insights"
   RiskRateClientSecretSsmArn:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/riskrate"
+  AppShellBffClientSecretSsmArn:
+    Value: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/appshell-bff"
