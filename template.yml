@@ -9,6 +9,7 @@ Metadata:
     config:
       ignore_checks:
         - W3002
+        - I3042
 
 Parameters:
   InfrastructureStackName:
