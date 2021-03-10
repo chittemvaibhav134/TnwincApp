@@ -59,7 +59,7 @@ From the repo root:
 
 ```shell
 docker-compose -f docker-compose.yml down
-docker volume rm platform-auth-keycloak_keycloak-app-db	
+docker volume rm platform-auth-keycloak_db
 docker-compose -f docker-compose-idp.yml down
 docker volume rm platform-auth-keycloak_keycloak-idp-db	
 docker network rm navexdev
