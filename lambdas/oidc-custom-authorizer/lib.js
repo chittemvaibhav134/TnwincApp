@@ -42,7 +42,7 @@ const getToken = (params) => {
             return getRequestToken(tokenString);
         }
     } else {
-        throw new Error('Expected "event.type" parameter to have value "TOKEN"');
+        throw new Error('Expected "event.type" parameter to have value "TOKEN" or "REQUEST"');
     }
 }
 
