@@ -29,17 +29,29 @@ const getToken = (params) => {
         if (!tokenString) {
             throw new Error('Expected "event.headers.Authorization" parameter to be set');
         }
-
-        const match = tokenString.match(/^Bearer (.*)$/);
-        if (!match || match.length < 2) {
-            throw new Error(`Invalid Authorization token - ${tokenString} does not match "Bearer .*"`);
-        }
-        return match[1];
+        return getRequestToken(tokenString);
     } else if (eventType === 'REQUEST') {
-        return getWebSocketRequestToken(params);
+        const headers = params.headers;
+        if (!headers) {
+            throw new Error('Expected "event.headers" parameter to be set');
+        }
+        if (headers.Connection === "upgrade" && headers.Upgrade === "websocket") {
+            return getWebSocketRequestToken(params);
+        } else {
+            const tokenString = headers["Authorization"];
+            return getRequestToken(tokenString);
+        }
     } else {
-        throw new Error('Expected "event.type" parameter to have value "TOKEN"');
+        throw new Error('Expected "event.type" parameter to have value "TOKEN" or "REQUEST"');
     }
+}
+
+const getRequestToken = (tokenString) => {
+    const match = tokenString.match(/^Bearer (.*)$/);
+    if (!match || match.length < 2) {
+        throw new Error(`Invalid Authorization token - ${tokenString} does not match "Bearer .*"`);
+    }
+    return match[1];
 }
 
 const getWebSocketRequestToken = (request) => {
@@ -48,21 +60,17 @@ const getWebSocketRequestToken = (request) => {
         throw new Error('Expected "event.headers" parameter to be set');
     }
 
-    if (headers.Connection === "upgrade" && headers.Upgrade === "websocket") {
-        const subProtocolHeader = headers['Sec-WebSocket-Protocol'];
-        const subProtocols = subProtocolHeader.split(',');
-        const match = subProtocols[0].match(/^bearer(.*)$/);
-        if (!match || match.length < 2) {
-            throw new Error('Invalid sub protocol.'); 
-        }
-        return match[1]; 
-    } else {
-        throw new Error('Invalid WebSocket request because not all required headers are present: connection, upgrade, sec-websocket-protocol.');
+    const subProtocolHeader = headers['Sec-WebSocket-Protocol'];
+    const subProtocols = subProtocolHeader.split(',');
+    const match = subProtocols[0].match(/^bearer(.*)$/);
+    if (!match || match.length < 2) {
+        throw new Error('Invalid sub protocol.');
     }
+    return match[1];
 }
 
 const getClientKey = (decodedToken) => {
-    if(!decodedToken.payload || !decodedToken.payload.clientkey) {
+    if (!decodedToken.payload || !decodedToken.payload.clientkey) {
         throw new Error('token does not have clientkey')
     }
     return decodedToken.payload.clientkey
@@ -91,9 +99,9 @@ module.exports.authenticate = (params) => {
             const signingKey = key.publicKey || key.rsaPublicKey;
             return jwt.verify(token, signingKey);
         })
-        .then((decoded)=> ({
+        .then((decoded) => ({
             principalId: decoded.sub,
-            policyDocument: getPolicyDocument('Allow','*'),
+            policyDocument: getPolicyDocument('Allow', '*'),
             context: { scope: decoded.scope }
         }));
 }
