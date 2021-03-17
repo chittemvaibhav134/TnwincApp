@@ -38,7 +38,7 @@ const getToken = (params) => {
         if (headers.Connection === "upgrade" && headers.Upgrade === "websocket") {
             return getWebSocketRequestToken(params);
         } else {
-            const tokenString = headers["Authorization"];
+            const tokenString = headers["authorization"];
             return getRequestToken(tokenString);
         }
     } else {
