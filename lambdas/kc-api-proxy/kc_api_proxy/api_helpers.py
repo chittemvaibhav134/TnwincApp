@@ -27,7 +27,8 @@ def rotate_and_store_client_secrets(kc: KeyCloakApiProxy, ssm_client, ssm_prefix
     realms = kc.get_realms()
     for realm in realms:
         realm_name = realm['realm']
-        for client in kc.get_clients(realm_name):
+        confidential_clients = [ client for client in kc.get_clients(realm_name) if not client['publicClient'] and not client['bearerOnly'] ]
+        for client in confidential_clients:
             secret = kc.rotate_secret(realm_name, client['id'])
             ssm_path = assemble_ssm_path(ssm_prefix, realm_name, client['clientId'])
             logger.info(f"Persisting rotated secret for {client['clientId']} ({client['id']}) to {ssm_path}")
