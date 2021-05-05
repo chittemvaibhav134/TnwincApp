@@ -1076,7 +1076,7 @@ Resources:
         # Encryption at rest is supported on db.t2.small and larger i think
         # if we want to enable it for Dev stacks we need to up the instance class
         StorageEncrypted: false
-        EngineVersion: "10.14"
+        EngineVersion: "10.16"
         # if specifying a version explicitly apparently you should nuke the auto-upgrade
         # cause otherwise cfn can try to downgrade the db and blow up stack deployments
         AutoMinorVersionUpgrade: false
