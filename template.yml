@@ -49,6 +49,14 @@ Parameters:
   NewRelicLicenseKeySsmArn:
     Type: String
     Default: None
+  MoonwatchApiAccessPolicyArn:
+    Type: String
+    Default: None
+    Description: ARN for Policy that will allow KeyCloak to call Moonwatch API to notify it of sessions starting
+  LaunchDarklySdkKey:
+    Type: String
+    Default: None
+    Description: The SDK key that should be used for LaunchDarklyAPI calls to control release toggles
 
 Conditions:
   CreateInstanceCert: !Equals [ !Ref InstanceCertificateArn, "None"]
@@ -86,6 +94,8 @@ Resources:
             Effect: Allow
             Principal:
               Service: ecs-tasks.amazonaws.com
+      Policies:
+        - !Ref MoonwatchApiAccessPolicyArn
 
   ContainerTaskPolicy:
     Type: AWS::IAM::Policy
@@ -528,15 +538,19 @@ Resources:
                 Name: HIDE_CONSOLE
                 Value: yes-please
               - !Ref AWS::NoValue
+            - Name: AWS_REGION
+              Value: !Sub ${AWS::Region}
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
+            - Name: 
             - !If
                 - EnableNewRelicAgent
                 -
                     Name: NEW_RELIC_LICENSE_KEY
                     ValueFrom: !Ref NewRelicLicenseKeySsmArn
                 - !Ref "AWS::NoValue"
+            - a
           EntryPoint:
             - /opt/jboss/tools/start.sh
             - "-Djboss.bind.address.management=0.0.0.0"
