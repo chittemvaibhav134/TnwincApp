@@ -8,11 +8,11 @@ import com.amazonaws.annotation.SdkInternalApi;
 
 @SdkInternalApi
 public class InitSessionRequestMarshaller {
-    private static final MarshallingInfo<String> SESSIONID_BINDING = MarshallingInfo.builder(MarshallingType.STRING)
+    private static final MarshallingInfo<String> SESSIONID_BINDING = MarshallingInfo.builder(MarshallingType.STRING).marshallLocation(MarshallLocation.PAYLOAD)
             .marshallLocationName("sessionId").isExplicitPayloadMember(true).build();
-    private static final MarshallingInfo<String> LOGOUTURL_BINDING = MarshallingInfo.builder(MarshallingType.STRING)
-            .marshallLocationName("logoutUrl").isExplicitPayloadMember(true).build();
-    private static final MarshallingInfo<Integer> IDLETIMEOUT_BINDING = MarshallingInfo.builder(MarshallingType.INTEGER)
+    private static final MarshallingInfo<String> LOGOUTURL_BINDING = MarshallingInfo.builder(MarshallingType.STRING).marshallLocation(MarshallLocation.PAYLOAD)
+            .marshallLocationName("logoutUrl").build();
+    private static final MarshallingInfo<Integer> IDLETIMEOUT_BINDING = MarshallingInfo.builder(MarshallingType.INTEGER).marshallLocation(MarshallLocation.PAYLOAD)
             .marshallLocationName("idleTimeout").isExplicitPayloadMember(true).build();
     
     private static final InitSessionRequestMarshaller instance = new InitSessionRequestMarshaller();

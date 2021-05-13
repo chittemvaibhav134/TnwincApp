@@ -12,29 +12,29 @@ import com.amazonaws.transform.Marshaller;
 import com.amazonaws.annotation.SdkInternalApi;
 
 @SdkInternalApi
-public class InitSessionRequestProtocolMarshaller implements Marshaller<Request<InitSessionRequest>, InitSessionRequest> {
+public class NavexRequestProtocolMarshaller<TPayload extends StructuredPojo> implements Marshaller<Request<NavexRequest<TPayload>>, NavexRequest<TPayload>> {
     private static final OperationInfo SDK_OPERATION_BINDING = OperationInfo.builder().protocol(Protocol.API_GATEWAY)
             .requestUri("/v1/session/init").httpMethodName(HttpMethodName.POST).hasExplicitPayloadMember(true)
             .hasPayloadMembers(true).serviceName("Moonwatch").build();
 
     private final com.amazonaws.opensdk.protect.protocol.ApiGatewayProtocolFactoryImpl protocolFactory;
 
-    public InitSessionRequestProtocolMarshaller(com.amazonaws.opensdk.protect.protocol.ApiGatewayProtocolFactoryImpl protocolFactory) {
+    public NavexRequestProtocolMarshaller(com.amazonaws.opensdk.protect.protocol.ApiGatewayProtocolFactoryImpl protocolFactory) {
         this.protocolFactory = protocolFactory;
     }
 
-    public Request<InitSessionRequest> marshall(InitSessionRequest initSessionRequest) {
+    public Request<NavexRequest<TPayload>> marshall(NavexRequest<TPayload> initSessionRequest) {
 
         if (initSessionRequest == null) {
             throw new SdkClientException("Invalid argument passed to marshall(...)");
         }
 
         try {
-            final ProtocolRequestMarshaller<InitSessionRequest> protocolMarshaller = protocolFactory
+            final ProtocolRequestMarshaller<NavexRequest<TPayload>> protocolMarshaller = protocolFactory
                     .createProtocolMarshaller(SDK_OPERATION_BINDING, initSessionRequest);
 
             protocolMarshaller.startMarshalling();
-            InitSessionRequestMarshaller.getInstance().marshall(initSessionRequest, protocolMarshaller);
+            new NavexRequestMarshaller<TPayload>().marshall(initSessionRequest, protocolMarshaller);
             return protocolMarshaller.finishMarshalling();
         } catch (Exception e) {
             System.err.println(e.getCause().getMessage());

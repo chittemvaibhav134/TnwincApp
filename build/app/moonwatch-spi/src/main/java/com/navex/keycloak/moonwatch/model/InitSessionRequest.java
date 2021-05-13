@@ -1,6 +1,12 @@
 package com.navex.keycloak.moonwatch.model;
 
-public class InitSessionRequest extends com.amazonaws.opensdk.BaseRequest {
+import java.io.Serializable;
+
+import com.amazonaws.protocol.ProtocolMarshaller;
+import com.amazonaws.protocol.StructuredPojo;
+import com.navex.keycloak.moonwatch.model.transform.InitSessionRequestMarshaller;
+
+public class InitSessionRequest implements Serializable, Cloneable, StructuredPojo {
     private String sessionId;
     public void setSessionId(String value) {
         this.sessionId = value;
@@ -100,18 +106,14 @@ public class InitSessionRequest extends com.amazonaws.opensdk.BaseRequest {
 
     @Override
     public InitSessionRequest clone() {
-        return (InitSessionRequest) super.clone();
+        try {
+            return (InitSessionRequest) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException("Got a CloneNotSupportedException from Object.clone() " + "even though we're Cloneable!", e);
+        }
     }
-
-    /**
-     * Set the configuration for this request.
-     *
-     * @param sdkRequestConfig
-     *        Request configuration.
-     * @return This object for method chaining.
-     */
-    public InitSessionRequest sdkRequestConfig(com.amazonaws.opensdk.SdkRequestConfig sdkRequestConfig) {
-        super.sdkRequestConfig(sdkRequestConfig);
-        return this;
+    @Override
+    public void marshall(ProtocolMarshaller protocolMarshaller) {
+        new InitSessionRequestMarshaller().marshall(this, protocolMarshaller);
     }
 }

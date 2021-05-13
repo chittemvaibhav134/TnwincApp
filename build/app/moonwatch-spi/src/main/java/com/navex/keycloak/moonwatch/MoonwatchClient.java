@@ -2,6 +2,7 @@ package com.navex.keycloak.moonwatch;
 
 import java.util.Arrays;
 
+import com.amazonaws.RequestConfig;
 import com.amazonaws.SdkBaseException;
 import com.amazonaws.annotation.ThreadSafe;
 import com.amazonaws.client.AwsSyncClientParams;
@@ -45,11 +46,11 @@ public class MoonwatchClient {
 
         HttpResponseHandler<SdkBaseException> errorResponseHandler = createErrorResponseHandler();
 
-        return clientHandler.execute(new ClientExecutionParams<InitSessionRequest, InitSessionResult>()
-                .withMarshaller(new InitSessionRequestProtocolMarshaller(protocolFactory))
+        return clientHandler.execute(new ClientExecutionParams<NavexRequest<InitSessionRequest>, InitSessionResult>()
+                .withMarshaller(new NavexRequestProtocolMarshaller<InitSessionRequest>(protocolFactory))
                 .withResponseHandler(responseHandler)
                 .withErrorResponseHandler(errorResponseHandler)
-                .withInput(request));
+                .withInput(new NavexRequest<InitSessionRequest>().payload(request)));
     }
 
     /**

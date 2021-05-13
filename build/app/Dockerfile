@@ -10,9 +10,9 @@ RUN unzip newrelic-java.zip -d /nr
 FROM maven:3.8.1-openjdk-11 AS moonwatch-build
 WORKDIR /src
 COPY "./moonwatch-spi/pom.xml" "./"
-RUN mvn clean dependency:resolve
+RUN mvn clean dependency:resolve dependency:resolve-plugins package
 COPY ./moonwatch-spi .
-RUN mvn dependency:copy-dependencies package assembly:single
+RUN mvn clean package assembly:single
 
 FROM base AS final
 ENV NEW_RELIC_BROWSER_MONITORING_AUTO_INSTRUMENT false
