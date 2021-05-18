@@ -2,7 +2,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-        nodejs: 10
+        nodejs: 14
     commands:
       - cd ./lambdas/oidc-custom-authorizer && npm ci --only=prod && cd -
   build:
