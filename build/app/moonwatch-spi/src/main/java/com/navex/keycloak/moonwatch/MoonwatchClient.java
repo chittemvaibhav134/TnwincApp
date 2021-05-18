@@ -1,70 +1,132 @@
 package com.navex.keycloak.moonwatch;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
-import com.amazonaws.RequestConfig;
-import com.amazonaws.SdkBaseException;
-import com.amazonaws.annotation.ThreadSafe;
-import com.amazonaws.client.AwsSyncClientParams;
-import com.amazonaws.client.ClientExecutionParams;
-import com.amazonaws.client.ClientHandler;
-import com.amazonaws.client.ClientHandlerParams;
-import com.amazonaws.http.HttpResponseHandler;
-import com.amazonaws.opensdk.protect.client.SdkClientHandler;
-import com.amazonaws.protocol.json.JsonClientMetadata;
-import com.amazonaws.protocol.json.JsonErrorResponseMetadata;
-import com.amazonaws.protocol.json.JsonErrorShapeMetadata;
-import com.amazonaws.protocol.json.JsonOperationMetadata;
 import com.navex.keycloak.moonwatch.model.*;
-import com.navex.keycloak.moonwatch.model.transform.*;
 
-@ThreadSafe
-public class MoonwatchClient {
-    private final ClientHandler clientHandler;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.signer.AwsSignerExecutionAttribute;
+import software.amazon.awssdk.awscore.client.config.AwsClientOption;
+import software.amazon.awssdk.core.ClientType;
+import software.amazon.awssdk.core.client.config.SdkAdvancedClientOption;
+import software.amazon.awssdk.core.client.config.SdkClientConfiguration;
+import software.amazon.awssdk.core.client.config.SdkClientOption;
+import software.amazon.awssdk.core.interceptor.ExecutionAttributes;
+import software.amazon.awssdk.core.signer.Signer;
+import software.amazon.awssdk.core.util.json.JacksonUtils;
+import software.amazon.awssdk.http.HttpExecuteRequest;
+import software.amazon.awssdk.http.HttpExecuteResponse;
+import software.amazon.awssdk.http.SdkHttpClient;
+import software.amazon.awssdk.http.SdkHttpFullRequest;
+import software.amazon.awssdk.http.SdkHttpMethod;
 
-    private static final com.amazonaws.opensdk.protect.protocol.ApiGatewayProtocolFactoryImpl protocolFactory = 
-        new com.amazonaws.opensdk.protect.protocol.ApiGatewayProtocolFactoryImpl(
-            new JsonClientMetadata()
-                .withProtocolVersion("1.1")
-                .withSupportsCbor(false)
-                .withSupportsIon(false)
-                .withContentTypeOverride("application/json")
-                .withBaseServiceExceptionClass(com.navex.keycloak.moonwatch.model.MoonwatchException.class));
+
+public class MoonwatchClient implements AutoCloseable {
+    private SdkClientConfiguration config;
+    private AwsCredentialsProvider credentialsProvider;
+    private SdkHttpClient httpClient;
+    private Signer signer;
+    private String logContext;
+
+    static String messageWithContext(String logContext, String msg) {
+        return "[ctx:" + logContext + "] " + msg;
+    }
+    void writeError(String msg) {
+        System.err.println(messageWithContext(logContext, msg));
+    }
+
+    public MoonwatchClient(String logContext, SdkClientConfiguration config) {
+        this.logContext = logContext;
+        this.config = config;
+        if( config.option(SdkClientOption.CLIENT_TYPE) == ClientType.ASYNC ) throw MoonwatchException.create(messageWithContext(logContext, "Async Client Types are not supported"));
+
+        httpClient = config.option(SdkClientOption.SYNC_HTTP_CLIENT);
+        if( httpClient == null ) throw MoonwatchException.create(messageWithContext(logContext, "Unable to get HTTPClient from SdkClientConfiguration"));
+
+        credentialsProvider = config.option(AwsClientOption.CREDENTIALS_PROVIDER);
+        if( credentialsProvider == null ) throw MoonwatchException.create(messageWithContext(logContext, "Unable to get CredentialsProvider from SdkClientConfiguration"));
+
+        signer = config.option(SdkAdvancedClientOption.SIGNER);
+        if( signer == null ) throw MoonwatchException.create(messageWithContext(logContext, "Unable to get Signer from SdkClientConfiguration"));
+    }
+
+    private SdkHttpFullRequest buildRequest(SdkHttpMethod method, String path, Object bodyObj) {
+        return SdkHttpFullRequest.builder()
+            .method(method)
+            .uri(config.option(SdkClientOption.ENDPOINT))
+            .encodedPath(path)
+            .contentStreamProvider(new JsonContentStream(bodyObj))
+            .putHeader("Accept", "application/json")
+            .putHeader("Content-type", "application/json")
+            .build();
+    }
     
-    public MoonwatchClient(AwsSyncClientParams clientParams) {
-        this.clientHandler = new SdkClientHandler(new ClientHandlerParams().withClientParams(clientParams));
+    private SdkHttpFullRequest signRequest(SdkHttpFullRequest request) {
+        var creds = credentialsProvider.resolveCredentials();
+        var signingName = config.option(AwsClientOption.SERVICE_SIGNING_NAME);
+        var region = config.option(AwsClientOption.AWS_REGION);
+
+        var exeAttrs = ExecutionAttributes.builder()
+            .put(AwsSignerExecutionAttribute.AWS_CREDENTIALS, creds)
+            .put(AwsSignerExecutionAttribute.SERVICE_SIGNING_NAME, signingName)
+            .put(AwsSignerExecutionAttribute.SIGNING_REGION, region)
+            .build();
+        
+        return signer.sign(request, exeAttrs);
     }
 
-    public InitSessionResult initSession(InitSessionRequest request) {
-        HttpResponseHandler<InitSessionResult> responseHandler = protocolFactory
-            .createResponseHandler(
-                new JsonOperationMetadata()
-                    .withPayloadJson(true)
-                    .withHasStreamingSuccessResponse(false),
-                new InitSessionResultJsonUnmarshaller()
-            );
+    private HttpExecuteResponse executeRequest(SdkHttpFullRequest request) {
+        var exeRequest = HttpExecuteRequest.builder()
+            .request(request)
+            .contentStreamProvider(request.contentStreamProvider().get())
+            .build();
 
-        HttpResponseHandler<SdkBaseException> errorResponseHandler = createErrorResponseHandler();
-
-        return clientHandler.execute(new ClientExecutionParams<NavexRequest<InitSessionRequest>, InitSessionResult>()
-                .withMarshaller(new NavexRequestProtocolMarshaller<InitSessionRequest>(protocolFactory))
-                .withResponseHandler(responseHandler)
-                .withErrorResponseHandler(errorResponseHandler)
-                .withInput(new NavexRequest<InitSessionRequest>().payload(request)));
+        var doRequest = httpClient.prepareRequest(exeRequest);
+        try {
+            return doRequest.call();
+        }
+        catch(IOException ex) {
+            throw MoonwatchException.create(messageWithContext(logContext, "Unable to make call to " + request.encodedPath()), ex);
+        }
     }
 
-    /**
-     * Create the error response handler for the operation.
-     * 
-     * @param errorShapeMetadata
-     *        Error metadata for the given operation
-     * @return Configured error response handler to pass to HTTP layer
-     */
-    private HttpResponseHandler<SdkBaseException> createErrorResponseHandler(JsonErrorShapeMetadata... errorShapeMetadata) {
-        return protocolFactory.createErrorResponseHandler(new JsonErrorResponseMetadata().withErrorShapes(Arrays.asList(errorShapeMetadata)));
+    private <T> T handleResponse(String requestPath, HttpExecuteResponse response, Class<T> clazz) {
+        try {
+            var sdkResponse = response.httpResponse();
+            var body = response.responseBody();
+            if( sdkResponse.isSuccessful() ) {
+                String s = new String(body.get().readAllBytes(), StandardCharsets.UTF_8);
+                return JacksonUtils.fromJsonString(s, clazz);
+            } else {
+                if( body.isPresent() ) {
+                    String s = new String(body.get().readAllBytes(), StandardCharsets.UTF_8);
+                    writeError("Got failed call to " + requestPath + " resulted in " + sdkResponse.statusCode() + " with responseBody: " + s.substring(0, Math.min(512, s.length())));
+                    return null;
+                }
+                else {
+                    writeError("Got failed call to " + requestPath + " resulted in " + sdkResponse.statusCode() + " " + sdkResponse.statusText());
+                    return null;
+                }
+            }
+        }
+        catch(IOException ex) {
+            throw MoonwatchException.create(messageWithContext(logContext, "Exception while reading resposne to " + requestPath), ex);
+        }
     }
 
-    public void shutdown() {
-        clientHandler.shutdown();
+    public InitSessionResult initSession(InitSessionRequest request) throws MoonwatchException {
+        String path = "/v1/session/init";
+        
+        var sdkRequest = signRequest(buildRequest(SdkHttpMethod.POST, path, request));
+        var response = executeRequest(sdkRequest);
+        return handleResponse(path, response, InitSessionResult.class);
+    }
+
+    @Override
+    public void close() {
+        if( httpClient != null ) {
+            httpClient.close();
+        }
     }
 }

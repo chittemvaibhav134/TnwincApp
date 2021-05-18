@@ -10,7 +10,6 @@ import org.keycloak.models.KeycloakSession;
 public class SessionProvider implements EventListenerProvider {
     SessionProviderConfig config;
     KeycloakSession session;
-    MoonwatchClient client;
     public SessionProvider(SessionProviderConfig config, KeycloakSession session) {
         super();
         this.config = config;
@@ -28,6 +27,7 @@ public class SessionProvider implements EventListenerProvider {
                 System.err.println( "Unable to handle Moonwatch due to missing base url" );
                 return;
             }
+            System.out.println("Got LOGIN event from " + event.getSessionId() + " calling Moonwatch InitSession");
             String clientKey = session.getAttribute("clientkey", String.class);
             // check for release toggle
             if( !config.isToggleEnabled("PlatformIdleTimeSettings", clientKey, false) ) {
@@ -35,25 +35,27 @@ public class SessionProvider implements EventListenerProvider {
                 return;
             }
 
-            if( client == null ) {
-                client = new MoonwatchClientBuilder(config).build();
+            var client = new MoonwatchClientBuilder(event.getSessionId(), config).build();
+            try {
+                InitSessionRequest request = new InitSessionRequest()
+                    .sessionId(event.getSessionId())
+                    .keyCloakSessionId(event.getSessionId())
+                    .idleTimeout(30)
+                    .logoutUrl(null);
+                
+                InitSessionResult result = client.initSession(request);
+                if( result == null ) { return; }
+                System.out.println("Moonwatch Session Init: sessionId[" + event.getSessionId() + "] result[" + result.toString() + "]");
+            }
+            finally {
+                client.close();
             }
 
-            InitSessionRequest request = new InitSessionRequest()
-                .sessionId(event.getSessionId())
-                .idleTimeout(30)
-                .logoutUrl(null);
-            
-            InitSessionResult result = client.initSession(request);
-            System.out.println("Moonwatch Session Init: sessionId[" + event.getSessionId() + "] result[" + result.toString() + "]");
-
-            client.shutdown();
-            client = null;
         }
     }
 
     @Override
     public void close() {
-        if( client != null ) client.shutdown();
+        
     }
 }

@@ -35,7 +35,7 @@ public class SessionProviderConfig {
     }
 
     public boolean isToggleEnabled(String toggleName, String clientKey, boolean defaultValue) {
-        if( ldClient == null ) {
+        if( localToggles.containsKey(toggleName.toLowerCase()) || ldClient == null) {
             return localToggles.getOrDefault(toggleName.toLowerCase(), defaultValue);
         }
         try {

@@ -2,11 +2,7 @@ package com.navex.keycloak.moonwatch.model;
 
 import java.io.Serializable;
 
-import com.amazonaws.protocol.ProtocolMarshaller;
-import com.amazonaws.protocol.StructuredPojo;
-import com.navex.keycloak.moonwatch.model.transform.InitSessionRequestMarshaller;
-
-public class InitSessionRequest implements Serializable, Cloneable, StructuredPojo {
+public class InitSessionRequest implements Serializable, Cloneable {
     private String sessionId;
     public void setSessionId(String value) {
         this.sessionId = value;
@@ -31,6 +27,14 @@ public class InitSessionRequest implements Serializable, Cloneable, StructuredPo
         return this.idleTimeout;
     }
 
+    private String keyCloakSessionId = "";
+    public void setKeyCloakSessionId(String value) {
+        this.keyCloakSessionId = value;
+    }
+    public String getKeyCloakSessionId() {
+        return this.keyCloakSessionId;
+    }
+
     /** @return Returns a reference to this object so that method calls can be chained together. */
     public InitSessionRequest sessionId(String newSessionId) {
         setSessionId(newSessionId);
@@ -44,6 +48,10 @@ public class InitSessionRequest implements Serializable, Cloneable, StructuredPo
     /** @return Returns a reference to this object so that method calls can be chained together. */
     public InitSessionRequest idleTimeout(int newidleTimeout) {
         setIdleTimeout(newidleTimeout);
+        return this;
+    }
+    public InitSessionRequest keyCloakSessionId(String newValue) {
+        setKeyCloakSessionId(newValue);
         return this;
     }
 
@@ -111,9 +119,5 @@ public class InitSessionRequest implements Serializable, Cloneable, StructuredPo
         } catch (CloneNotSupportedException e) {
             throw new IllegalStateException("Got a CloneNotSupportedException from Object.clone() " + "even though we're Cloneable!", e);
         }
-    }
-    @Override
-    public void marshall(ProtocolMarshaller protocolMarshaller) {
-        new InitSessionRequestMarshaller().marshall(this, protocolMarshaller);
     }
 }

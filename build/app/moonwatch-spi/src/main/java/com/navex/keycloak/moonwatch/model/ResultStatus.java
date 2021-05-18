@@ -1,9 +1,9 @@
 package com.navex.keycloak.moonwatch.model;
 
 public enum ResultStatus {
-    Success("success"),
-    Fail("fail"),
-    Error("error");
+    success("success"),
+    fail("fail"),
+    error("error");
 
     private String value;
 

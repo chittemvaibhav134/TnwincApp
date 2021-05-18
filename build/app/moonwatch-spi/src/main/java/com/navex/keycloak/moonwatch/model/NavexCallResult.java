@@ -2,7 +2,7 @@ package com.navex.keycloak.moonwatch.model;
 
 import java.io.Serializable;
 
-public class NavexCallResult<PayloadType> extends com.amazonaws.opensdk.BaseResult implements Serializable, Cloneable {
+public class NavexCallResult<PayloadType> implements Serializable, Cloneable {
     private ResultStatus status;
     private PayloadType data;
     private String[] errors;
