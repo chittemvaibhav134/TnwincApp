@@ -47,6 +47,12 @@ phases:
       - |
           NewRelicLicenseKeySsmArnDefault='None'
           NewRelicLicenseKeySsmArn=$(jq --arg DEFAULT "$NewRelicLicenseKeySsmArnDefault" -r '.NewRelicenseKeySsmArn // $DEFAULT' "$DC_ART_DIR/global-configuration" || echo "$NewRelicLicenseKeySsmArnDefault")
+      - |
+          MoonwatchApiBaseUrlDefault='None'
+          MoonwatchApiBaseUrl=$(jq --arg DEFAULT "$MoonwatchApiBaseUrlDefault" -r '.Url // $DEFAULT' "$DC_ART_DIR/moonwatch" || echo "$MoonwatchApiBaseUrlDefault")
+      - |
+          MoonwatchApiAccessPolicyArnDefault='None'
+          MoonwatchApiAccessPolicyArn=$(jq --arg DEFAULT "$MoonwatchApiAccessPolicyArnDefault" -r '.ApiAccessPolicy // $DEFAULT' "$DC_ART_DIR/moonwatch" || echo "$MoonwatchApiAccessPolicyArnDefault")
       - mkdir transformed-import
   build:
     commands:

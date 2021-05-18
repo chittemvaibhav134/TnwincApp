@@ -102,6 +102,19 @@
           "Required": true
         }
       ]
+    },
+    {
+      "Project": "moonwatch",
+      "Artifacts": [
+        {
+          "Name": "ApiAccessPolicy",
+          "Required": true
+        },
+        {
+          "Name": "Url",
+          "Required": true
+        }
+      ]
     }
   ],
   "Exposes": [

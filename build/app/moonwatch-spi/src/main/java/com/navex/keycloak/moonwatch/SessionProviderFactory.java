@@ -40,7 +40,7 @@ public class SessionProviderFactory implements EventListenerProviderFactory{
         Map<String, String> env = System.getenv();
         
         SessionProviderConfig config = new SessionProviderConfig();
-        config.awsRegion = env.get("AWS_REGION");
+        config.awsRegion = env.get("AWS_MW_REGION");
         config.moonwatchApiBase = env.get("MOONWATCH_API_BASE_URL");
 
         serviceConfig = config;

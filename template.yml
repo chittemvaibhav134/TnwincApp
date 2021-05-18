@@ -49,13 +49,17 @@ Parameters:
   NewRelicLicenseKeySsmArn:
     Type: String
     Default: None
+  MoonwatchApiBaseUrl:
+    Type: String
+    Default: None
+    Description: Base Url to the Moonwatch API
   MoonwatchApiAccessPolicyArn:
     Type: String
     Default: None
     Description: ARN for Policy that will allow KeyCloak to call Moonwatch API to notify it of sessions starting
   LaunchDarklySdkKey:
     Type: String
-    Default: None
+    Default: sdk-ecf3d6b7-302d-4b26-8580-edf18ab4e0f9
     Description: The SDK key that should be used for LaunchDarklyAPI calls to control release toggles
 
 Conditions:
@@ -538,8 +542,12 @@ Resources:
                 Name: HIDE_CONSOLE
                 Value: yes-please
               - !Ref AWS::NoValue
-            - Name: AWS_REGION
+            - Name: AWS_MW_REGION
               Value: !Sub ${AWS::Region}
+            - Name: LAUNCH_DARKLY_KEY
+              Value: !Sub LaunchDarklySdkKey
+            - Name: MOONWATCH_API_BASE_URL
+              Value: !Sub MoonwatchApiBaseUrl
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
