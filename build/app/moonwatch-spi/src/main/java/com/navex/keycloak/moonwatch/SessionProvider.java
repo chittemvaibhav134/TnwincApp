@@ -1,7 +1,6 @@
 package com.navex.keycloak.moonwatch;
 
-import com.navex.keycloak.moonwatch.model.InitSessionRequest;
-import com.navex.keycloak.moonwatch.model.InitSessionResult;
+import com.navex.keycloak.moonwatch.model.*;
 
 import org.keycloak.events.*;
 import org.keycloak.events.admin.AdminEvent;
@@ -22,16 +21,17 @@ public class SessionProvider implements EventListenerProvider {
 
     @Override
     public void onEvent(Event event) {
+        String logContext = event.getSessionId();
         if( event.getType() == EventType.LOGIN ) {
             if( config.moonwatchApiBase == null || config.moonwatchApiBase.isEmpty() ) {
-                System.err.println( "Unable to handle Moonwatch due to missing base url" );
+                Logger.writeError(logContext, "Unable to handle Moonwatch due to missing base url");
                 return;
             }
-            System.out.println("Got LOGIN event from " + event.getSessionId() + " calling Moonwatch InitSession");
+            Logger.writeInfo(logContext, "Got LOGIN event, calling Moonwatch InitSession");
             String clientKey = session.getAttribute("clientkey", String.class);
             // check for release toggle
             if( !config.isToggleEnabled("PlatformIdleTimeSettings", clientKey, false) ) {
-                System.out.println( "Moonwatch was not notified because PlatformIdleTimeSettings was evaluated to off" );
+                Logger.writeInfo(logContext, "Moonwatch was not notified because PlatformIdleTimeSettings was evaluated to off");
                 return;
             }
 
@@ -45,17 +45,43 @@ public class SessionProvider implements EventListenerProvider {
                 
                 InitSessionResult result = client.initSession(request);
                 if( result == null ) { return; }
-                System.out.println("Moonwatch Session Init: sessionId[" + event.getSessionId() + "] result[" + result.toString() + "]");
+                Logger.writeInfo(logContext, "Moonwatch Session Init: result[" + result.toString() + "]");
             }
             finally {
                 client.close();
             }
+        }
+        else if( event.getType() == EventType.LOGOUT ) {
+            if( config.moonwatchApiBase == null || config.moonwatchApiBase.isEmpty() ) {
+                Logger.writeError(logContext, "Unable to handle Moonwatch due to missing base url");
+                return;
+            }
+            Logger.writeInfo(logContext, "Got LOGOUT event, calling Moonwatch EndSession");
+            String clientKey = session.getAttribute("clientkey", String.class);
+            // check for release toggle
+            if( !config.isToggleEnabled("PlatformIdleTimeSettings", clientKey, false) ) {
+                Logger.writeInfo(logContext, "Moonwatch was not notified because PlatformIdleTimeSettings was evaluated to off" );
+                return;
+            }
+
+            var client = new MoonwatchClientBuilder(event.getSessionId(), config).build();
+
+            EndSessionRequest request = new EndSessionRequest()
+                .id(event.getSessionId())
+                .reason("UserInitiated");
+        
+            EndSessionResult result = client.endSession(request);
+            if( result == null ) { return; }
+            Logger.writeInfo(logContext, "Moonwatch Session End: result[" + result.toString() + "]");
+
+            client.close();
+            client = null;
 
         }
     }
 
     @Override
     public void close() {
-        
+
     }
 }

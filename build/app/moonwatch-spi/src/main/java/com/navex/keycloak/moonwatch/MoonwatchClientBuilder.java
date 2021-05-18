@@ -24,10 +24,10 @@ public class MoonwatchClientBuilder extends AwsDefaultClientBuilder<MoonwatchCli
         AwsCredentialsProvider creds;
         Map<String, String> env = System.getenv();
         if( env.containsKey(CRED_KEY_ID) ) {
-            System.out.println("Loading Moonwatch API credentials from the Environment.");
+            Logger.writeInfo(logContext, "Loading Moonwatch API credentials from the Environment.");
             creds = StaticCredentialsProvider.create(AwsBasicCredentials.create(env.get(CRED_KEY_ID), env.get(CRED_SECRET)));
         } else {
-            System.out.println("Loading Moonwatch API credentials from container session.");
+            Logger.writeInfo(logContext, "Loading Moonwatch API credentials from container session.");
             creds = DefaultCredentialsProvider.create();
         }
 

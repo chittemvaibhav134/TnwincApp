@@ -41,4 +41,20 @@ public class NavexCallResult<PayloadType> implements Serializable, Cloneable {
         setErrors(newValue);
         return this;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{ ");
+        sb.append("status: ").append(getStatus());
+        if( getStatus() == ResultStatus.success ) {
+            sb.append(", data: ");
+            if( getData() == null ) sb.append("null");
+            else sb.append(getData().toString());
+        } else {
+            sb.append(", errors: ").append(String.join(",", getErrors()));
+        }
+        sb.append(" }");
+        return sb.toString();
+    }
 }

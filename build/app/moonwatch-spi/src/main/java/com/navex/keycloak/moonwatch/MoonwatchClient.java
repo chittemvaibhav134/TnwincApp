@@ -29,26 +29,26 @@ public class MoonwatchClient implements AutoCloseable {
     private Signer signer;
     private String logContext;
 
-    static String messageWithContext(String logContext, String msg) {
-        return "[ctx:" + logContext + "] " + msg;
+    String messageWithContext(String msg) {
+        return Logger.messageWithContext(logContext, msg);
     }
     void writeError(String msg) {
-        System.err.println(messageWithContext(logContext, msg));
+        Logger.writeError(logContext, msg);
     }
 
     public MoonwatchClient(String logContext, SdkClientConfiguration config) {
         this.logContext = logContext;
         this.config = config;
-        if( config.option(SdkClientOption.CLIENT_TYPE) == ClientType.ASYNC ) throw MoonwatchException.create(messageWithContext(logContext, "Async Client Types are not supported"));
+        if( config.option(SdkClientOption.CLIENT_TYPE) == ClientType.ASYNC ) throw MoonwatchException.create(messageWithContext("Async Client Types are not supported"));
 
         httpClient = config.option(SdkClientOption.SYNC_HTTP_CLIENT);
-        if( httpClient == null ) throw MoonwatchException.create(messageWithContext(logContext, "Unable to get HTTPClient from SdkClientConfiguration"));
+        if( httpClient == null ) throw MoonwatchException.create(messageWithContext("Unable to get HTTPClient from SdkClientConfiguration"));
 
         credentialsProvider = config.option(AwsClientOption.CREDENTIALS_PROVIDER);
-        if( credentialsProvider == null ) throw MoonwatchException.create(messageWithContext(logContext, "Unable to get CredentialsProvider from SdkClientConfiguration"));
+        if( credentialsProvider == null ) throw MoonwatchException.create(messageWithContext("Unable to get CredentialsProvider from SdkClientConfiguration"));
 
         signer = config.option(SdkAdvancedClientOption.SIGNER);
-        if( signer == null ) throw MoonwatchException.create(messageWithContext(logContext, "Unable to get Signer from SdkClientConfiguration"));
+        if( signer == null ) throw MoonwatchException.create(messageWithContext("Unable to get Signer from SdkClientConfiguration"));
     }
 
     private SdkHttpFullRequest buildRequest(SdkHttpMethod method, String path, Object bodyObj) {
@@ -87,7 +87,7 @@ public class MoonwatchClient implements AutoCloseable {
             return doRequest.call();
         }
         catch(IOException ex) {
-            throw MoonwatchException.create(messageWithContext(logContext, "Unable to make call to " + request.encodedPath()), ex);
+            throw MoonwatchException.create(messageWithContext("Unable to make call to " + request.encodedPath()), ex);
         }
     }
 
@@ -111,7 +111,7 @@ public class MoonwatchClient implements AutoCloseable {
             }
         }
         catch(IOException ex) {
-            throw MoonwatchException.create(messageWithContext(logContext, "Exception while reading resposne to " + requestPath), ex);
+            throw MoonwatchException.create(messageWithContext("Exception while reading resposne to " + requestPath), ex);
         }
     }
 
@@ -121,6 +121,14 @@ public class MoonwatchClient implements AutoCloseable {
         var sdkRequest = signRequest(buildRequest(SdkHttpMethod.POST, path, request));
         var response = executeRequest(sdkRequest);
         return handleResponse(path, response, InitSessionResult.class);
+    }
+
+    public EndSessionResult endSession(EndSessionRequest request) throws MoonwatchException {
+        String path = "/v1/session/end";
+        
+        var sdkRequest = signRequest(buildRequest(SdkHttpMethod.POST, path, request));
+        var response = executeRequest(sdkRequest);
+        return handleResponse(path, response, EndSessionResult.class);
     }
 
     @Override
