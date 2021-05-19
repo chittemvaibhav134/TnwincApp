@@ -546,14 +546,10 @@ Resources:
                 Name: HIDE_CONSOLE
                 Value: yes-please
               - !Ref AWS::NoValue
-            - Name: AWS_MW_REGION
-              Value: !Sub ${AWS::Region}
-            - Name: LAUNCH_DARKLY_KEY
-              Value: !GetAtt LaunchDarklySdkKey.Parameter.Value
             - Name: MOONWATCH_API_BASE_URL
-              Value: !Sub MoonwatchApiBaseUrl
+              Value: !Ref MoonwatchApiBaseUrl
             - Name: AWS_MW_REGION
-              Value: !Sub MoonwatchApiRegion
+              Value: !Ref MoonwatchApiRegion
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
@@ -564,18 +560,15 @@ Resources:
                     Name: NEW_RELIC_LICENSE_KEY
                     ValueFrom: !Ref NewRelicLicenseKeySsmArn
                 - !Ref "AWS::NoValue"
-            - a
+            - !If
+                - LaunchDarklySdkKeySsmValue
+                -
+                    Name: LAUNCH_DARKLY_KEY
+                    ValueFrom: !Ref LaunchDarklySdkKeySsmValue
+                - !Ref "AWS::NoValue"
           EntryPoint:
             - /opt/jboss/tools/start.sh
             - "-Djboss.bind.address.management=0.0.0.0"
-
-  LaunchDarklySdkKey:
-    Type: Custom::SsmGetParameter
-    Properties:
-      Name: !Select [ "1", !Split [ ":parameter", !Ref LaunchDarklySdkKeySsmValue ] ]
-      UpdateTrigger: !Ref BuildHash
-      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cloudformation-get-ssm-param
-
 
   ImportConfigTaskDefinition:
     Type: AWS::ECS::TaskDefinition
