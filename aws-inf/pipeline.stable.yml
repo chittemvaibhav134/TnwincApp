@@ -992,7 +992,7 @@ Resources:
                           "DnsHostedZone": "navex-stage.com",
                           "DnsHostedZoneId": "Z1GXJLTUOO7LYC",
                           "Stage": "Production",
-                          "DesiredTaskCount": "2",
+                          "DesiredTaskCount": "3",
                           "DbaAccessCidr": "10.98.24.15/32"
                         },
                         "Tags": {
@@ -1274,7 +1274,7 @@ Resources:
                           "DnsHostedZone": "navexone.eu",
                           "DnsHostedZoneId": "Z22ECC3Q0NT9H2",
                           "Stage": "Production",
-                          "DesiredTaskCount": "2",
+                          "DesiredTaskCount": "3",
                           "DbaAccessCidr": "10.162.24.15/32"
                         },
                         "Tags": {
@@ -1553,7 +1553,7 @@ Resources:
                         "DnsHostedZone": "navexone.com",
                         "DnsHostedZoneId": "Z29CNCMQKCNU6I",
                         "Stage": "Production",
-                        "DesiredTaskCount": "2",
+                        "DesiredTaskCount": "3",
                         "DbaAccessCidr": "10.98.24.15/32"
                       },
                       "Tags": {
