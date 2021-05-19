@@ -26,6 +26,8 @@ New-ExecutableToCall -Name "Start Keycloak" -WorkingDirectory $repoRoot -Tag Pre
 		docker network create navexdev
 	}
 
+	# Create empty secrets for docker-compose to be happy with, if it already exists that's okay.
+	New-Item -Path secrets.env -ItemType File -ErrorAction SilentlyContinue
 	# remove existing instance if it exists
 	docker-compose -f docker-compose.yml down;
 	docker volume rm platform-auth-keycloak_db
