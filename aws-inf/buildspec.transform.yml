@@ -53,6 +53,12 @@ phases:
       - |
           MoonwatchApiAccessPolicyArnDefault='None'
           MoonwatchApiAccessPolicyArn=$(jq --arg DEFAULT "$MoonwatchApiAccessPolicyArnDefault" -r '.ApiAccessPolicy // $DEFAULT' "$DC_ART_DIR/moonwatch" || echo "$MoonwatchApiAccessPolicyArnDefault")
+      - |
+          MoonwatchApiRegionDefault='None'
+          MoonwatchApiRegion=$(jq --arg DEFAULT "$MoonwatchApiRegionDefault" -r '.AwsRegion // $DEFAULT' "$DC_ART_DIR/moonwatch" || echo "$MoonwatchApiRegionDefault")
+      - |
+          LaunchDarklySdkKeySsmValueDefault='None'
+          LaunchDarklySdkKeySsmValue=$(jq --arg DEFAULT "$LaunchDarklySdkKeySsmValueDefault" -r '.LaunchDarklySdkKeySsmArn // $DEFAULT' "$DC_ART_DIR/global-configuration" || echo "$LaunchDarklySdkKeySsmValueDefault")
       - mkdir transformed-import
   build:
     commands:
@@ -116,10 +122,18 @@ phases:
         jq --null-input \
           --arg InfrastructureStackName "$InfStackName" \
           --arg NewRelicLicenseKeySsmArn "$NewRelicLicenseKeySsmArn" \
+          --arg MoonwatchApiBaseUrl "$MoonwatchApiBaseUrl" \
+          --arg MoonwatchApiAccessPolicyArn "$MoonwatchApiAccessPolicyArn" \
+          --arg MoonwatchApiRegion "$MoonwatchApiRegion" \
+          --arg LaunchDarklySdkKeySsmValue "$LaunchDarklySdkKeySsmValue" \
           '{
             "Parameters": {
               "InfrastructureStackName": $InfrastructureStackName,
-              "NewRelicLicenseKeySsmArn": $NewRelicLicenseKeySsmArn
+              "NewRelicLicenseKeySsmArn": $NewRelicLicenseKeySsmArn,
+              "MoonwatchApiBaseUrl": $MoonwatchApiBaseUrl,
+              "MoonwatchApiAccessPolicyArn": $MoonwatchApiAccessPolicyArn,
+              "MoonwatchApiRegion": $MoonwatchApiRegion,
+              "LaunchDarklySdkKeySsmValue": $LaunchDarklySdkKeySsmValue
             }
           }' > \
           ./template-configuration.json

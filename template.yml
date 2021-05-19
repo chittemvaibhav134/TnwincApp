@@ -53,14 +53,18 @@ Parameters:
     Type: String
     Default: None
     Description: Base Url to the Moonwatch API
+  MoonwatchApiRegion:
+    Type: String
+    Default: None
+    Description: Region in which Moonwatch is deployed
   MoonwatchApiAccessPolicyArn:
     Type: String
     Default: None
     Description: ARN for Policy that will allow KeyCloak to call Moonwatch API to notify it of sessions starting
-  LaunchDarklySdkKey:
+  LaunchDarklySdkKeySsmValue:
     Type: String
-    Default: sdk-ecf3d6b7-302d-4b26-8580-edf18ab4e0f9
-    Description: The SDK key that should be used for LaunchDarklyAPI calls to control release toggles
+    Default: None
+    Description: Global Launch Darkly SDK Key
 
 Conditions:
   CreateInstanceCert: !Equals [ !Ref InstanceCertificateArn, "None"]
@@ -545,9 +549,11 @@ Resources:
             - Name: AWS_MW_REGION
               Value: !Sub ${AWS::Region}
             - Name: LAUNCH_DARKLY_KEY
-              Value: !Sub LaunchDarklySdkKey
+              Value: !GetAtt LaunchDarklySdkKey.Parameter.Value
             - Name: MOONWATCH_API_BASE_URL
               Value: !Sub MoonwatchApiBaseUrl
+            - Name: AWS_MW_REGION
+              Value: !Sub MoonwatchApiRegion
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
@@ -562,6 +568,14 @@ Resources:
           EntryPoint:
             - /opt/jboss/tools/start.sh
             - "-Djboss.bind.address.management=0.0.0.0"
+
+  LaunchDarklySdkKey:
+    Type: Custom::SsmGetParameter
+    Properties:
+      Name: !Select [ "1", !Split [ ":parameter", !Ref LaunchDarklySdkKeySsmValue ] ]
+      UpdateTrigger: !Ref BuildHash
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cloudformation-get-ssm-param
+
 
   ImportConfigTaskDefinition:
     Type: AWS::ECS::TaskDefinition
