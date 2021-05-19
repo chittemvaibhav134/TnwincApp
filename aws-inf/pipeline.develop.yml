@@ -18,8 +18,6 @@ Parameters:
   GitHubToken:
     Type: String
     NoEcho: true
-  RegionalPackageStackName:
-    Type: String
   DevAccountId:
     Type: String
     Default: "552242929734"
