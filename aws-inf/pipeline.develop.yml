@@ -163,7 +163,6 @@ Resources:
   AuthPackageCodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
-      Name: !Sub ${AWS::StackName}-${ProjectName}-auth
       ServiceRole: "navex-codebuild"
       EncryptionKey: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/navex-pipeline"
       Description: Packages keycloak lambdas
@@ -253,7 +252,7 @@ Resources:
               RunOrder: 1
             - 
               Name: PackageUsWest2
-              Region: us-west-2
+              Region: !Ref AWS::Region
               ActionTypeId:
                 Category: Build
                 Owner: AWS
@@ -272,7 +271,7 @@ Resources:
               RunOrder: 1
             - 
               Name: PackageUsEast1
-              Region: us-west-2
+              Region: !Ref AWS::Region
               ActionTypeId:
                 Category: Build
                 Owner: AWS
@@ -291,7 +290,7 @@ Resources:
               RunOrder: 1
             - 
               Name: AuthPackageUsWest2
-              Region: us-west-2
+              Region: !Ref AWS::Region
               ActionTypeId:
                 Category: Build
                 Owner: AWS
@@ -310,7 +309,7 @@ Resources:
               RunOrder: 1
             - 
               Name: AuthPackageUsEast1
-              Region: us-west-2
+              Region: !Ref AWS::Region
               ActionTypeId:
                 Category: Build
                 Owner: AWS
