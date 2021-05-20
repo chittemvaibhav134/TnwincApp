@@ -553,7 +553,6 @@ Resources:
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
-            - Name: 
             - !If
                 - EnableNewRelicAgent
                 -
