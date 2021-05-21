@@ -100,6 +100,27 @@
         {
           "Name": "NavexRootDomains",
           "Required": true
+        },
+        {
+          "Name": "LaunchDarklySdkKeySsmArn",
+          "Required": false
+        }
+      ]
+    },
+    {
+      "Project": "moonwatch",
+      "Artifacts": [
+        {
+          "Name": "ApiAccessPolicy",
+          "Required": true
+        },
+        {
+          "Name": "Url",
+          "Required": true
+        },
+        {
+          "Name": "AwsRegion",
+          "Required": true
         }
       ]
     }

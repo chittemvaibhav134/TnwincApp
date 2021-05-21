@@ -12,5 +12,6 @@
             "adminUsername": "dvader",
             "adminPassword": "password"
         }
-    }
+    },
+    "java.configuration.updateBuildConfiguration": "automatic"
 }

@@ -49,6 +49,21 @@ Parameters:
   NewRelicLicenseKeySsmArn:
     Type: String
     Default: None
+  MoonwatchApiBaseUrl:
+    Type: String
+    Default: None
+    Description: Base Url to the Moonwatch API
+  MoonwatchApiRegion:
+    Type: String
+    Default: None
+    Description: Region in which Moonwatch is deployed
+  MoonwatchApiAccessPolicyArn:
+    Type: String
+    Description: ARN for Policy that will allow KeyCloak to call Moonwatch API to notify it of sessions starting
+  LaunchDarklySdkKeySsmValue:
+    Type: String
+    Default: None
+    Description: Global Launch Darkly SDK Key
 
 Conditions:
   CreateInstanceCert: !Equals [ !Ref InstanceCertificateArn, "None"]
@@ -80,6 +95,7 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - !Ref MoonwatchApiAccessPolicyArn
       AssumeRolePolicyDocument:
         Statement:
           - Action: sts:AssumeRole
@@ -528,6 +544,10 @@ Resources:
                 Name: HIDE_CONSOLE
                 Value: yes-please
               - !Ref AWS::NoValue
+            - Name: MOONWATCH_API_BASE_URL
+              Value: !Ref MoonwatchApiBaseUrl
+            - Name: AWS_MW_REGION
+              Value: !Ref MoonwatchApiRegion
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
@@ -537,6 +557,8 @@ Resources:
                     Name: NEW_RELIC_LICENSE_KEY
                     ValueFrom: !Ref NewRelicLicenseKeySsmArn
                 - !Ref "AWS::NoValue"
+            - Name: LAUNCH_DARKLY_KEY
+              ValueFrom: !Ref LaunchDarklySdkKeySsmValue
           EntryPoint:
             - /opt/jboss/tools/start.sh
             - "-Djboss.bind.address.management=0.0.0.0"
