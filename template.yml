@@ -96,14 +96,13 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - !Ref MoonwatchApiAccessPolicyArn
       AssumeRolePolicyDocument:
         Statement:
           - Action: sts:AssumeRole
             Effect: Allow
             Principal:
               Service: ecs-tasks.amazonaws.com
-      Policies:
-        - !Ref MoonwatchApiAccessPolicyArn
 
   ContainerTaskPolicy:
     Type: AWS::IAM::Policy
@@ -559,12 +558,8 @@ Resources:
                     Name: NEW_RELIC_LICENSE_KEY
                     ValueFrom: !Ref NewRelicLicenseKeySsmArn
                 - !Ref "AWS::NoValue"
-            - !If
-                - LaunchDarklySdkKeySsmValue
-                -
-                    Name: LAUNCH_DARKLY_KEY
-                    ValueFrom: !Ref LaunchDarklySdkKeySsmValue
-                - !Ref "AWS::NoValue"
+            - Name: LAUNCH_DARKLY_KEY
+              ValueFrom: !Ref LaunchDarklySdkKeySsmValue
           EntryPoint:
             - /opt/jboss/tools/start.sh
             - "-Djboss.bind.address.management=0.0.0.0"
