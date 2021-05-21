@@ -112,15 +112,15 @@
       "Artifacts": [
         {
           "Name": "ApiAccessPolicy",
-          "Required": true
+          "Required": false
         },
         {
           "Name": "Url",
-          "Required": true
+          "Required": false
         },
         {
           "Name": "AwsRegion",
-          "Required": true
+          "Required": false
         }
       ]
     }

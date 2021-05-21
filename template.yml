@@ -59,6 +59,7 @@ Parameters:
     Description: Region in which Moonwatch is deployed
   MoonwatchApiAccessPolicyArn:
     Type: String
+    Default: None
     Description: ARN for Policy that will allow KeyCloak to call Moonwatch API to notify it of sessions starting
   LaunchDarklySdkKeySsmValue:
     Type: String
@@ -72,6 +73,7 @@ Conditions:
   DbaAccess: !Not [!Equals [ !Ref DbaAccessCidr, "255.255.255.255/32" ] ]
   EnableNewRelicAgent: !Not [!Equals [ !Ref NewRelicLicenseKeySsmArn, "None" ] ]
   AutoApproveCert: !Not [!Equals [ !Ref DnsHostedZoneId, "None" ] ]
+  MoonwatchApiAccessPolicy: !Not [ !Equals [ !Ref "MoonwatchApiAccessPolicyArn", "None" ] ]
 
 Mappings:
   StageToSubnets:
@@ -95,7 +97,7 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-        - !Ref MoonwatchApiAccessPolicyArn
+        - !If [ MoonwatchApiAccessPolicy, !Ref "MoonwatchApiAccessPolicyArn", !Ref "AWS::NoValue" ]
       AssumeRolePolicyDocument:
         Statement:
           - Action: sts:AssumeRole
