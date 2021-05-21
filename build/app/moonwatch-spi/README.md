@@ -5,6 +5,7 @@ This builds an SPI for KeyCloak that calls Moonwatch after a LOGIN and LOGOUT ev
 It uses the Amazon SDK 2.x to make the calls to the Moonwatch API gateway.
 
 ## Configuration
+Configuration is read through environment variables
 ### Local
 Create a `secrets.env` in the repository root based on `secrets.env.sample`
 ### Deployed

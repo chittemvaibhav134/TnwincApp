@@ -59,7 +59,6 @@ Parameters:
     Description: Region in which Moonwatch is deployed
   MoonwatchApiAccessPolicyArn:
     Type: String
-    Default: None
     Description: ARN for Policy that will allow KeyCloak to call Moonwatch API to notify it of sessions starting
   LaunchDarklySdkKeySsmValue:
     Type: String
