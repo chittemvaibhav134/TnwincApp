@@ -118,6 +118,7 @@ Resources:
           - Resource: 
             - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*"
             - !If [ EnableNewRelicAgent, !Ref NewRelicLicenseKeySsmArn, !Ref "AWS::NoValue" ]
+            - !Ref LaunchDarklySdkKeySsmValue
             Effect: Allow
             Action:
               - ssm:GetParameterHistory
