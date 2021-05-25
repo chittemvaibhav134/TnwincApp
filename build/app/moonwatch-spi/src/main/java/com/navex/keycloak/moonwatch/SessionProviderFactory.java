@@ -48,6 +48,7 @@ public class SessionProviderFactory implements EventListenerProviderFactory{
         String ldKey = env.get("LAUNCH_DARKLY_KEY");
         if( ldKey != null && !ldKey.isEmpty() ) {
             ldClient = new LDClient(ldKey);
+            config.setLaunchDarklyClient(ldClient);
         }
     }
 
