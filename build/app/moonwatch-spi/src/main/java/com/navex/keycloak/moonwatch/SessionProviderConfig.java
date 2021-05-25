@@ -42,6 +42,7 @@ public class SessionProviderConfig {
             return GetToggleState(toggleName, new LDUser(clientKey), defaultValue, null);
         }
         catch(Exception ex) {
+            Logger.writeError("Global", ex.toString());
             return defaultValue;
         }
     }
@@ -64,10 +65,16 @@ public class SessionProviderConfig {
         EvaluationDetail<String> toggleStringResult = ldClient.stringVariationDetail( toggleName, user, String.valueOf(defaultValue) );
         EvaluationReason resultReason = toggleStringResult.getReason();
 
+        //Logger.writeInfo(toggleName, "String Toggle got kind["+resultReason.getKind()+"] errorKind["+resultReason.getErrorKind()+"]");
+
         if( resultReason.getKind() == EvaluationReason.Kind.ERROR  &&
             resultReason.getErrorKind() == EvaluationReason.ErrorKind.WRONG_TYPE )
         {
             EvaluationDetail<Boolean> resultDetails = ldClient.boolVariationDetail( toggleName, user, defaultValue );
+
+            //resultReason = resultDetails.getReason();
+            //Logger.writeInfo(toggleName, "Bool Toggle got kind["+resultReason.getKind()+"] errorKind["+resultReason.getErrorKind()+"]");
+
             result = resultDetails.getValue();
         }
         else if( resultReason.getKind() == EvaluationReason.Kind.ERROR )
