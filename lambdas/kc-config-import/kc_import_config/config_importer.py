@@ -45,18 +45,21 @@ def stop_task(ecs_client, cluster: str, task_arn: str, reason: str):
     ecs_client.stop_task(cluster=cluster, task=task_arn, reason=reason)
 
 def get_timestamp(datetime_obj: datetime) -> int:
-    return int(datetime_obj.timestamp())
+    return int(datetime_obj.timestamp() * 1000)
 
 def get_timestamp_now() -> int:
     return get_timestamp(datetime.utcnow())
     
 def kc_finished_importing(logs_client, group: str, stream: str) -> bool:
+    logFilterEndTime = get_timestamp_now()
+    # now - 1 hour
+    logFilterStartTime = logFilterEndTime - 3600000
     regex_match = r".*Import finished successfully"
     filter_pattern = '"KC-SERVICES0032"'
     logger.info(f"Checking log group {group} and stream {stream} for logs that match '{filter_pattern}'")
     paginator = logs_client.get_paginator("filter_log_events")
     messages = []
-    for logs in paginator.paginate(logGroupName=group, logStreamNames=[stream], filterPattern=filter_pattern):
+    for logs in paginator.paginate(logGroupName=group, logStreamNames=[stream], filterPattern=filter_pattern, startTime=logFilterStartTime, endTime=logFilterEndTime):
         messages += [ event['message'] for event in logs['events'] if re.match(regex_match, event['message']) ]
     return len(messages) >= 1
 
@@ -64,5 +67,5 @@ def get_task(ecs_client, cluster: str, task_arn: str) -> dict:
     tasks = ecs_client.describe_tasks(cluster=cluster, tasks=[task_arn])['tasks']
     return tasks[0]
 
-def taken_too_long(start_time: int, ttl_minutes: int = 5) -> bool:
+def taken_too_long(start_time: int, ttl_minutes: int = 15) -> bool:
     return (get_timestamp_now() - start_time) > (ttl_minutes * 60 * 1000)
