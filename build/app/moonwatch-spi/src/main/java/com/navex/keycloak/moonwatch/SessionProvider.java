@@ -23,14 +23,27 @@ public class SessionProvider implements EventListenerProvider {
     public void onEvent(Event event) {
         String logContext = event.getSessionId();
         String clientKey = null;
-        if( event.getType() == EventType.LOGIN || event.getType() == EventType.LOGOUT ) {
+        var eventType = event.getType();
+        var userId = event.getUserId();
+        if( eventType == EventType.LOGIN || eventType == EventType.LOGOUT ) {
             if( config.moonwatchApiBase == null || config.moonwatchApiBase.isEmpty() ) {
                 Logger.writeError(logContext, "Unable to handle Moonwatch due to missing base url");
                 return;
             }
-            clientKey = session.getContext().getAuthenticationSession().getAuthenticatedUser().getFirstAttribute("clientkey");
-            clientKey = clientKey == null ? "null": clientKey;
-            Logger.writeInfo(logContext, "Got " + event.getType() + " event, clientKey: " + clientKey);
+
+            var userDb = session.users();
+            var sessionContext = session.getContext();
+            if( sessionContext == null ) {
+                Logger.writeError(logContext, "Session lacked Context, unable to process due to missing ClientKey");
+                return;
+            }
+
+            Logger.writeInfo(logContext, "userId:" + userId);
+            var user = userDb.getUserById(userId, sessionContext.getRealm());
+
+            clientKey = user.getFirstAttribute("clientkey");
+            
+            Logger.writeInfo(logContext, "Got " + eventType + " event, clientKey: " + clientKey);
 
             // check for release toggle
             if( !config.isToggleEnabled("PlatformIdleTimeSettings", clientKey, false) ) {
@@ -41,7 +54,7 @@ public class SessionProvider implements EventListenerProvider {
             var client = new MoonwatchClientBuilder(event.getSessionId(), config).build();
 
             try {
-                if( event.getType() == EventType.LOGIN ) {
+                if( eventType == EventType.LOGIN ) {
                     InitSessionRequest request = new InitSessionRequest()
                         .sessionId(event.getSessionId())
                         .keyCloakSessionId(event.getSessionId())
@@ -52,7 +65,7 @@ public class SessionProvider implements EventListenerProvider {
                     if( result == null ) { return; }
                     Logger.writeInfo(logContext, "Moonwatch Session Init: result[" + result.toString() + "]");
                 }
-                else if( event.getType() == EventType.LOGOUT ) {
+                else if( eventType == EventType.LOGOUT ) {
                     EndSessionRequest request = new EndSessionRequest()
                         .id(event.getSessionId())
                         .reason("UserInitiated");
