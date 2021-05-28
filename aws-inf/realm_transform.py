@@ -86,7 +86,7 @@ if __name__== "__main__":
     parser.add_argument("--csp-header", type=str.lower, help="Comma delimited list of allowed domains", required=False)
     parser.add_argument("--wildcard-prefix", action='store_true', help="Prefix each domain with a *", required=False)
     
-    parser.add_argument("--client-id", type=str, help="clientId in realm file that needs transforming")
+    parser.add_argument("--client-id", type=str, help="client name in realm file that needs transforming")
     parser.add_argument("-p", "--client-property", type=str, help="client property that needs to be set. ex: redirectUris, adminUrl")
     parser.add_argument("-v", "--client-value", type=str, action='append', help="List of values to set for a client property", default=[])
     parser.add_argument("--append", action='store_true', help="Add onto existing list; if not supplied the list is replaced")
