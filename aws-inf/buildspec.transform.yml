@@ -43,10 +43,11 @@ phases:
       - |
         if ! $INCLUDE_ADMIN_USER_IMPORT ; then
           # remove any users in the realm files with hard coded credentials
-          $TransformScript -r "$MasterRealmJson" -o transformed-import/master-realm.json  --disable-users
+          $TransformScript -r "$MasterRealmJson" -i --disable-users
           $TransformScript -r "$NavexRealmJson" -i --disable-users
         fi
-      
+      # copy updated realm file to captured artifact dir
+      - cp "$MasterRealmJson" transformed-import/master-realm.json
       # Set idp config off of doorman metadata
       - $TransformScript -r "$NavexRealmJson" -i --idp-alias doorman --idp-metadata-url $DoormanMetadataUrl
       
@@ -62,11 +63,11 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellUserAppUrl"
       
       # Set cmd-backend client related urls 
-      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://$CMDUIROOTDOMAIN/oidc/coderedirector/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://$CmdUiRootDomain/oidc/coderedirector/*"
       
       # Set cmd-frontend client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p redirectUris -v "https://$CMDUIROOTDOMAIN/oidc/coderedirector/*" -v "https://$CMDUIROOTDOMAIN/oidc/silentchecksso/*" -v "${DoormanBaseUrl}/*"
-      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p redirectUris -v "https://$CMDUIROOTDOMAIN"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p redirectUris -v "https://$CmdUiRootDomain/oidc/coderedirector/*" -v "https://$CmdUiRootDomain/oidc/silentchecksso/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p webOrigins -v "https://$CmdUiRootDomain"
 
       # Set epim-iem client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p adminUrl -v "https://${EpimIemRootDomain}/"
@@ -82,7 +83,7 @@ phases:
       # Set riskrate client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id riskrate -p redirectUris -v "${RiskRateAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
 
-      # move updated realm file to captured artifact dir
+      # copy updated realm file to captured artifact dir
       - cp "$NavexRealmJson" transformed-import/navex-realm.json
 
       - |
