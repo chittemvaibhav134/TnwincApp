@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse,json
 from urllib3 import PoolManager
 from xml.etree.ElementTree import fromstring as xml_fromstring
