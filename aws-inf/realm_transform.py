@@ -39,16 +39,13 @@ def update_client_property(realm_dict: dict, client_id: str, property: str, valu
 def update_sso_config(realm_dict: dict, idp_alias: str, metadata_url: str) -> None:
     http = PoolManager(cert_reqs='CERT_NONE', assert_hostname=False)
     print(f"Fetching metadata xml from: {metadata_url}")
+    
     metadata_xml_string = http.request('GET', metadata_url).data.decode('utf-8')
     xml = xml_fromstring(metadata_xml_string)
-    #print(metadata_xml_string)
-    # need to circle back and figure out how xml works :/ 
-    # EntityDescriptor.IDPSSODescriptor.KeyDescriptor.KeyInfo.X509Data.X509Certificate.text
-    cert = xml[0][0][0][0][0].text
-    #EntityDescriptor.IDPSSODescriptor.SingleLogoutService[Location]
-    ss_out_uri = xml[0][1].attrib['Location']
-    #EntityDescriptor.IDPSSODescriptor.SingleSignOnService[Location]
-    ss_in_uri = xml[0][3].attrib['Location']
+    cert = xml.find('.//{http://www.w3.org/2000/09/xmldsig#}X509Certificate').text
+    ss_out_uri = xml.find('.//{urn:oasis:names:tc:SAML:2.0:metadata}SingleLogoutService').attrib['Location']
+    ss_in_uri = xml.find('.//{urn:oasis:names:tc:SAML:2.0:metadata}SingleSignOnService').attrib['Location']
+
     print(f"Searching for identityProvider with alias {idp_alias}...")
     idp = next( i for i in realm_dict['identityProviders'] if i['alias'] == idp_alias )
     print(f"Setting signingCertificate to: {cert}")
