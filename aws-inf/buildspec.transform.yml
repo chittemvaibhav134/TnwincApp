@@ -63,11 +63,11 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellUserAppUrl"
       
       # Set cmd-backend client related urls 
-      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://$CmdUiRootDomain/oidc/coderedirector/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*"
       
       # Set cmd-frontend client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p redirectUris -v "https://$CmdUiRootDomain/oidc/coderedirector/*" -v "https://$CmdUiRootDomain/oidc/silentchecksso/*" -v "${DoormanBaseUrl}/*"
-      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p webOrigins -v "https://$CmdUiRootDomain"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "https://maint.$CmdUiRootDomain/oidc/silentchecksso/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p webOrigins -v "https://maint.$CmdUiRootDomain"
 
       # Set epim-iem client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p adminUrl -v "https://${EpimIemRootDomain}/"
