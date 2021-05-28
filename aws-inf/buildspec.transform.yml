@@ -55,7 +55,7 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --csp-header "$NavexRootDomains" --wildcard-prefix
       
       # Set appshell client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p baseUrl -v "$AppshellUserAppUrl"
       
       # Set appshell-bff client related urls
