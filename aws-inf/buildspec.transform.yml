@@ -18,45 +18,24 @@ phases:
       - DoormanBaseUrl=$(jq -r '.BaseUrl' "$DC_ART_DIR/doorman")
       - NavexRootDomains=$(jq -r '.NavexRootDomains' "$DC_ART_DIR/global-configuration")
       - |
-          # I think this handles a default value if the artifact is missing or if the entire json file is
-          AppshellAdminUrlDefault="http://admin.devlocal.navex-pe.com:3000"
-          AppshellAdminUrl=$(jq --arg DEFAULT "$AppshellAdminUrlDefault" -r '.RootUiAdminUrl // $DEFAULT' "$DC_ART_DIR/appshell-infra" || echo "$AppshellAdminUrlDefault")
-          AppshellPlatforminatorUrlDefault="http://navexadmin.devlocal.navex-pe.com:3000"
-          AppshellPlatforminatorUrl=$(jq --arg DEFAULT "$AppshellPlatforminatorUrlDefault" -r '.RootUiNavexAdminUrl // $DEFAULT' "$DC_ART_DIR/appshell-infra" || echo "$AppshellPlatforminatorUrlDefault")
-          AppshellUserAppUrlDefault="http://user.app.devlocal.navex-pe.com:3000"
-          AppshellUserAppUrl=$(jq --arg DEFAULT "$AppshellUserAppUrlDefault" -r '.RootUiUserAppUrl // $DEFAULT' "$DC_ART_DIR/appshell-infra" || echo "$AppshellUserAppUrlDefault")
+          AppshellAdminUrl=$(jq -r '.RootUiAdminUrl' "$DC_ART_DIR/appshell-infra")
+          AppshellPlatforminatorUrl=$(jq -r '.RootUiNavexAdminUrl' "$DC_ART_DIR/appshell-infra")
+          AppshellUserAppUrl=$(jq -r '.RootUiUserAppUrl' "$DC_ART_DIR/appshell-infra")
 
-      - |
-          CmdUiRootDomainDefault="pt.dev.local"
-          CmdUiRootDomain=$(jq --arg DEFAULT "$CmdUiRootDomainDefault" -r '.UiRootDomain // $DEFAULT' "$DC_ART_DIR/policytech" || echo "$CmdUiRootDomainDefault")
-      - |
-          EpimIemRootDomainDefault="dev.ep.local"
-          EpimIemRootDomain=$(jq --arg DEFAULT "$EpimIemRootDomainDefault" -r '.UiRootDomain // $DEFAULT' "$DC_ART_DIR/epim" || echo "$EpimIemRootDomainDefault")
-      - |
-          CoiAuthRedirectUrlDefault="https://auth.coi.devlocal.navex-pe.com"
-          CoiAuthRedirectUrl=$(jq --arg DEFAULT "$CoiAuthRedirectUrlDefault" -r '.CoiAuthRedirectUrl // $DEFAULT' "$DC_ART_DIR/coi-ui" || echo "$CoiAuthRedirectUrlDefault")
-      - |
-          InsightsApiBaseUrlDefault="https://api.dev.insights.local"
-          InsightsApiBaseUrl=$(jq --arg DEFAULT "$InsightsApiBaseUrlDefault" -r '.ApiFriendlyBaseUrl // $DEFAULT' "$DC_ART_DIR/insights" || echo "$InsightsApiBaseUrlDefault")
-      - |
-          RiskRateAuthRedirectUrlDefault="https://auth.dev.rr.local"
-          RiskRateAuthRedirectUrl=$(jq --arg DEFAULT "$RiskRateAuthRedirectUrlDefault" -r '.AuthRedirectUrl // $DEFAULT' "$DC_ART_DIR/riskrate" || echo "$RiskRateAuthRedirectUrlDefault")
-      - |
-          NewRelicLicenseKeySsmArnDefault='None'
-          NewRelicLicenseKeySsmArn=$(jq --arg DEFAULT "$NewRelicLicenseKeySsmArnDefault" -r '.NewRelicenseKeySsmArn // $DEFAULT' "$DC_ART_DIR/global-configuration" || echo "$NewRelicLicenseKeySsmArnDefault")
-      - |
-          MoonwatchApiBaseUrlDefault='None'
-          MoonwatchApiBaseUrl=$(jq --arg DEFAULT "$MoonwatchApiBaseUrlDefault" -r '.Url // $DEFAULT' "$DC_ART_DIR/moonwatch" || echo "$MoonwatchApiBaseUrlDefault")
-      - |
-          MoonwatchApiAccessPolicyArnDefault='None'
-          MoonwatchApiAccessPolicyArn=$(jq --arg DEFAULT "$MoonwatchApiAccessPolicyArnDefault" -r '.ApiAccessPolicy // $DEFAULT' "$DC_ART_DIR/moonwatch" || echo "$MoonwatchApiAccessPolicyArnDefault")
-      - |
-          MoonwatchApiRegionDefault='None'
-          MoonwatchApiRegion=$(jq --arg DEFAULT "$MoonwatchApiRegionDefault" -r '.AwsRegion // $DEFAULT' "$DC_ART_DIR/moonwatch" || echo "$MoonwatchApiRegionDefault")
-      - |
-          LaunchDarklySdkKeySsmValueDefault='None'
-          LaunchDarklySdkKeySsmValue=$(jq --arg DEFAULT "$LaunchDarklySdkKeySsmValueDefault" -r '.LaunchDarklySdkKeySsmArn // $DEFAULT' "$DC_ART_DIR/global-configuration" || echo "$LaunchDarklySdkKeySsmValueDefault")
+      - CmdUiRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/policytech")
+      - EpimIemRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim")
+      - CoiAuthRedirectUrl=$(jq -r '.CoiAuthRedirectUrl' "$DC_ART_DIR/coi-ui")
+      - InsightsApiBaseUrl=$(jq -r '.ApiFriendlyBaseUrl' "$DC_ART_DIR/insights")
+      - RiskRateAuthRedirectUrl=$(jq -r '.AuthRedirectUrl' "$DC_ART_DIR/riskrate")
+      - NewRelicLicenseKeySsmArn=$(jq -r '.NewRelicenseKeySsmArn' "$DC_ART_DIR/global-configuration")
+      - MoonwatchApiBaseUrl=$(jq -r '.Url' "$DC_ART_DIR/moonwatch")
+      - MoonwatchApiAccessPolicyArn=$(jq -r '.ApiAccessPolicy' "$DC_ART_DIR/moonwatch")
+      - MoonwatchApiRegion=$(jq -r '.AwsRegion' "$DC_ART_DIR/moonwatch")
+      - LaunchDarklySdkKeySsmValue=$(jq -r '.LaunchDarklySdkKeySsmArn' "$DC_ART_DIR/global-configuration")
       - mkdir transformed-import
+      - | 
+        TransformScript="$APP_DIR/aws-inf/realm_transform.py"
+        chmod +x $TransformScript
   build:
     commands:
       - |
@@ -76,7 +55,7 @@ phases:
         LOGIN_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleSignOnService/@Location)' doorman-metadata.xml )
       - | 
         # Allow navex root domains in csp
-        TransformScript="$APP_DIR/aws-inf/domain_csp_transform.py"
+        TransformScript="$APP_DIR/aws-inf/realm_transform.py"
         echo "Running '$TransformScript $NavexRootDomains'"
         chmod +x $TransformScript
         CSP_DOMAINS=$($TransformScript $NavexRootDomains)
