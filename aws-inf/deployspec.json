@@ -33,15 +33,15 @@
       "Artifacts": [
         {
           "Name": "RootUiAdminUrl",
-          "Required": false
+          "DefaultValue": "http://admin.devlocal.navex-pe.com:3000"
         },
         {
           "Name": "RootUiUserAppUrl",
-          "Required": false
+          "DefaultValue": "http://user.app.devlocal.navex-pe.com:3000"
         },
         {
           "Name": "RootUiNavexAdminUrl",
-          "Required": false
+          "DefaultValue": "http://navexadmin.devlocal.navex-pe.com:3000"
         }
       ]
     },
@@ -50,7 +50,7 @@
       "Artifacts": [
         {
           "Name": "UiRootDomain",
-          "Required": false
+          "DefaultValue": "pt.dev.local"
         }
       ]
     },
@@ -59,7 +59,7 @@
       "Artifacts": [
         {
           "Name": "UiRootDomain",
-          "Required": false
+          "DefaultValue": "dev.ep.local"
         }
       ]
     },
@@ -68,7 +68,7 @@
       "Artifacts": [
         {
           "Name": "CoiAuthRedirectUrl",
-          "Required": false
+          "DefaultValue": "https://auth.coi.devlocal.navex-pe.com"
         }
       ]
     },
@@ -77,7 +77,7 @@
       "Artifacts": [
         {
           "Name": "ApiFriendlyBaseUrl",
-          "Required": false
+          "DefaultValue": "https://api.dev.insights.local"
         }
       ]
     },
@@ -86,7 +86,7 @@
       "Artifacts": [
         {
           "Name": "AuthRedirectUrl",
-          "Required": false
+          "DefaultValue": "https://auth.dev.rr.local"
         }
       ]
     },
@@ -95,7 +95,7 @@
       "Artifacts": [
         {
           "Name": "NewRelicenseKeySsmArn",
-          "Required": false
+          "DefaultValue": "None"
         },
         {
           "Name": "NavexRootDomains",
@@ -103,7 +103,7 @@
         },
         {
           "Name": "LaunchDarklySdkKeySsmArn",
-          "Required": false
+          "DefaultValue": "None"
         }
       ]
     },
@@ -112,21 +112,35 @@
       "Artifacts": [
         {
           "Name": "ApiAccessPolicy",
-          "Required": false
+          "DefaultValue": "None"
         },
         {
           "Name": "Url",
-          "Required": false
+          "DefaultValue": "None"
         },
         {
           "Name": "AwsRegion",
-          "Required": false
+          "DefaultValue": "None"
         }
       ]
     }
   ],
   "Exposes": [
     "Domain",
-    "RootDomain"
+    "RootDomain",
+    "ConfigBucket",
+    "CpConfigImportLambdaArn",
+    "CpPostDeployLambdaArn",
+    "ClientSecretSsmPrefix",
+    "ClientSecretSsmRegion",
+    "ClientSecretSsmKmsArn",
+    "NcisApiClientSecretSsmArn",
+    "CmdBackendClientSecretSsmArn",
+    "EpimIemClientSecretSsmArn",
+    "InsightsClientSecretSsmArn",
+    "RiskRateClientSecretSsmArn",
+    "AppShellBffClientSecretSsmArn",
+    "CustomOidcAuthorizerLambdaName",
+    "ApiGatewayAuthorizerRole"
   ]
 }
