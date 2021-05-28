@@ -37,8 +37,8 @@ def update_client_property(realm_dict: dict, client_id: str, property: str, valu
         
 
 def update_sso_config(realm_dict: dict, idp_alias: str, metadata_url: str) -> None:
-    http = PoolManager()
-    print(f"Fetching metadata xml from {metadata_url}...")
+    http = PoolManager(cert_reqs='CERT_NONE', assert_hostname=False)
+    print(f"Fetching metadata xml from: {metadata_url}")
     metadata_xml_string = http.request('GET', metadata_url).data.decode('utf-8')
     xml = xml_fromstring(metadata_xml_string)
     #print(metadata_xml_string)
