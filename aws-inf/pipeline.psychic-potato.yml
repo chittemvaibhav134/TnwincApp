@@ -81,7 +81,7 @@ Resources:
         BuildSpec: aws-inf/buildspec.yml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:4.0
+        Image: aws/codebuild/standard:5.0
         Type: LINUX_CONTAINER
         PrivilegedMode: True
         EnvironmentVariables:
@@ -103,7 +103,7 @@ Resources:
         BuildSpec: app/aws-inf/buildspec.transform.yml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:4.0
+        Image: aws/codebuild/standard:5.0
         Type: LINUX_CONTAINER
       VpcConfig:
         SecurityGroupIds:
@@ -112,7 +112,46 @@ Resources:
           - !ImportValue CodeBuildSubnetAZ1
           - !ImportValue CodeBuildSubnetAZ2
         VpcId: !ImportValue CodeBuildVpcId    
-
+  PackageCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: "navex-codebuild"
+      EncryptionKey: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/navex-pipeline"
+      Description: Packages various cfn customresource
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: aws-inf/buildspec.package.yml
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:5.0
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: S3_BUCKET
+            Value: !Sub navex-artifacts-${AWS::AccountId}-${AWS::Region}
+          - Name: S3_PREFIX
+            Value: !Ref AWS::StackName
+  AuthPackageCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: "navex-codebuild"
+      EncryptionKey: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/navex-pipeline"
+      Description: Packages keycloak lambdas
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: aws-inf/buildspec.auth.package.yml    
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:5.0
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: S3_BUCKET
+            Value: !Sub navex-artifacts-${AWS::AccountId}-${AWS::Region}
+          - Name: S3_PREFIX
+            Value: !Ref AWS::StackName
   PipelineWebhook:
     Type: AWS::CodePipeline::Webhook
     Properties:
@@ -185,14 +224,18 @@ Resources:
               RunOrder: 1
             - 
               Name: PackageUsWest2
-              Region: us-west-2
+              Region: !Ref AWS::Region
               ActionTypeId:
                 Category: Build
                 Owner: AWS
                 Version: "1"
                 Provider: CodeBuild
               Configuration:
-                ProjectName: !Sub ${RegionalPackageStackName}-${ProjectName}
+                ProjectName: !Ref PackageCodeBuildProject
+                EnvironmentVariables: !Sub |
+                  [
+                    {"name":"S3_BUCKET","value": "navex-artifacts-${AWS::AccountId}-us-west-2"}
+                  ]
               InputArtifacts:
                 - Name: App
               OutputArtifacts:
@@ -200,14 +243,18 @@ Resources:
               RunOrder: 1
             - 
               Name: AuthPackageUsWest2
-              Region: us-west-2
+              Region: !Ref AWS::Region
               ActionTypeId:
                 Category: Build
                 Owner: AWS
                 Version: "1"
                 Provider: CodeBuild
               Configuration:
-                ProjectName: !Sub ${RegionalPackageStackName}-${ProjectName}-auth
+                ProjectName: !Ref AuthPackageCodeBuildProject
+                EnvironmentVariables: !Sub |
+                  [
+                    {"name":"S3_BUCKET","value": "navex-artifacts-${AWS::AccountId}-us-west-2"}
+                  ]
               InputArtifacts:
                 - Name: App
               OutputArtifacts:
@@ -215,14 +262,18 @@ Resources:
               RunOrder: 1
             - 
               Name: AuthPackageUsEast1
-              Region: us-east-1
+              Region: !Ref AWS::Region
               ActionTypeId:
                 Category: Build
                 Owner: AWS
                 Version: "1"
                 Provider: CodeBuild
               Configuration:
-                ProjectName: !Sub ${RegionalPackageStackName}-${ProjectName}-auth
+                ProjectName: !Ref AuthPackageCodeBuildProject
+                EnvironmentVariables: !Sub |
+                  [
+                    {"name":"S3_BUCKET","value": "navex-artifacts-${AWS::AccountId}-us-east-1"}
+                  ]
               InputArtifacts:
                 - Name: App
               OutputArtifacts:

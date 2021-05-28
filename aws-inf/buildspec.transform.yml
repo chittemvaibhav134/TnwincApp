@@ -10,9 +10,6 @@ env:
     INCLUDE_ADMIN_USER_IMPORT: "false"
 
 phases:
-  install:
-    runtime-versions:
-      nodejs: 12
   pre_build:
     commands:
       - echo "loading values from deployment context artifacts $DC_ART_DIR/aws-inf"
