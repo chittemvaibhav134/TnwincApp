@@ -66,11 +66,19 @@ def update_csp_header(realm_dict: dict, domains: List[str], prepend_wildcard: bo
     print(f"Setting contentSecurityPolicy to: {domain_str}")
     realm_dict['browserSecurityHeaders']['contentSecurityPolicy'] = domain_str
 
+def disable_users(realm_dict: dict) -> None:
+    for user in realm_dict['users']:
+        if user['credentials']:
+            print(f"Disabling user {user['username']}. FirstName '{user.get('firstName')}' LastName '{user.get('lastName')}'")
+            user['enabled'] = False
+
 if __name__== "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-r", "--realm-file", type=str, help="Path to realm file that needs to be transformed", required=True)
     parser.add_argument("-o", "--output-file", type=str, help="File to write transformed json to")
     parser.add_argument("-i", "--inplace-update", action='store_true', help="Save changes to realm file passed in")
+
+    parser.add_argument("--disable-users", action='store_true', help="Disables hardcoded users from realm file")
 
     parser.add_argument("--idp-alias", type=str, help="identityProviders alias to update sso config from metadata url", required=False)
     parser.add_argument("--idp-metadata-url", type=str, help="Url to metadata of identity provider", required=False)
@@ -87,6 +95,10 @@ if __name__== "__main__":
     
     realm_dict = load_json_file(args.realm_file)
     print(f"Transforming keycloak v{realm_dict['keycloakVersion']} realm file: {args.realm_file}")
+
+    if args.disable_users:
+        print("Disabling hardcoded users from realm file...")
+        disable_users(realm_dict)
     if args.idp_alias and args.idp_metadata_url:
         print("Transforming sso config...")
         update_sso_config(realm_dict, args.idp_alias, args.idp_metadata_url)
