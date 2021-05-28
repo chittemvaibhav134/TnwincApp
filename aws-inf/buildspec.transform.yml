@@ -55,15 +55,10 @@ phases:
       
       # Set appshell client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*"
-        # These two seem to be updating the same prop unless i'm missing something...
-      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p baseUrl -v "$AppshellAdminUrl"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p baseUrl -v "$AppshellUserAppUrl"
       
       # Set appshell-bff client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*"
-      # These three seem to be updating the same prop unless i'm missing something... 
-      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellAdminUrl"
-      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellPlatforminatorUrl"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellUserAppUrl"
       
       # Set cmd-backend client related urls 
