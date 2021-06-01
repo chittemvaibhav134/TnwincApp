@@ -459,7 +459,7 @@ Resources:
       TaskDefinition: !Ref TaskDefinition
       LaunchType: FARGATE
       PlatformVersion: 1.4.0
-      HealthCheckGracePeriodSeconds: 150
+      HealthCheckGracePeriodSeconds: 200
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED

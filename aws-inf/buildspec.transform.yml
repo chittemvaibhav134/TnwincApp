@@ -10,9 +10,6 @@ env:
     INCLUDE_ADMIN_USER_IMPORT: "false"
 
 phases:
-  install:
-    runtime-versions:
-      nodejs: 12
   pre_build:
     commands:
       - echo "loading values from deployment context artifacts $DC_ART_DIR/aws-inf"
@@ -105,7 +102,7 @@ phases:
           jq --arg APPSHELL_USER "$AppshellUserAppUrl" '(.clients[] | select(.name == "appshell-bff") | .baseUrl) |= $APPSHELL_USER' |
           jq --arg CMDUIROOTDOMAIN "$CmdUiRootDomain" --arg CMDUIROOTDOMAINDEFAULT "$CmdUiRootDomainDefault" '(.clients[] | select(.name == "Content Management and Distribution") | .redirectUris[]) |= sub($CMDUIROOTDOMAINDEFAULT;$CMDUIROOTDOMAIN)' |
           jq --arg CMDUIROOTDOMAIN "$CmdUiRootDomain" --arg CMDUIROOTDOMAINDEFAULT "$CmdUiRootDomainDefault" '(.clients[] | select(.name == "Content Management and Distribution") | .webOrigins[]) |= sub($CMDUIROOTDOMAINDEFAULT;$CMDUIROOTDOMAIN)' |
-          jq --arg CMD_DOORMAN_REDIRECT "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "cmd-frontend") | .redirectUris[2]) |= $CMD_DOORMAN_REDIRECT' |          
+          jq --arg CMD_DOORMAN_REDIRECT "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "cmd-frontend") | .redirectUris[0]) |= $CMD_DOORMAN_REDIRECT' |          
           jq --arg EPIMIEMADMINURL "https://${EpimIemRootDomain}/" '(.clients[] | select(.clientId == "epim-iem") | .adminUrl) |= $EPIMIEMADMINURL' |
           jq --arg EPIMIEMREDIRECTURI "https://${EpimIemRootDomain}/*" '(.clients[] | select(.clientId == "epim-iem") | .redirectUris[0]) |= $EPIMIEMREDIRECTURI' |
           jq --arg EPIM_DOORMAN_REDIRECT "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "epim-iem") | .redirectUris[1]) |= $EPIM_DOORMAN_REDIRECT' |

@@ -22,13 +22,29 @@ public class SessionProvider implements EventListenerProvider {
     @Override
     public void onEvent(Event event) {
         String logContext = event.getSessionId();
-        if( event.getType() == EventType.LOGIN ) {
+        String clientKey = null;
+        var eventType = event.getType();
+        var userId = event.getUserId();
+        if( eventType == EventType.LOGIN || eventType == EventType.LOGOUT ) {
             if( config.moonwatchApiBase == null || config.moonwatchApiBase.isEmpty() ) {
                 Logger.writeError(logContext, "Unable to handle Moonwatch due to missing base url");
                 return;
             }
-            Logger.writeInfo(logContext, "Got LOGIN event, calling Moonwatch InitSession");
-            String clientKey = session.getAttribute("clientkey", String.class);
+
+            var userDb = session.users();
+            var sessionContext = session.getContext();
+            if( sessionContext == null ) {
+                Logger.writeError(logContext, "Session lacked Context, unable to process due to missing ClientKey");
+                return;
+            }
+
+            Logger.writeInfo(logContext, "userId:" + userId);
+            var user = userDb.getUserById(userId, sessionContext.getRealm());
+
+            clientKey = user.getFirstAttribute("clientkey");
+            
+            Logger.writeInfo(logContext, "Got " + eventType + " event, clientKey: " + clientKey);
+
             // check for release toggle
             if( !config.isToggleEnabled("PlatformIdleTimeSettings", clientKey, false) ) {
                 Logger.writeInfo(logContext, "Moonwatch was not notified because PlatformIdleTimeSettings was evaluated to off");
@@ -36,47 +52,32 @@ public class SessionProvider implements EventListenerProvider {
             }
 
             var client = new MoonwatchClientBuilder(event.getSessionId(), config).build();
+
             try {
-                InitSessionRequest request = new InitSessionRequest()
-                    .sessionId(event.getSessionId())
-                    .keyCloakSessionId(event.getSessionId())
-                    .idleTimeout(30)
-                    .logoutUrl(null);
+                if( eventType == EventType.LOGIN ) {
+                    InitSessionRequest request = new InitSessionRequest()
+                        .sessionId(event.getSessionId())
+                        .keyCloakSessionId(event.getSessionId())
+                        .idleTimeout(30)
+                        .logoutUrl(null);
+                    
+                    InitSessionResult result = client.initSession(request);
+                    if( result == null ) { return; }
+                    Logger.writeInfo(logContext, "Moonwatch Session Init: result[" + result.toString() + "]");
+                }
+                else if( eventType == EventType.LOGOUT ) {
+                    EndSessionRequest request = new EndSessionRequest()
+                        .id(event.getSessionId())
+                        .reason("UserInitiated");
                 
-                InitSessionResult result = client.initSession(request);
-                if( result == null ) { return; }
-                Logger.writeInfo(logContext, "Moonwatch Session Init: result[" + result.toString() + "]");
+                    EndSessionResult result = client.endSession(request);
+                    if( result == null ) { return; }
+                    Logger.writeInfo(logContext, "Moonwatch Session End: result[" + result.toString() + "]");
+                }
             }
             finally {
                 client.close();
             }
-        }
-        else if( event.getType() == EventType.LOGOUT ) {
-            if( config.moonwatchApiBase == null || config.moonwatchApiBase.isEmpty() ) {
-                Logger.writeError(logContext, "Unable to handle Moonwatch due to missing base url");
-                return;
-            }
-            Logger.writeInfo(logContext, "Got LOGOUT event, calling Moonwatch EndSession");
-            String clientKey = session.getAttribute("clientkey", String.class);
-            // check for release toggle
-            if( !config.isToggleEnabled("PlatformIdleTimeSettings", clientKey, false) ) {
-                Logger.writeInfo(logContext, "Moonwatch was not notified because PlatformIdleTimeSettings was evaluated to off" );
-                return;
-            }
-
-            var client = new MoonwatchClientBuilder(event.getSessionId(), config).build();
-
-            EndSessionRequest request = new EndSessionRequest()
-                .id(event.getSessionId())
-                .reason("UserInitiated");
-        
-            EndSessionResult result = client.endSession(request);
-            if( result == null ) { return; }
-            Logger.writeInfo(logContext, "Moonwatch Session End: result[" + result.toString() + "]");
-
-            client.close();
-            client = null;
-
         }
     }
 
