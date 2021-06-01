@@ -1101,21 +1101,6 @@
         {
           "config": {
             "access.token.claim": "true",
-            "claim.name": "moonwatch_session_id",
-            "id.token.claim": "true",
-            "jsonType.label": "String",
-            "user.attribute": "moonwatch_session_id",
-            "userinfo.token.claim": "true"
-          },
-          "consentRequired": false,
-          "id": "c8193b18-d566-4026-8a6b-c5af551a6894",
-          "name": "MoonwatchSessionId",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-attribute-mapper"
-        },
-        {
-          "config": {
-            "access.token.claim": "true",
             "claim.name": "puid",
             "id.token.claim": "true",
             "jsonType.label": "String",
@@ -2281,18 +2266,6 @@
   "groups": [],
   "id": "navex",
   "identityProviderMappers": [
-    {
-      "config": {
-        "attribute.name": "http://schemas.navexglobal.com/identity/claims/MoonwatchSessionId",
-        "attributes": "[]",
-        "syncMode": "INHERIT",
-        "user.attribute": "moonwatch_session_id"
-      },
-      "id": "31d0e918-a644-4546-94c4-e800f53b1c70",
-      "identityProviderAlias": "doorman",
-      "identityProviderMapper": "saml-user-attribute-idp-mapper",
-      "name": "MoonwatchSessionId"
-    },
     {
       "config": {
         "attribute.name": "http://schemas.navexglobal.com/identity/claims/DoormanClientKey",
