@@ -42,7 +42,7 @@ public class SessionProvider implements EventListenerProvider {
             var user = userDb.getUserById(userId, sessionContext.getRealm());
 
             clientKey = user.getFirstAttribute("clientkey");
-            
+
             Logger.writeInfo(logContext, "Got " + eventType + " event, clientKey: " + clientKey);
 
             // check for release toggle
@@ -58,9 +58,9 @@ public class SessionProvider implements EventListenerProvider {
                     InitSessionRequest request = new InitSessionRequest()
                         .sessionId(event.getSessionId())
                         .keyCloakSessionId(event.getSessionId())
-                        .idleTimeout(30)
+                        .clientKey(clientKey)
                         .logoutUrl(null);
-                    
+
                     InitSessionResult result = client.initSession(request);
                     if( result == null ) { return; }
                     Logger.writeInfo(logContext, "Moonwatch Session Init: result[" + result.toString() + "]");
@@ -69,7 +69,7 @@ public class SessionProvider implements EventListenerProvider {
                     EndSessionRequest request = new EndSessionRequest()
                         .id(event.getSessionId())
                         .reason("UserInitiated");
-                
+
                     EndSessionResult result = client.endSession(request);
                     if( result == null ) { return; }
                     Logger.writeInfo(logContext, "Moonwatch Session End: result[" + result.toString() + "]");
