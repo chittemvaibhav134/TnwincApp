@@ -17,6 +17,11 @@ This process should only need to be performed once, unless the KeyCloak shared c
 From the repo root:
 
 ```shell
+# *nix environments
+touch secrets.env
+# Powershell environments
+New-Item -Path secrets.env -ItemType File -ErrorAction SilentlyContinue
+# All environments
 docker network create navexdev
 docker-compose -f docker-compose.yml up -d --build
 docker-compose -f docker-compose-idp.yml up -d --build

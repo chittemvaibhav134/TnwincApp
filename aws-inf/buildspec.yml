@@ -9,7 +9,6 @@ phases:
   install:
     runtime-versions:
       python: 3.8
-      docker: 19
     commands:
       - pip install --upgrade cfn-lint awscli
   pre_build:
