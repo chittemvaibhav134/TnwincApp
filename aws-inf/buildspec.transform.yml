@@ -82,6 +82,9 @@ phases:
 
       # Set riskrate client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id riskrate -p redirectUris -v "${RiskRateAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
+      # riskrate wants to use the preview KC instance for an additional environment and the easiest way to accomplish this hacky goal is to
+      # add the redirectUri for that env in all environments. Not ideal, but an easy way to make it happen...
+      - $TransformScript -r "$NavexRealmJson" -i --client-id riskrate -p redirectUris -v "https://auth.rr.navexglobalpreview.com/auth/*" --append
 
       # copy updated realm file to captured artifact dir
       - cp "$NavexRealmJson" transformed-import/navex-realm.json
