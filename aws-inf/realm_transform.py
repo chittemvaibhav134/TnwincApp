@@ -33,7 +33,7 @@ def update_client_property(realm_dict: dict, client_id: str, property: str, valu
     elif not is_prop_list and append:
         raise RuntimeError(f"append=True specified but {property} is not an array on the client object")
     elif not is_prop_list and len(value) > 1:
-        raise RuntimeError(f"Multiple values passed in for client propert {property} that is not a list")
+        raise RuntimeError(f"Multiple values passed in for client property {property} that is not a list")
         
 
 def update_sso_config(realm_dict: dict, idp_alias: str, metadata_url: str) -> None:
