@@ -102,6 +102,6 @@ module.exports.authenticate = (params) => {
         .then((decoded) => ({
             principalId: decoded.sub,
             policyDocument: getPolicyDocument('Allow', '*'),
-            context: { scope: decoded.scope, session_state: decoded.payload.session_state, clientKey: decoded.payload.clientKey }
+            context: { scope: decoded.scope, session_state: decoded.payload.session_state, clientkey: clientkey }
         }));
 }
