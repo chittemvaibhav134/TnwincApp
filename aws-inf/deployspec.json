@@ -141,6 +141,7 @@
     "RiskRateClientSecretSsmArn",
     "AppShellBffClientSecretSsmArn",
     "CustomOidcAuthorizerLambdaName",
-    "ApiGatewayAuthorizerRole"
+    "ApiGatewayAuthorizerRole",
+    "RotateSecretTopicArn"
   ]
 }

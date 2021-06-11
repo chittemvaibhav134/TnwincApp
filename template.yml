@@ -777,6 +777,15 @@ Resources:
               - Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.AdminSecretSsmPath}"
                 Effect: Allow
                 Action: ssm:GetParameter
+        - PolicyName: SNSPublishMessagePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Resource: 
+                  - !Ref RotateSecretTopic
+                Effect: Allow
+                Action: 
+                  - sns:Publish
     
   CweClientSecretRotateLambda:
     Type: AWS::Lambda::Function
@@ -794,6 +803,7 @@ Resources:
           AdminDefaultSecret: !Ref KeyCloakAdminApiDefaultSecret
           AdminSecretSsmPath: !GetAtt ClientSecretRotationConstants.AdminSecretSsmPath
           SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
+          RotateSecretTopicArn: !Ref RotateSecretTopic
 
   CweRemoveDuplicateUsersRole:
     Type: AWS::IAM::Role
@@ -888,6 +898,7 @@ Resources:
           AdminDefaultSecret: !Ref KeyCloakAdminApiDefaultSecret
           AdminSecretSsmPath: !GetAtt ClientSecretRotationConstants.AdminSecretSsmPath
           SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
+          RotateSecretTopicArn: !Ref RotateSecretTopic
 
   Dns:
     Type: AWS::Route53::RecordSet
@@ -1205,6 +1216,9 @@ Resources:
           !Sub "${InfrastructureStackName}-PrivateRouteTableAZ2"
       SubnetId: !Ref KeyCloakDbSubnet2
 
+   RotateSecretTopic:
+    Type: AWS::SNS::Topic
+
 Outputs:
   Domain:
     Description: domain to KC service
@@ -1236,3 +1250,5 @@ Outputs:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/riskrate"
   AppShellBffClientSecretSsmArn:
     Value: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/appshell-bff"
+  RotateSecretTopicArn:
+    Value: !Ref RotateSecretTopic
