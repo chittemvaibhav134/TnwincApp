@@ -51,6 +51,10 @@ def rotate_and_store_client_secrets(kc: KeyCloakApiProxy, ssm_client, sns_client
                     'clientId': {
                         'DataType': 'String',
                         'StringValue': client['clientId']
+                    },
+                    'ssmPath': {
+                        'DataType': 'String',
+                        'StringValue': ssm_path
                     }
                 },
             )
