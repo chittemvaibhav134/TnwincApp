@@ -1,4 +1,4 @@
-import os, logging, json
+import os, logging
 from .apiproxy import KeyCloakApiProxy
 
 logger = logging.getLogger(__name__)
@@ -42,11 +42,7 @@ def rotate_and_store_client_secrets(kc: KeyCloakApiProxy, ssm_client, sns_client
 
             sns_client.publish(
                 TopicArn=sns_topicarn,
-                MessageStructure='json',
-                Message=json.dumps({'default': json.dumps({
-                    'realmName': realm_name,
-                    'clientId': client['clientId']
-                })}),
+                Message='A Keycloak secret has been rotated',
                 MessageAttributes={
                     'realmName': {
                         'DataType': 'String',
