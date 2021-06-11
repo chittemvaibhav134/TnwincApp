@@ -23,7 +23,7 @@ def clear_all_users_cache(kc: KeyCloakApiProxy):
         realm_name = realm['realm']
         kc.clear_user_cache(realm_name)
 
-def rotate_and_store_client_secrets(kc: KeyCloakApiProxy, ssm_client, ssm_prefix: str):
+def rotate_and_store_client_secrets(kc: KeyCloakApiProxy, ssm_client, sns_client, ssm_prefix: str, sns_topicarn: str):
     realms = kc.get_realms()
     for realm in realms:
         realm_name = realm['realm']
@@ -38,4 +38,23 @@ def rotate_and_store_client_secrets(kc: KeyCloakApiProxy, ssm_client, ssm_prefix
                 Value=secret['value'],
                 Type='SecureString',
                 Overwrite=True
+            )
+
+            sns_client.publish(
+                TopicArn=sns_topicarn,
+                Message='A Keycloak secret has been rotated',
+                MessageAttributes={
+                    'realmName': {
+                        'DataType': 'String',
+                        'StringValue': realm_name
+                    },
+                    'clientId': {
+                        'DataType': 'String',
+                        'StringValue': client['clientId']
+                    },
+                    'ssmPath': {
+                        'DataType': 'String',
+                        'StringValue': ssm_path
+                    }
+                },
             )
