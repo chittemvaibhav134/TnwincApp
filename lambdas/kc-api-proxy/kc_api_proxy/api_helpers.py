@@ -1,4 +1,4 @@
-import os, logging
+import os, logging, json
 from .apiproxy import KeyCloakApiProxy
 
 logger = logging.getLogger(__name__)
