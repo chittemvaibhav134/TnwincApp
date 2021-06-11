@@ -105,7 +105,7 @@ Microservices can subscribe to the output ```RotateSecretTopicArn``` in order to
     "MessageAttributes": {
         "clientId": {
             "Type": "String",
-            "Value": "account"
+            "Value": "workato"
         },
         "realmName": {
             "Type": "String",
