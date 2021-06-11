@@ -23,7 +23,7 @@ def clear_all_users_cache(kc: KeyCloakApiProxy):
         realm_name = realm['realm']
         kc.clear_user_cache(realm_name)
 
-def rotate_and_store_client_secrets(kc: KeyCloakApiProxy, ssm_client, sns_client, ssm_prefix: str):
+def rotate_and_store_client_secrets(kc: KeyCloakApiProxy, ssm_client, sns_client, ssm_prefix: str, sns_topicarn: str):
     realms = kc.get_realms()
     for realm in realms:
         realm_name = realm['realm']
@@ -41,7 +41,7 @@ def rotate_and_store_client_secrets(kc: KeyCloakApiProxy, ssm_client, sns_client
             )
 
             sns_client.publish(
-                TopicArn=os.environ.get('RotateSecretTopicArn'),
+                TopicArn=sns_topicarn,
                 MessageStructure='json',
                 Message=json.dumps({'default': json.dumps({
                     'realmName': realm_name,
@@ -49,10 +49,12 @@ def rotate_and_store_client_secrets(kc: KeyCloakApiProxy, ssm_client, sns_client
                 })}),
                 MessageAttributes={
                     'realmName': {
-                        'DataType': 'String'
+                        'DataType': 'String',
+                        'StringValue': realm_name
                     },
                     'clientId': {
-                        'DataType': 'String'
+                        'DataType': 'String',
+                        'StringValue': client['clientId']
                     }
                 },
             )

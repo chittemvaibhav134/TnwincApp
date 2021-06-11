@@ -38,7 +38,7 @@ def get_keycloak_api_proxy_from_env() -> KcApiProxySsmRefresh:
 def cwe_rotate_handler(event, context):
     logger.info("Cloudwatch scheduled secret rotation started")
     kc = get_keycloak_api_proxy_from_env()
-    rotate_and_store_client_secrets(kc, ssm_client, sns_client, os.environ['SsmPrefix'])
+    rotate_and_store_client_secrets(kc, ssm_client, sns_client, os.environ['SsmPrefix'], os.environ['RotateSecretTopicArn'])
     logger.info("Cloudwatch scheduled secret rotation finished")
 
 def get_search_times_from_alarm_event(event):
@@ -109,7 +109,7 @@ def cp_post_deploy_handler(event, context):
     for action in actions:
         try:
             if 'rotate_client_secrets' == action:
-                rotate_and_store_client_secrets(kc, ssm_client, sns_client, os.environ['SsmPrefix'])
+                rotate_and_store_client_secrets(kc, ssm_client, sns_client, os.environ['SsmPrefix'], os.environ['RotateSecretTopicArn'])
             if 'clear_user_cache' == action:
                 clear_all_users_cache(kc)
         except Exception as e:
