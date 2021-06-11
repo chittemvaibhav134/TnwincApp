@@ -1216,7 +1216,7 @@ Resources:
           !Sub "${InfrastructureStackName}-PrivateRouteTableAZ2"
       SubnetId: !Ref KeyCloakDbSubnet2
 
-   RotateSecretTopic:
+  RotateSecretTopic:
     Type: AWS::SNS::Topic
 
 Outputs:
