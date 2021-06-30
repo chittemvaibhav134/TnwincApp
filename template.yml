@@ -1089,6 +1089,11 @@ Resources:
     Condition: NotDevelopment
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - I3013
     Properties:
       Engine: aurora-postgresql
       DBClusterIdentifier:  !Ref DatabaseCluster
