@@ -1616,7 +1616,7 @@ Resources:
                         "DnsHostedZone": "navexone.com",
                         "DnsHostedZoneId": "Z29CNCMQKCNU6I",
                         "Stage": "Production",
-                        "DesiredTaskCount": "3",
+                        "DesiredTaskCount": "4",
                         "DbaAccessCidr": "10.98.24.14/31"
                       },
                       "Tags": {
