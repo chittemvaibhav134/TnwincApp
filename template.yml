@@ -87,8 +87,8 @@ Mappings:
       TaskMemory: 2048
       TaskCpu: 1024
     Production:
-      TaskMemory: 2048
-      TaskCpu: 1024
+      TaskMemory: 4096
+      TaskCpu: 2048
 
 Resources:
   ECSTaskRole:
@@ -1089,6 +1089,11 @@ Resources:
     Condition: NotDevelopment
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - I3013
     Properties:
       Engine: aurora-postgresql
       DBClusterIdentifier:  !Ref DatabaseCluster
