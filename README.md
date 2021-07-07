@@ -87,6 +87,38 @@ From the repo root, in PowerShell:
 
 The exported configuration is now in the `import` directory. It should be committed to source control if any important changes have been made. NOTE: KeyCloak generates new IDs for most config elements during export. They will show up as diffs. This is annoying, but normal.
 
+## SNS Topic
+
+Microservices can subscribe to the output ```RotateSecretTopicArn``` in order to receive messages when Keycloak secrets are rotated. The new secrets can be retrieved from SSM. Example message:
+```
+{
+    "Type": "Notification",
+    "MessageId": "f8509f8f-9ba0-57d6-a76b-c6b259f2499f",
+    "TopicArn": "arn:aws:sns:us-west-2:455920928861:keycloak-psychic-potato-RotateSecretTopic-FX36U8LR4R02",
+    "Subject": null,
+    "Message": "A Keycloak secret has been rotated",
+    "Timestamp": "2021-06-11T19:57:06.807Z",
+    "SignatureVersion": "1",
+    "Signature": "GyrZLpOYPVD1gM7cwmY1r407sBHMcj0Lo4kmxKKeEdKxtPGV8zHWDpg9k3rMrCrYSlKPs2qmIL+8hjJBBnaH3HNgAPF5msjDkag6zM77+oUK76VjQUODoDO3nYAJbziQ8gzJowPOMkqjKtGbnYtOHHhq4I4MkHg0XE+/et569LJDTgQa17iZvk9HyLfg6s9gk4lLv5ib3Nep8ooO69WG6vDPrbmKMB6ZUhM7LZ9fn4hOSyEb1K4Xloj2pxe54FrD28fElQaTcv/rid7UcPEdgKyKGfwnSYjs6kqJjczT/2Smtyu9mKjdJ2AmLdUnS1OhsVNrAA7FltexhVXrSjtKLg==",
+    "SigningCertUrl": "https://sns.us-west-2.amazonaws.com/SimpleNotificationService-010a507c1833636cd94bdb98bd93083a.pem",
+    "UnsubscribeUrl": "https://sns.us-west-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-west-2:455920928861:keycloak-psychic-potato-RotateSecretTopic-FX36U8LR4R02:0bda2f10-20d2-4469-bcb9-51692dff7396",
+    "MessageAttributes": {
+        "clientId": {
+            "Type": "String",
+            "Value": "workato"
+        },
+        "realmName": {
+            "Type": "String",
+            "Value": "navex"
+        },
+        "ssmPath": {
+            "Type": "String",
+            "Value": "/keycloak-psychic-potato/client-keys/navex/workato"
+        }
+    }
+}
+```
+
 ## Miscellaneous notes
 
 ### Hostfile changes

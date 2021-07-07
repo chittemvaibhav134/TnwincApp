@@ -18,103 +18,77 @@ phases:
       - DoormanBaseUrl=$(jq -r '.BaseUrl' "$DC_ART_DIR/doorman")
       - NavexRootDomains=$(jq -r '.NavexRootDomains' "$DC_ART_DIR/global-configuration")
       - |
-          # I think this handles a default value if the artifact is missing or if the entire json file is
-          AppshellAdminUrlDefault="http://admin.devlocal.navex-pe.com:3000"
-          AppshellAdminUrl=$(jq --arg DEFAULT "$AppshellAdminUrlDefault" -r '.RootUiAdminUrl // $DEFAULT' "$DC_ART_DIR/appshell-infra" || echo "$AppshellAdminUrlDefault")
-          AppshellPlatforminatorUrlDefault="http://navexadmin.devlocal.navex-pe.com:3000"
-          AppshellPlatforminatorUrl=$(jq --arg DEFAULT "$AppshellPlatforminatorUrlDefault" -r '.RootUiNavexAdminUrl // $DEFAULT' "$DC_ART_DIR/appshell-infra" || echo "$AppshellPlatforminatorUrlDefault")
-          AppshellUserAppUrlDefault="http://user.app.devlocal.navex-pe.com:3000"
-          AppshellUserAppUrl=$(jq --arg DEFAULT "$AppshellUserAppUrlDefault" -r '.RootUiUserAppUrl // $DEFAULT' "$DC_ART_DIR/appshell-infra" || echo "$AppshellUserAppUrlDefault")
+          AppshellAdminUrl=$(jq -r '.RootUiAdminUrl' "$DC_ART_DIR/appshell-infra")
+          AppshellPlatforminatorUrl=$(jq -r '.RootUiNavexAdminUrl' "$DC_ART_DIR/appshell-infra")
+          AppshellUserAppUrl=$(jq -r '.RootUiUserAppUrl' "$DC_ART_DIR/appshell-infra")
 
-      - |
-          CmdUiRootDomainDefault="pt.dev.local"
-          CmdUiRootDomain=$(jq --arg DEFAULT "$CmdUiRootDomainDefault" -r '.UiRootDomain // $DEFAULT' "$DC_ART_DIR/policytech" || echo "$CmdUiRootDomainDefault")
-      - |
-          EpimIemRootDomainDefault="dev.ep.local"
-          EpimIemRootDomain=$(jq --arg DEFAULT "$EpimIemRootDomainDefault" -r '.UiRootDomain // $DEFAULT' "$DC_ART_DIR/epim" || echo "$EpimIemRootDomainDefault")
-      - |
-          CoiAuthRedirectUrlDefault="https://auth.coi.devlocal.navex-pe.com"
-          CoiAuthRedirectUrl=$(jq --arg DEFAULT "$CoiAuthRedirectUrlDefault" -r '.CoiAuthRedirectUrl // $DEFAULT' "$DC_ART_DIR/coi-ui" || echo "$CoiAuthRedirectUrlDefault")
-      - |
-          InsightsApiBaseUrlDefault="https://api.dev.insights.local"
-          InsightsApiBaseUrl=$(jq --arg DEFAULT "$InsightsApiBaseUrlDefault" -r '.ApiFriendlyBaseUrl // $DEFAULT' "$DC_ART_DIR/insights" || echo "$InsightsApiBaseUrlDefault")
-      - |
-          RiskRateAuthRedirectUrlDefault="https://auth.dev.rr.local"
-          RiskRateAuthRedirectUrl=$(jq --arg DEFAULT "$RiskRateAuthRedirectUrlDefault" -r '.AuthRedirectUrl // $DEFAULT' "$DC_ART_DIR/riskrate" || echo "$RiskRateAuthRedirectUrlDefault")
-      - |
-          NewRelicLicenseKeySsmArnDefault='None'
-          NewRelicLicenseKeySsmArn=$(jq --arg DEFAULT "$NewRelicLicenseKeySsmArnDefault" -r '.NewRelicenseKeySsmArn // $DEFAULT' "$DC_ART_DIR/global-configuration" || echo "$NewRelicLicenseKeySsmArnDefault")
-      - |
-          MoonwatchApiBaseUrlDefault='None'
-          MoonwatchApiBaseUrl=$(jq --arg DEFAULT "$MoonwatchApiBaseUrlDefault" -r '.Url // $DEFAULT' "$DC_ART_DIR/moonwatch" || echo "$MoonwatchApiBaseUrlDefault")
-      - |
-          MoonwatchApiAccessPolicyArnDefault='None'
-          MoonwatchApiAccessPolicyArn=$(jq --arg DEFAULT "$MoonwatchApiAccessPolicyArnDefault" -r '.ApiAccessPolicy // $DEFAULT' "$DC_ART_DIR/moonwatch" || echo "$MoonwatchApiAccessPolicyArnDefault")
-      - |
-          MoonwatchApiRegionDefault='None'
-          MoonwatchApiRegion=$(jq --arg DEFAULT "$MoonwatchApiRegionDefault" -r '.AwsRegion // $DEFAULT' "$DC_ART_DIR/moonwatch" || echo "$MoonwatchApiRegionDefault")
-      - |
-          LaunchDarklySdkKeySsmValueDefault='None'
-          LaunchDarklySdkKeySsmValue=$(jq --arg DEFAULT "$LaunchDarklySdkKeySsmValueDefault" -r '.LaunchDarklySdkKeySsmArn // $DEFAULT' "$DC_ART_DIR/global-configuration" || echo "$LaunchDarklySdkKeySsmValueDefault")
+      - CmdUiRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/policytech")
+      - EpimIemRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim")
+      - CoiAuthRedirectUrl=$(jq -r '.CoiAuthRedirectUrl' "$DC_ART_DIR/coi-ui")
+      - InsightsApiBaseUrl=$(jq -r '.ApiFriendlyBaseUrl' "$DC_ART_DIR/insights")
+      - RiskRateAuthRedirectUrl=$(jq -r '.AuthRedirectUrl' "$DC_ART_DIR/riskrate")
+      - NewRelicLicenseKeySsmArn=$(jq -r '.NewRelicenseKeySsmArn' "$DC_ART_DIR/global-configuration")
+      - MoonwatchApiBaseUrl=$(jq -r '.Url' "$DC_ART_DIR/moonwatch")
+      - MoonwatchApiAccessPolicyArn=$(jq -r '.ApiAccessPolicy' "$DC_ART_DIR/moonwatch")
+      - MoonwatchApiRegion=$(jq -r '.AwsRegion' "$DC_ART_DIR/moonwatch")
+      - LaunchDarklySdkKeySsmValue=$(jq -r '.LaunchDarklySdkKeySsmArn' "$DC_ART_DIR/global-configuration")
       - mkdir transformed-import
+      - | 
+        TransformScript="$APP_DIR/aws-inf/realm_transform.py"
+        chmod +x $TransformScript
+      - NavexRealmJson="$APP_DIR/import/variants/keycloak-app/navex-realm.json"
+      - MasterRealmJson="$APP_DIR/import/variants/keycloak-app/master-realm.json"
   build:
     commands:
       - |
         if ! $INCLUDE_ADMIN_USER_IMPORT ; then
-          # remove any users in the master realm with hard coded credentials
-          # should probably do this in navex-realm as well
-          echo "Disabling hard coded users from master realm..."
-          jq '(.users[] | select(.credentials != []) | .enabled) |= false' $APP_DIR/import/variants/keycloak-app/master-realm.json > master-realm.temp.json
-          mv master-realm.temp.json $APP_DIR/import/variants/keycloak-app/master-realm.json
+          # remove any users in the realm files with hard coded credentials
+          $TransformScript -r "$MasterRealmJson" -i --disable-users
+          $TransformScript -r "$NavexRealmJson" -i --disable-users
         fi
-      - cp $APP_DIR/import/variants/keycloak-app/master-realm.json transformed-import/
-      - |
-        # TODO: Learn how to actually use either sed or xml with namespaces...
-        curl -k $DoormanMetadataUrl | sed 's/xmlns="urn:oasis:names:tc:SAML:2.0:metadata"//g' | sed 's/xmlns="http:\/\/www.w3.org\/2000\/09\/xmldsig#"//g' > doorman-metadata.xml
-        CERT=$(xmllint --xpath '/EntityDescriptor/IDPSSODescriptor/KeyDescriptor/KeyInfo/X509Data/X509Certificate/text()' doorman-metadata.xml )
-        LOGOUT_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleLogoutService/@Location)' doorman-metadata.xml )
-        LOGIN_URL=$(xmllint --xpath 'string(/EntityDescriptor/IDPSSODescriptor/SingleSignOnService/@Location)' doorman-metadata.xml )
-      - | 
-        # Allow navex root domains in csp
-        TransformScript="$APP_DIR/aws-inf/domain_csp_transform.py"
-        echo "Running '$TransformScript $NavexRootDomains'"
-        chmod +x $TransformScript
-        CSP_DOMAINS=$($TransformScript $NavexRootDomains)
-        CSP_HEADER="frame-src 'self'; frame-ancestors 'self' $CSP_DOMAINS; object-src 'none';"
-      - |
-        # TODO: Figure out a less dumb way to update the json file  
-        jq --arg CERT "$CERT" '(.identityProviders[] | select(.alias == "doorman") | .config.signingCertificate) |= $CERT' $APP_DIR/import/variants/keycloak-app/navex-realm.json |
-          jq --arg LOGOUT_URL "$LOGOUT_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleLogoutServiceUrl) |= $LOGOUT_URL' |
-          jq --arg LOGIN_URL "$LOGIN_URL" '(.identityProviders[] | select(.alias == "doorman") | .config.singleSignOnServiceUrl) |= $LOGIN_URL' | 
-          jq --arg APPSHELL_ADMIN_REDIRECT "$AppshellAdminUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[0]) |= $APPSHELL_ADMIN_REDIRECT' |
-          jq --arg APPSHELL_ADMIN "$AppshellAdminUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL_ADMIN' |
-          jq --arg APPSHELL_PLATFORMINATOR_REDIRECT "$AppshellPlatforminatorUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[1]) |= $APPSHELL_PLATFORMINATOR_REDIRECT' |
-          jq --arg APPSHELL_PLATFORMINATOR "$AppshellPlatforminatorUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL_PLATFORMINATOR' |
-          jq --arg APPSHELL_USER_REDIRECT "$AppshellUserAppUrl/*" '(.clients[] | select(.name == "appshell") | .redirectUris[2]) |= $APPSHELL_USER_REDIRECT' |
-          jq --arg APPSHELL_DOORMAN_REDIRECT "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "appshell") | .redirectUris[3]) |= $APPSHELL_DOORMAN_REDIRECT' |
-          jq --arg APPSHELL_USER "$AppshellUserAppUrl" '(.clients[] | select(.name == "appshell") | .baseUrl) |= $APPSHELL_USER' |
-          jq --arg APPSHELL_ADMIN_REDIRECT "$AppshellAdminUrl/*" '(.clients[] | select(.name == "appshell-bff") | .redirectUris[0]) |= $APPSHELL_ADMIN_REDIRECT' |
-          jq --arg APPSHELL_ADMIN "$AppshellAdminUrl" '(.clients[] | select(.name == "appshell-bff") | .baseUrl) |= $APPSHELL_ADMIN' |
-          jq --arg APPSHELL_PLATFORMINATOR_REDIRECT "$AppshellPlatforminatorUrl/*" '(.clients[] | select(.name == "appshell-bff") | .redirectUris[1]) |= $APPSHELL_PLATFORMINATOR_REDIRECT' |
-          jq --arg APPSHELL_PLATFORMINATOR "$AppshellPlatforminatorUrl" '(.clients[] | select(.name == "appshell-bff") | .baseUrl) |= $APPSHELL_PLATFORMINATOR' |
-          jq --arg APPSHELL_USER_REDIRECT "$AppshellUserAppUrl/*" '(.clients[] | select(.name == "appshell-bff") | .redirectUris[2]) |= $APPSHELL_USER_REDIRECT' |
-          jq --arg APPSHELL_DOORMAN_REDIRECT "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "appshell-bff") | .redirectUris[3]) |= $APPSHELL_DOORMAN_REDIRECT' |
-          jq --arg APPSHELL_USER "$AppshellUserAppUrl" '(.clients[] | select(.name == "appshell-bff") | .baseUrl) |= $APPSHELL_USER' |
-          jq --arg CMDUIROOTDOMAIN "$CmdUiRootDomain" --arg CMDUIROOTDOMAINDEFAULT "$CmdUiRootDomainDefault" '(.clients[] | select(.name == "Content Management and Distribution") | .redirectUris[]) |= sub($CMDUIROOTDOMAINDEFAULT;$CMDUIROOTDOMAIN)' |
-          jq --arg CMDUIROOTDOMAIN "$CmdUiRootDomain" --arg CMDUIROOTDOMAINDEFAULT "$CmdUiRootDomainDefault" '(.clients[] | select(.name == "Content Management and Distribution") | .webOrigins[]) |= sub($CMDUIROOTDOMAINDEFAULT;$CMDUIROOTDOMAIN)' |
-          jq --arg CMD_DOORMAN_REDIRECT "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "cmd-frontend") | .redirectUris[0]) |= $CMD_DOORMAN_REDIRECT' |          
-          jq --arg EPIMIEMADMINURL "https://${EpimIemRootDomain}/" '(.clients[] | select(.clientId == "epim-iem") | .adminUrl) |= $EPIMIEMADMINURL' |
-          jq --arg EPIMIEMREDIRECTURI "https://${EpimIemRootDomain}/*" '(.clients[] | select(.clientId == "epim-iem") | .redirectUris[0]) |= $EPIMIEMREDIRECTURI' |
-          jq --arg EPIM_DOORMAN_REDIRECT "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "epim-iem") | .redirectUris[1]) |= $EPIM_DOORMAN_REDIRECT' |
-          jq --arg EPIMIEMWEBORIGIN "https://${EpimIemRootDomain}" '(.clients[] | select(.clientId == "epim-iem") | .webOrigins[0]) |= $EPIMIEMWEBORIGIN' |
-          jq --arg CSP_HEADER "$CSP_HEADER" '(.browserSecurityHeaders.contentSecurityPolicy) |= $CSP_HEADER' |
-          jq --arg COIREDIRECTURI "${CoiAuthRedirectUrl}/*" '(.clients[] | select(.clientId == "coi") | .redirectUris[0]) |= $COIREDIRECTURI' |
-          jq --arg COI_DOORMAN_REDIRECTURI "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "coi") | .redirectUris[2]) |= $COI_DOORMAN_REDIRECTURI' |
-          jq --arg INREDIRECTURI "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" '(.clients[] | select(.clientId == "insights") | .redirectUris[0]) |= $INREDIRECTURI' |
-          jq --arg INDOORMANREDIRECTURI "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "insights") | .redirectUris[1]) |= $INDOORMANREDIRECTURI' |
-          jq --arg RRREDIRECTURI "${RiskRateAuthRedirectUrl}/*" '(.clients[] | select(.clientId == "riskrate") | .redirectUris[0]) |= $RRREDIRECTURI' |
-          jq --arg RRDOORMANREDIRECTURI "${DoormanBaseUrl}/*" '(.clients[] | select(.clientId == "riskrate") | .redirectUris[1]) |= $RRDOORMANREDIRECTURI' |
-          jq --arg CSP_HEADER "$CSP_HEADER" '(.attributes."_browser_header.contentSecurityPolicy") |= $CSP_HEADER' > transformed-import/navex-realm.json
+      # copy updated realm file to captured artifact dir
+      - cp "$MasterRealmJson" transformed-import/master-realm.json
+      # Set idp config off of doorman metadata
+      - $TransformScript -r "$NavexRealmJson" -i --idp-alias doorman --idp-metadata-url $DoormanMetadataUrl
+      
+      # Set CSP header to allow navex root domains. Script will parse the comma delimited list that NavexRootDomains is
+      - $TransformScript -r "$NavexRealmJson" -i --csp-header "$NavexRootDomains" --wildcard-prefix
+      
+      # Set appshell client related urls
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p baseUrl -v "$AppshellUserAppUrl"
+      
+      # Set appshell-bff client related urls
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellUserAppUrl"
+      
+      # Set cmd-backend client related urls 
+      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*"
+      
+      # Set cmd-frontend client related urls
+      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "https://maint.$CmdUiRootDomain/oidc/silentchecksso/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p webOrigins -v "https://maint.$CmdUiRootDomain"
+
+      # Set epim-iem client related urls
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p adminUrl -v "https://${EpimIemRootDomain}/"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p redirectUris -v "https://${EpimIemRootDomain}/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p webOrigins -v "https://${EpimIemRootDomain}"
+
+      # Set coi client related urls
+      - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
+      
+      # Set insights client related urls
+      - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p redirectUris -v "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" -v "${DoormanBaseUrl}/*"
+
+      # Set riskrate client related urls
+      - $TransformScript -r "$NavexRealmJson" -i --client-id riskrate -p redirectUris -v "${RiskRateAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
+      # riskrate wants to use the preview KC instance for an additional environment and the easiest way to accomplish this hacky goal is to
+      # add the redirectUri for that env in all environments. Not ideal, but an easy way to make it happen...
+      - $TransformScript -r "$NavexRealmJson" -i --client-id riskrate -p redirectUris -v "https://auth.rr.navexglobalpreview.com/auth/*" --append
+
+      # copy updated realm file to captured artifact dir
+      - cp "$NavexRealmJson" transformed-import/navex-realm.json
+
       - |
         jq --null-input \
           --arg InfrastructureStackName "$InfStackName" \

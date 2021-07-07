@@ -6,8 +6,8 @@ public class InitSessionRequest implements Serializable {
     private String sessionId;
     private String keyCloakSessionId = "";
     private String logoutUrl;
-    private Integer idleTimeout;
-    
+    private String clientKey;
+
     public void setSessionId(String value) {
         this.sessionId = value;
     }
@@ -22,11 +22,11 @@ public class InitSessionRequest implements Serializable {
         return this.logoutUrl;
     }
 
-    public void setIdleTimeout(Integer value) {
-        this.idleTimeout = value;
+    public void setClientKey(String value) {
+        this.clientKey = value;
     }
-    public Integer getIdleTimeout() {
-        return this.idleTimeout;
+    public String getClientKey() {
+        return this.clientKey;
     }
 
     public void setKeyCloakSessionId(String value) {
@@ -47,8 +47,8 @@ public class InitSessionRequest implements Serializable {
         return this;
     }
     /** @return Returns a reference to this object so that method calls can be chained together. */
-    public InitSessionRequest idleTimeout(int newidleTimeout) {
-        setIdleTimeout(newidleTimeout);
+    public InitSessionRequest clientKey(String newValue) {
+        setClientKey(newValue);
         return this;
     }
     public InitSessionRequest keyCloakSessionId(String newValue) {
@@ -72,8 +72,8 @@ public class InitSessionRequest implements Serializable {
             sb.append(getSessionId());
         else
             sb.append("null");
-        sb.append(" IdleTimeout: ")
-          .append(getIdleTimeout())
+        sb.append(" ClientKey: ")
+          .append(getClientKey())
           .append("}");
         return sb.toString();
     }
