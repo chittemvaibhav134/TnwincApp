@@ -65,6 +65,11 @@ Parameters:
     Type: String
     Default: None
     Description: Global Launch Darkly SDK Key
+  InfiniSpanCacheOwners:
+    Type: Number
+    Default: 2
+    MaxValue: 2
+    Description: How many nodes in the Infinispan cluster will replicate a given session
 
 Conditions:
   CreateInstanceCert: !Equals [ !Ref InstanceCertificateArn, "None"]
@@ -552,7 +557,7 @@ Resources:
             - Name: AWS_MW_REGION
               Value: !Ref MoonwatchApiRegion
             - Name: CACHE_OWNERS
-              Value: "2"
+              Value: !Ref InfiniSpanCacheOwners
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
