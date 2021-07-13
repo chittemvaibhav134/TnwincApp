@@ -551,6 +551,8 @@ Resources:
               Value: !Ref MoonwatchApiBaseUrl
             - Name: AWS_MW_REGION
               Value: !Ref MoonwatchApiRegion
+            - Name: CACHE_OWNERS
+              Value: "2"
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
