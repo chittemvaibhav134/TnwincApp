@@ -1340,6 +1340,7 @@ Resources:
                           "DnsHostedZoneId": "Z22ECC3Q0NT9H2",
                           "Stage": "Production",
                           "DesiredTaskCount": "3",
+                          "InfiniSpanCacheOwners": "1",
                           "DbaAccessCidr": "10.162.24.14/31"
                         },
                         "Tags": {
@@ -1619,6 +1620,7 @@ Resources:
                         "DnsHostedZoneId": "Z29CNCMQKCNU6I",
                         "Stage": "Production",
                         "DesiredTaskCount": "4",
+                        "InfiniSpanCacheOwners": "1",
                         "DbaAccessCidr": "10.98.24.14/31"
                       },
                       "Tags": {
