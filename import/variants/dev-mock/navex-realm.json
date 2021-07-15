@@ -879,7 +879,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "96a6c7fb-d59f-437a-8f07-ce45dc440bb5",
-    "defaultRoles" : [ "view-profile", "manage-account" ],
+      "defaultRoles" : [ "manage-account", "view-profile" ],
     "redirectUris" : [ "/realms/navex/account/*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
@@ -1339,7 +1339,6 @@
       "consentRequired" : false,
       "config" : {
         "user.session.note" : "clientId",
-        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "clientId",
@@ -1353,7 +1352,6 @@
       "consentRequired" : false,
       "config" : {
         "user.session.note" : "clientHost",
-        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "clientHost",
@@ -1367,7 +1365,6 @@
       "consentRequired" : false,
       "config" : {
         "user.session.note" : "clientAddress",
-        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "clientAddress",
@@ -1562,7 +1559,6 @@
       "consentRequired" : false,
       "config" : {
         "user.session.note" : "clientAddress",
-        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "clientAddress",
@@ -1590,7 +1586,6 @@
       "consentRequired" : false,
       "config" : {
         "user.session.note" : "clientId",
-        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "clientId",
@@ -1604,7 +1599,6 @@
       "consentRequired" : false,
       "config" : {
         "user.session.note" : "clientHost",
-        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "clientHost",
@@ -2283,17 +2277,6 @@
       "attribute.name" : "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
     }
   }, {
-    "id" : "516ad1c1-0500-477e-8bba-ae165d050cab",
-    "name" : "EmailAddress",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
-    "config" : {
-      "syncMode" : "LEGACY",
-      "user.attribute" : "email",
-      "attributes" : "[]",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/EmailAddress"
-    }
-  }, {
     "id" : "7abf8a82-a75a-4947-a261-faf95603913e",
     "name" : "LastName",
     "identityProviderAlias" : "doorman",
@@ -2303,39 +2286,6 @@
       "user.attribute" : "lastName",
       "attributes" : "[]",
       "attribute.name" : "http://schemas.navexglobal.com/identity/claims/LastName"
-    }
-  }, {
-    "id" : "88b26c5e-1c38-4237-8914-c07493f362f5",
-    "name" : "PreferredLanguageRegion",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
-    "config" : {
-      "syncMode" : "LEGACY",
-      "user.attribute" : "locale",
-      "attributes" : "[]",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/PreferredLanguageRegion"
-    }
-  }, {
-    "id" : "ac650d49-95dd-424a-a438-6170d897e385",
-    "name" : "MoonwatchSessionId",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
-    "config" : {
-      "syncMode" : "LEGACY",
-      "user.attribute" : "moonwatch_session_id",
-      "attributes" : "[]",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/MoonwatchSessionId"
-    }
-  }, {
-    "id" : "2de25c6e-5b7d-4ff7-9c51-41634d4644c4",
-    "name" : "Preferred Username",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
-    "config" : {
-      "syncMode" : "LEGACY",
-      "user.attribute" : "preferred_username",
-      "attributes" : "[]",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/UserName"
     }
   }, {
     "id" : "99d60c39-e1ce-411a-9f57-5882f3b077c3",
@@ -2349,17 +2299,6 @@
       "attribute.name" : "http://schemas.navexglobal.com/identity/claims/MiddleName"
     }
   }, {
-    "id" : "9f0c643b-9916-49aa-adab-e7b1828997b1",
-    "name" : "ClientKey",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
-    "config" : {
-      "syncMode" : "LEGACY",
-      "user.attribute" : "clientkey",
-      "attributes" : "[]",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/DoormanClientKey"
-    }
-  }, {
     "id" : "325b8db9-9369-4611-99ba-ff2d02a2d89f",
     "name" : "UserStoreRole",
     "identityProviderAlias" : "doorman",
@@ -2371,6 +2310,17 @@
       "attribute.name" : "http://schemas.navexglobal.com/identity/claims/UserStoreRole"
     }
   }, {
+    "id" : "ac650d49-95dd-424a-a438-6170d897e385",
+    "name" : "MoonwatchSessionId",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "syncMode" : "LEGACY",
+      "user.attribute" : "moonwatch_session_id",
+      "attributes" : "[]",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/MoonwatchSessionId"
+    }
+  }, {
     "id" : "88bdc99e-dce8-4421-8267-f4c8d786ba66",
     "name" : "FirstName",
     "identityProviderAlias" : "doorman",
@@ -2380,6 +2330,50 @@
       "user.attribute" : "firstName",
       "attributes" : "[]",
       "attribute.name" : "http://schemas.navexglobal.com/identity/claims/FirstName"
+    }
+  }, {
+    "id" : "2de25c6e-5b7d-4ff7-9c51-41634d4644c4",
+    "name" : "Preferred Username",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "syncMode" : "LEGACY",
+      "user.attribute" : "preferred_username",
+      "attributes" : "[]",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/UserName"
+    }
+    }, {
+    "id" : "88b26c5e-1c38-4237-8914-c07493f362f5",
+    "name" : "PreferredLanguageRegion",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "syncMode" : "LEGACY",
+      "user.attribute" : "locale",
+      "attributes" : "[]",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/PreferredLanguageRegion"
+    }
+  }, {
+    "id" : "9f0c643b-9916-49aa-adab-e7b1828997b1",
+    "name" : "ClientKey",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "syncMode" : "LEGACY",
+      "user.attribute" : "clientkey",
+      "attributes" : "[]",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/DoormanClientKey"
+    }
+  }, {
+    "id" : "516ad1c1-0500-477e-8bba-ae165d050cab",
+    "name" : "EmailAddress",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "syncMode" : "LEGACY",
+      "user.attribute" : "email",
+      "attributes" : "[]",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/EmailAddress"
     }
   }, {
     "id" : "1ff9ebb9-5b3c-48dd-9fc2-e767d827160a",
@@ -2410,7 +2404,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "saml-user-property-mapper", "oidc-full-name-mapper", "saml-role-list-mapper", "oidc-usermodel-property-mapper", "oidc-address-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-attribute-mapper", "oidc-usermodel-attribute-mapper" ]
+          "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "oidc-full-name-mapper", "saml-role-list-mapper", "oidc-address-mapper", "oidc-usermodel-property-mapper", "saml-user-attribute-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper" ]
       }
     }, {
       "id" : "c39dec49-fd86-4320-86f5-a86375958bf7",
@@ -2435,7 +2429,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-full-name-mapper", "saml-user-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-property-mapper", "saml-role-list-mapper", "oidc-usermodel-attribute-mapper", "oidc-address-mapper", "saml-user-property-mapper" ]
+          "allowed-protocol-mapper-types" : [ "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "saml-user-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-full-name-mapper", "oidc-usermodel-property-mapper" ]
       }
     }, {
       "id" : "a17b3c9d-44d4-4416-8d16-b66dd9f8ffb0",
@@ -2464,6 +2458,16 @@
       }
     } ],
     "org.keycloak.keys.KeyProvider" : [ {
+      "id" : "d719114b-8436-4ba8-9111-e4e2cf4e9426",
+      "name" : "rsa-generated",
+      "providerId" : "rsa-generated",
+      "subComponents" : { },
+      "config" : {
+        "privateKey" : [ "MIIEpAIBAAKCAQEAgqN7Vl86lYXT+leqK+ldkEMY0xK/OcAiTxEwNgL8XYi0CyR9m/eu4brJukxqAfU7Pv7G0f3Ug2w6rfT6Ib0aRTiITX+qJOdKFECW1UfTucIaAjKJtz7AaQL6yFGkfWdBQgHzHn5hR4bRZkG+PcNh0Sii8jOZu0OWb0DwCHvLY02YAU+wIzSUGkbY66zmzeS3OvcuED9JV9/7h+/F5ybo0tVg4t7plfc0l6kaTXzILlP38phD/y9BAQX3ROKP/Hf6wMLJU9q2wbJNO6wtvUeXib71DfiLJjhTRtNPPoQYdNE3YotaxRnIo6eA4KMh/1S4WKA3UgWuQB52v7Ecpi9AnwIDAQABAoIBAGfwBftMPOIl3ee5w8y4GRbkK2YT7kzWTvW1aTQv3/XTA9wxpjZnM56o7ELq9RSltgOC1VDRsTj27SDmXfRl7fbQ6bEvN4Gw+0FtuhPq18tdYTAKYYOHy7JBCqJCQqr7cfJAdtv2FRPBcez3tZKSVssAl9Q3tcJGHfRaKB+3zrQsLN/Qrpvln63V+KgrspTOAbHzhkA6P/z4hif0/EGegx5gBrQFLPNxCxvOrDqtGwn/LP1o7fgACJhlFSk/jKsmjWMMLP00OwxaLRS0ok9vkIRcPeoDtAsEqKe+A00Ac63+/4VmjJ7N9P33eBCwWMWEQlGKUbFKmPQ9zN8uYLwwAmECgYEAzvJmQSDRPdsWxl0+OOtJDpw/JhzKgjsNWT2Bw3lRQmZnyIhHmkNT3BM4lQHKMpqkfkhuebNJeA1JB4eb/67GHCLuDUOagLg02oJMc0YkSBizHJqA8d5RriD1DZpBTZjYAXXIkocy+rgTSJUwxiKDhFk8i5f5Hq7Fv8KEIVPVbXkCgYEAoZqsNT1Dfq9+R/aLiNqfPYLG4H0AxWNhzeBdjR1K5jIgBF3K8esQTutvh1xnT4UzbDWWpAGdQaO2RXXnupoNxqZEmKr1Vl6KBQmrByTuWFQV1xrC2ph3FtWSebcEXhaXc6Cro037mkzi6XRXnRVSi1TxLlr3i9URG1Fy72Nu0NcCgYEAgeR1uCVQEGImnmVCO9m6plf97v8dQLat/zhy7W2FSocaVyzqvHHL/hN2bViNQEv+OWFfLjYRRDAaiYZdrRNXN6vY/SxUmryEOC6Wq7f35+TQ74AutSGU5RW8mkga+wiXc/so5IfFwMavG9zAm2xoXjbgoMHH1LFgX6dI5d5H1QkCgYAb/gbGUg5W618caABTfEsJBJYeXIi9qDFQ0ARkZSaMKTKSjwyQSv9QLEftUnwysgfuPnoRfpYWwJzZ+0pgcD7iofpP140XoNiXds1BN4xxkF8YG3KVGsPGGMh+fM0s3wzs4m/YobFrUNYdSiHC++aIa/Y66Vbnychkyv71qGuRkQKBgQC77OuA7SJ32MSiNXASB+ob9TUWvje/c1xzS3g/5qRQKxP1x1TmM1OmawYZDhutYd5Jaqg2oWhUK0C8bp/Evg5Cd9yS+I2meylxzkCjx29zkJoOPY57/usOnyDwOb0xg35GQjItM4maqcgAWwcfBNEDP6cAhhn2zbfbnNsj7mNfoA==" ],
+        "certificate" : [ "MIICmTCCAYECBgFuhIHI/DANBgkqhkiG9w0BAQsFADAQMQ4wDAYDVQQDDAVuYXZleDAeFw0xOTExMTkxNjMwMjhaFw0yOTExMTkxNjMyMDhaMBAxDjAMBgNVBAMMBW5hdmV4MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgqN7Vl86lYXT+leqK+ldkEMY0xK/OcAiTxEwNgL8XYi0CyR9m/eu4brJukxqAfU7Pv7G0f3Ug2w6rfT6Ib0aRTiITX+qJOdKFECW1UfTucIaAjKJtz7AaQL6yFGkfWdBQgHzHn5hR4bRZkG+PcNh0Sii8jOZu0OWb0DwCHvLY02YAU+wIzSUGkbY66zmzeS3OvcuED9JV9/7h+/F5ybo0tVg4t7plfc0l6kaTXzILlP38phD/y9BAQX3ROKP/Hf6wMLJU9q2wbJNO6wtvUeXib71DfiLJjhTRtNPPoQYdNE3YotaxRnIo6eA4KMh/1S4WKA3UgWuQB52v7Ecpi9AnwIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBSLq1BJ9NyKNtRVZvbaRrsNNQ7RmrBVAq78GRGEC7H3VYOgQtZP0K0M86SFOR2mUQpUmVAN8BWoXn/xcHg/GLRZNWJgkIOZi2md5O8VUogEAiLsulk+IzCYBG/i3HvjfyPMR9m82vkzTlv777CjH/rbis8YEakp3aqNPij48xB58Y1jdYipOUR4/5mCtSw3Fi/DnrtPjywohKWimR1+e1cxCQuMEuFS9t3nzwr/7S9V43XQFY25a7sY8Y3UcTH2N4wcwPNUaSOh5g9B6L0CzaBrk8+WiEFGZnbDMERMyohb5hpXZ6Ea9LyWoVdc2HIxYWysXUyxR3mjqKK6KZuVhHI" ],
+        "priority" : [ "100" ]
+      }
+    }, {
       "id" : "acc085b8-8957-4958-bc5c-8841477ecc3c",
       "name" : "hmac-generated",
       "providerId" : "hmac-generated",
@@ -2473,16 +2477,6 @@
         "secret" : [ "_QPADVIh-4tvX2u0ir0IWUAiFIjvs4LgGc_XjfGXgiRa1UV3PaaR02Ve8a0-CPpLPoe22yigZL1bfrtzyLHxgg" ],
         "priority" : [ "100" ],
         "algorithm" : [ "HS256" ]
-      }
-    }, {
-      "id" : "d719114b-8436-4ba8-9111-e4e2cf4e9426",
-      "name" : "rsa-generated",
-      "providerId" : "rsa-generated",
-      "subComponents" : { },
-      "config" : {
-        "privateKey" : [ "MIIEpAIBAAKCAQEAgqN7Vl86lYXT+leqK+ldkEMY0xK/OcAiTxEwNgL8XYi0CyR9m/eu4brJukxqAfU7Pv7G0f3Ug2w6rfT6Ib0aRTiITX+qJOdKFECW1UfTucIaAjKJtz7AaQL6yFGkfWdBQgHzHn5hR4bRZkG+PcNh0Sii8jOZu0OWb0DwCHvLY02YAU+wIzSUGkbY66zmzeS3OvcuED9JV9/7h+/F5ybo0tVg4t7plfc0l6kaTXzILlP38phD/y9BAQX3ROKP/Hf6wMLJU9q2wbJNO6wtvUeXib71DfiLJjhTRtNPPoQYdNE3YotaxRnIo6eA4KMh/1S4WKA3UgWuQB52v7Ecpi9AnwIDAQABAoIBAGfwBftMPOIl3ee5w8y4GRbkK2YT7kzWTvW1aTQv3/XTA9wxpjZnM56o7ELq9RSltgOC1VDRsTj27SDmXfRl7fbQ6bEvN4Gw+0FtuhPq18tdYTAKYYOHy7JBCqJCQqr7cfJAdtv2FRPBcez3tZKSVssAl9Q3tcJGHfRaKB+3zrQsLN/Qrpvln63V+KgrspTOAbHzhkA6P/z4hif0/EGegx5gBrQFLPNxCxvOrDqtGwn/LP1o7fgACJhlFSk/jKsmjWMMLP00OwxaLRS0ok9vkIRcPeoDtAsEqKe+A00Ac63+/4VmjJ7N9P33eBCwWMWEQlGKUbFKmPQ9zN8uYLwwAmECgYEAzvJmQSDRPdsWxl0+OOtJDpw/JhzKgjsNWT2Bw3lRQmZnyIhHmkNT3BM4lQHKMpqkfkhuebNJeA1JB4eb/67GHCLuDUOagLg02oJMc0YkSBizHJqA8d5RriD1DZpBTZjYAXXIkocy+rgTSJUwxiKDhFk8i5f5Hq7Fv8KEIVPVbXkCgYEAoZqsNT1Dfq9+R/aLiNqfPYLG4H0AxWNhzeBdjR1K5jIgBF3K8esQTutvh1xnT4UzbDWWpAGdQaO2RXXnupoNxqZEmKr1Vl6KBQmrByTuWFQV1xrC2ph3FtWSebcEXhaXc6Cro037mkzi6XRXnRVSi1TxLlr3i9URG1Fy72Nu0NcCgYEAgeR1uCVQEGImnmVCO9m6plf97v8dQLat/zhy7W2FSocaVyzqvHHL/hN2bViNQEv+OWFfLjYRRDAaiYZdrRNXN6vY/SxUmryEOC6Wq7f35+TQ74AutSGU5RW8mkga+wiXc/so5IfFwMavG9zAm2xoXjbgoMHH1LFgX6dI5d5H1QkCgYAb/gbGUg5W618caABTfEsJBJYeXIi9qDFQ0ARkZSaMKTKSjwyQSv9QLEftUnwysgfuPnoRfpYWwJzZ+0pgcD7iofpP140XoNiXds1BN4xxkF8YG3KVGsPGGMh+fM0s3wzs4m/YobFrUNYdSiHC++aIa/Y66Vbnychkyv71qGuRkQKBgQC77OuA7SJ32MSiNXASB+ob9TUWvje/c1xzS3g/5qRQKxP1x1TmM1OmawYZDhutYd5Jaqg2oWhUK0C8bp/Evg5Cd9yS+I2meylxzkCjx29zkJoOPY57/usOnyDwOb0xg35GQjItM4maqcgAWwcfBNEDP6cAhhn2zbfbnNsj7mNfoA==" ],
-        "certificate" : [ "MIICmTCCAYECBgFuhIHI/DANBgkqhkiG9w0BAQsFADAQMQ4wDAYDVQQDDAVuYXZleDAeFw0xOTExMTkxNjMwMjhaFw0yOTExMTkxNjMyMDhaMBAxDjAMBgNVBAMMBW5hdmV4MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgqN7Vl86lYXT+leqK+ldkEMY0xK/OcAiTxEwNgL8XYi0CyR9m/eu4brJukxqAfU7Pv7G0f3Ug2w6rfT6Ib0aRTiITX+qJOdKFECW1UfTucIaAjKJtz7AaQL6yFGkfWdBQgHzHn5hR4bRZkG+PcNh0Sii8jOZu0OWb0DwCHvLY02YAU+wIzSUGkbY66zmzeS3OvcuED9JV9/7h+/F5ybo0tVg4t7plfc0l6kaTXzILlP38phD/y9BAQX3ROKP/Hf6wMLJU9q2wbJNO6wtvUeXib71DfiLJjhTRtNPPoQYdNE3YotaxRnIo6eA4KMh/1S4WKA3UgWuQB52v7Ecpi9AnwIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBSLq1BJ9NyKNtRVZvbaRrsNNQ7RmrBVAq78GRGEC7H3VYOgQtZP0K0M86SFOR2mUQpUmVAN8BWoXn/xcHg/GLRZNWJgkIOZi2md5O8VUogEAiLsulk+IzCYBG/i3HvjfyPMR9m82vkzTlv777CjH/rbis8YEakp3aqNPij48xB58Y1jdYipOUR4/5mCtSw3Fi/DnrtPjywohKWimR1+e1cxCQuMEuFS9t3nzwr/7S9V43XQFY25a7sY8Y3UcTH2N4wcwPNUaSOh5g9B6L0CzaBrk8+WiEFGZnbDMERMyohb5hpXZ6Ea9LyWoVdc2HIxYWysXUyxR3mjqKK6KZuVhHI" ],
-        "priority" : [ "100" ]
       }
     }, {
       "id" : "27f03eca-449f-4441-bf11-c38c53a52c4c",
