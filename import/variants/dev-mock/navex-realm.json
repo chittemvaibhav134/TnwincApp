@@ -879,7 +879,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "96a6c7fb-d59f-437a-8f07-ce45dc440bb5",
-      "defaultRoles" : [ "manage-account", "view-profile" ],
+    "defaultRoles" : [ "manage-account", "view-profile" ],
     "redirectUris" : [ "/realms/navex/account/*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
@@ -2404,7 +2404,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-          "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "oidc-full-name-mapper", "saml-role-list-mapper", "oidc-address-mapper", "oidc-usermodel-property-mapper", "saml-user-attribute-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "oidc-full-name-mapper", "saml-role-list-mapper", "oidc-address-mapper", "oidc-usermodel-property-mapper", "saml-user-attribute-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper" ]
       }
     }, {
       "id" : "c39dec49-fd86-4320-86f5-a86375958bf7",
@@ -2429,7 +2429,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-          "allowed-protocol-mapper-types" : [ "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "saml-user-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-full-name-mapper", "oidc-usermodel-property-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "saml-user-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-full-name-mapper", "oidc-usermodel-property-mapper" ]
       }
     }, {
       "id" : "a17b3c9d-44d4-4416-8d16-b66dd9f8ffb0",
