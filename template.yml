@@ -91,9 +91,11 @@ Mappings:
     Development:
       TaskMemory: 2048
       TaskCpu: 1024
+      MaxJvmHeap: 1024M
     Production:
       TaskMemory: 4096
       TaskCpu: 2048
+      MaxJvmHeap: 3072M
 
 Resources:
   ECSTaskRole:
@@ -532,6 +534,10 @@ Resources:
               Value: postgres
             - Name: DB_DATABASE
               Value: postgres
+            - Name: JAVA_OPTS
+              Value: !Sub 
+                - '-Xms64m -Xmx${MaxJvmHeap} -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true'
+                - MaxJvmHeap: !FindInMap [StageToContainerResources, !Ref "Stage", MaxJvmHeap]
             - Name: PROXY_ADDRESS_FORWARDING
               Value: "true"
             - Name: JGROUPS_TRANSPORT_STACK
