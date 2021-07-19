@@ -774,7 +774,6 @@ Resources:
                           "DnsHostedZone": "navex-stage.eu",
                           "DnsHostedZoneId": "Z343M2SX2SYHUN",
                           "Stage": "Production",
-                          "InfiniSpanCacheOwners": "1",
                           "DbaAccessCidr": "10.162.24.14/31"
                         },
                         "Tags": {
@@ -1057,7 +1056,6 @@ Resources:
                           "DnsHostedZoneId": "Z1GXJLTUOO7LYC",
                           "Stage": "Production",
                           "DesiredTaskCount": "3",
-                          "InfiniSpanCacheOwners": "1",
                           "DbaAccessCidr": "10.98.24.14/31"
                         },
                         "Tags": {
@@ -1340,7 +1338,6 @@ Resources:
                           "DnsHostedZoneId": "Z22ECC3Q0NT9H2",
                           "Stage": "Production",
                           "DesiredTaskCount": "3",
-                          "InfiniSpanCacheOwners": "1",
                           "DbaAccessCidr": "10.162.24.14/31"
                         },
                         "Tags": {
@@ -1620,7 +1617,6 @@ Resources:
                         "DnsHostedZoneId": "Z29CNCMQKCNU6I",
                         "Stage": "Production",
                         "DesiredTaskCount": "4",
-                        "InfiniSpanCacheOwners": "1",
                         "DbaAccessCidr": "10.98.24.14/31"
                       },
                       "Tags": {
