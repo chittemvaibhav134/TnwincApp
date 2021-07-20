@@ -375,6 +375,7 @@ Resources:
 
       Namespace: !Sub NAVEX/${AWS::StackName}
       DuplicateUserIdAttemptedLoginMetricName: DuplicateUserIdAttemptedLogin
+      InfinispanTimeoutMetricName: InfinispanTimeout
 
   DuplicateUserIdAttemptedLoginMetricFilter:
     Type: AWS::Logs::MetricFilter
@@ -399,6 +400,33 @@ Resources:
       MetricName: !GetAtt CustomMetricConstants.DuplicateUserIdAttemptedLoginMetricName
       Namespace: !GetAtt CustomMetricConstants.Namespace
       Period: 60
+      Statistic: Sum
+      TreatMissingData: notBreaching
+
+  InfinispanTimeoutMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref LogGroup
+      # Example log we are looking for
+      # [0m[31m17:17:54,048 ERROR [org.infinispan.interceptors.impl.InvocationContextInterceptor] (timeout-thread--p24-t1) ISPN000136: Error executing command ReplaceCommand on Cache 'sessions', writing keys [9222c3a4-ca85-4e15-81fa-e0c34c9c1eec]: org.infinispan.util.concurrent.TimeoutException: ISPN000476: Timed out waiting for responses for request 16082638 from ip-10-203-108-90
+      FilterPattern: '"ISPN000476"'
+      MetricTransformations:
+        -
+          MetricValue: '1'
+          MetricNamespace: !GetAtt CustomMetricConstants.Namespace
+          MetricName: !GetAtt CustomMetricConstants.InfinispanTimeoutMetricName
+
+  InfinispanTimeoutAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Alarm on logs that indicate that inifinspan requests are timing out
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 0
+      DatapointsToAlarm: 1
+      EvaluationPeriods: 1
+      MetricName: !GetAtt CustomMetricConstants.InfinispanTimeoutMetricName
+      Namespace: !GetAtt CustomMetricConstants.Namespace
+      Period: 10
       Statistic: Sum
       TreatMissingData: notBreaching
 
