@@ -158,10 +158,20 @@ Resources:
           FromPort: 7600
           ToPort: 7600
           Description: !Sub "KeyCloak AZ1 (${KeycloakSubnet1})"
+        - CidrIp: !GetAtt Cidrs.KCAZ1
+          IpProtocol: "TCP"
+          FromPort: 57600
+          ToPort: 57600
+          Description: !Sub "KeyCloak AZ1 (${KeycloakSubnet1})"
         - CidrIp: !GetAtt Cidrs.KCAZ2
           IpProtocol: "TCP"
           FromPort: 7600
           ToPort: 7600
+          Description: !Sub "KeyCloak AZ2 (${KeycloakSubnet2})"
+        - CidrIp: !GetAtt Cidrs.KCAZ2
+          IpProtocol: "TCP"
+          FromPort: 57600
+          ToPort: 57600
           Description: !Sub "KeyCloak AZ2 (${KeycloakSubnet2})"
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
@@ -494,7 +504,7 @@ Resources:
       TaskDefinition: !Ref TaskDefinition
       LaunchType: FARGATE
       PlatformVersion: 1.4.0
-      HealthCheckGracePeriodSeconds: 200
+      HealthCheckGracePeriodSeconds: 600
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
@@ -545,6 +555,7 @@ Resources:
             - ContainerPort: 8443
             - ContainerPort: 9990
             - ContainerPort: 7600
+            - ContainerPort: 57600
           LogConfiguration:
             LogDriver: awslogs
             Options:
