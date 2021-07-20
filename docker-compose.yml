@@ -25,6 +25,7 @@ services:
       DB_PORT: '5432'
       DB_USER: keycloak
       DB_VENDOR: postgres
+      JGROUPS_DISCOVERY_PROTOCOL: JDBC_PING
     ports:
       - '8443:8443'
       - '9990:9990'
