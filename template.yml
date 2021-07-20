@@ -429,6 +429,8 @@ Resources:
   InfinispanTimeoutAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
+      AlarmActions:
+        - Ref: AlarmSnsTopic
       AlarmDescription: Alarm on logs that indicate that inifinspan requests are timing out
       ComparisonOperator: GreaterThanThreshold
       Threshold: 0
@@ -440,6 +442,8 @@ Resources:
       Statistic: Sum
       TreatMissingData: notBreaching
 
+  AlarmSnsTopic:
+    Type: AWS::SNS::Topic
 
   # Will reintroduce whenever i can get scaling reliably working :/
   # Seemed okay till stage and then caused itself a bit of a broadcast storm
