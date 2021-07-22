@@ -510,8 +510,8 @@ Resources:
       MetricName: MemoryUtilization
       Namespace: AWS/ECS
       Statistic: Average
-      Period: 60
-      EvaluationPeriods: 3
+      Period: 10
+      EvaluationPeriods: 1
       Threshold: 70
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
@@ -527,9 +527,9 @@ Resources:
       - Ref: AlarmSnsTopic
       MetricName: UnHealthyHostCount
       Namespace: AWS/ApplicationELB
-      Statistic: Average
-      Period: 60
-      EvaluationPeriods: 3
+      Statistic: Sum
+      Period: 10
+      EvaluationPeriods: 1
       Threshold: 0
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
