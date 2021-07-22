@@ -501,6 +501,22 @@ Resources:
           MetricValue: '1'
           MetricNamespace: !GetAtt CustomMetricConstants.Namespace
           MetricName: !GetAtt CustomMetricConstants.JVMOutOfMemoryMetricName
+  ECSMemoryAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Alarm when ECS instance alloted memory is greater than 70%.
+      AlarmActions:
+      - Ref: AlarmSnsTopic
+      MetricName: MemoryUtilization
+      Namespace: AWS/ECS
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 3
+      Threshold: 70
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+      - Name: ClusterName
+        Value: !Ref Cluster.Name
   AlarmSnsTopic:
     Type: AWS::SNS::Topic
 
