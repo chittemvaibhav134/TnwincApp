@@ -504,19 +504,39 @@ Resources:
   ECSMemoryAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
-      AlarmDescription: Alarm when ECS instance alloted memory is greater than 70%.
+      AlarmDescription: Alarm when ECS instance allotted memory is greater than 70%.
       AlarmActions:
       - Ref: AlarmSnsTopic
       MetricName: MemoryUtilization
       Namespace: AWS/ECS
       Statistic: Average
-      Period: 60
-      EvaluationPeriods: 3
+      Period: 10
+      EvaluationPeriods: 1
       Threshold: 70
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
       - Name: ClusterName
         Value: !Ref Cluster
+      - Name: ServiceName
+        Value: !GetAtt FargateService.Name
+  UnhealthyHostCountAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Alarm when there is any unhealthy target. 
+      AlarmActions:
+      - Ref: AlarmSnsTopic
+      MetricName: UnHealthyHostCount
+      Namespace: AWS/ApplicationELB
+      Statistic: Sum
+      Period: 10
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+      - Name: TargetGroup
+        Value: !GetAtt TargetGroup.TargetGroupFullName
+      - Name: LoadBalancer
+        Value: !GetAtt LoadBalancer.LoadBalancerFullName
   AlarmSnsTopic:
     Type: AWS::SNS::Topic
 
