@@ -516,7 +516,7 @@ Resources:
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
       - Name: ClusterName
-        Value: !Ref Cluster.Name
+        Value: !Ref Cluster
   AlarmSnsTopic:
     Type: AWS::SNS::Topic
 
