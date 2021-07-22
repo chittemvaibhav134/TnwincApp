@@ -386,6 +386,8 @@ Resources:
       Namespace: !Sub NAVEX/${AWS::StackName}
       DuplicateUserIdAttemptedLoginMetricName: DuplicateUserIdAttemptedLogin
       InfinispanTimeoutMetricName: InfinispanTimeout
+      InfinispanCacheTimeoutMetricName: InfinispanCacheTimeout
+      JVMOutOfMemoryMetricName: JVMOutOfMemory
 
   DuplicateUserIdAttemptedLoginMetricFilter:
     Type: AWS::Logs::MetricFilter
@@ -441,7 +443,80 @@ Resources:
       Period: 10
       Statistic: Sum
       TreatMissingData: notBreaching
+  
+  InfinispanCacheTimeoutAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - Ref: AlarmSnsTopic
+      AlarmDescription: Alarm on logs that indicate that inifinspan cache requests are timing out
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 0
+      DatapointsToAlarm: 1
+      EvaluationPeriods: 1
+      MetricName: !GetAtt CustomMetricConstants.InfinispanCacheTimeoutMetricName
+      Namespace: !GetAtt CustomMetricConstants.Namespace
+      Period: 10
+      Statistic: Sum
+      TreatMissingData: notBreaching
 
+  InfinispanCacheTimeoutMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref LogGroup
+      # Example log we are looking for
+      # ISPN000136: Error executing command PutKeyValueCommand on Cache 'work', writing keys [task::ClearExpiredEvents]: org.infinispan.util.concurrent.TimeoutException: ISPN000476: Timed out waiting for responses for request 17063 from ip-10-202-108-87
+      FilterPattern: '"ISPN000136"'
+      MetricTransformations:
+        -
+          MetricValue: '1'
+          MetricNamespace: !GetAtt CustomMetricConstants.Namespace
+          MetricName: !GetAtt CustomMetricConstants.InfinispanCacheTimeoutMetricName
+  
+  JVMOutOfMemoryAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - Ref: AlarmSnsTopic
+      AlarmDescription: Alarm on logs that indicate that inifinspan requests are timing out
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 0
+      DatapointsToAlarm: 1
+      EvaluationPeriods: 1
+      MetricName: !GetAtt CustomMetricConstants.JVMOutOfMemoryMetricName
+      Namespace: !GetAtt CustomMetricConstants.Namespace
+      Period: 10
+      Statistic: Sum
+      TreatMissingData: notBreaching
+
+  JVMOutOfMemoryMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref LogGroup
+      # Example log we are looking for
+      # ISPN000136: Connection.Receiver [10.202.108.87:7600 - 10.202.108.77:37097]-24,ejb,ip-10-202-108-87" java.lang.OutOfMemoryError: Java heap space
+      FilterPattern: '"OutOfMemoryError: Java heap space"'
+      MetricTransformations:
+        -
+          MetricValue: '1'
+          MetricNamespace: !GetAtt CustomMetricConstants.Namespace
+          MetricName: !GetAtt CustomMetricConstants.JVMOutOfMemoryMetricName
+  ECSMemoryAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Alarm when ECS instance alloted memory is greater than 70%.
+      AlarmActions:
+      - Ref: AlarmSnsTopic
+      MetricName: MemoryUtilization
+      Namespace: AWS/ECS
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 3
+      Threshold: 70
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+      - Name: ClusterName
+        Value: !Ref Cluster
   AlarmSnsTopic:
     Type: AWS::SNS::Topic
 
