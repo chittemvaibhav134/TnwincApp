@@ -469,7 +469,7 @@ Resources:
         Value: !Ref Cluster
   AlarmSnsTopic:
     Type: AWS::SNS::Topic
-      
+
   # Will reintroduce whenever i can get scaling reliably working :/
   # Seemed okay till stage and then caused itself a bit of a broadcast storm
   # between scaling and the jdbc_ping clustering
