@@ -75,7 +75,7 @@ def check_get_users_endpoint(event, context):
     except Exception as e:
         logger.error(f"Failed to retrieve users from keycloak. Check status of keycloak")
         logger.exception(e)
-        pass
+        raise
 
 # This entry point will be called by codepipeline directly to cause
 # client secrets to rotate immediately following a deployment since they 

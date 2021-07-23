@@ -337,7 +337,6 @@ Resources:
       InfinispanTimeoutMetricName: InfinispanTimeout
       InfinispanCacheTimeoutMetricName: InfinispanCacheTimeout
       JVMOutOfMemoryMetricName: JVMOutOfMemory
-      GetUsersAlarmMetricName: GetUsersAlarm
 
   DuplicateUserIdAttemptedLoginMetricFilter:
     Type: AWS::Logs::MetricFilter
@@ -638,6 +637,8 @@ Resources:
                 - !Ref "AWS::NoValue"
             - Name: LAUNCH_DARKLY_KEY
               ValueFrom: !Ref LaunchDarklySdkKeySsmValue
+          EntryPoint:
+            - /opt/jboss/tools/start.sh
 
   ImportConfigTaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -878,7 +879,7 @@ Resources:
           SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
           RotateSecretTopicArn: !Ref RotateSecretTopic
 
-  CweRemoveDuplicateUsersRole:
+  LambdaKCApiProxyRole:
     Type: AWS::IAM::Role
     Properties:
       Path: /
@@ -918,7 +919,7 @@ Resources:
     Properties:
       Code: ./lambdas/kc-api-proxy/
       Runtime: python3.8
-      Role: !GetAtt CweRemoveDuplicateUsersRole.Arn
+      Role: !GetAtt LambdaKCApiProxyRole.Arn
       MemorySize: 256
       Timeout: 60
       Handler: kc_api_proxy.cwe_remove_duplicant_users_alarm_handler
@@ -960,7 +961,7 @@ Resources:
     Properties:
       Code: ./lamdas/kc-api-proxy/
       Runtime: python3.8
-      Role: !GetAtt CweRemoveDuplicateUsersRole.Arn
+      Role: !GetAtt LambdaKCApiProxyRole.Arn
       MemorySize: 256
       Timeout: 60
       Handler: kc_api_proxy.check_get_users_endpoint
@@ -985,23 +986,10 @@ Resources:
   PermissionForEventsToGetUsersAlarmLambda:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !Ref CweAlarmRemoveDuplicateUsersLambda
+      FunctionName: !Ref GetUsersAlarmLambda
       Action: "lambda:InvokeFunction"
       Principal: "events.amazonaws.com"
       SourceArn: !GetAtt GetUsersAlarmEventRule.Arn
-
-  GetUsersAlarmEventMetricFilter:
-    Type: AWS::Logs::MetricFilter
-    Properties:
-      LogGroupName: !Join  ["", ["/aws/lambda/", !Ref GetUsersAlarmLambda]]
-      # Example log we are looking for
-      # ERROR - 2021-07-23 11:07:00,588] Failed to retrieve users from keycloak. Check status of keycloak
-      FilterPattern: '"ERROR"'
-      MetricTransformations:
-        -
-          MetricValue: '1'
-          MetricNamespace: !GetAtt CustomMetricConstants.Namespace
-          MetricName: !GetAtt CustomMetricConstants.GetUsersAlarm
 
   GetUsersErrorAlarm:
     Type: AWS::CloudWatch::Alarm
@@ -1013,8 +1001,11 @@ Resources:
       Threshold: 0
       DatapointsToAlarm: 1
       EvaluationPeriods: 1
-      MetricName: !GetAtt CustomMetricConstants.GetUsersAlarm
-      Namespace: !GetAtt CustomMetricConstants.Namespace
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref GetUsersAlarmLambda
+      MetricName: "Errors"
+      Namespace: AWS/Lambda
       Period: 10
       Statistic: Sum
       TreatMissingData: notBreaching
