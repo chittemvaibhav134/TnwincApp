@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Description: >
-  Pipeline for unstable keycloak deployments
+  Pipeline for keycloak deployments to perflab
 Parameters:
   ProjectName:
     Type: String
@@ -424,7 +424,7 @@ Resources:
                         "KCBaseUrl": "CfnDeploy_PerfLab::stack-outputs.json:Domain"
                       },
                       "Tags": {
-                        "Navex:Technical:DeploymentContext": "PerfLab",
+                        "Navex:Technical:DeploymentContext": "perflab",
                         "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
                       } 
                     },
@@ -514,7 +514,7 @@ Resources:
                   {
                     "ProjectId": "${ProjectName}_navexstage_us-east-1",
                     "BuildInfoFile": "ProjectVersion::build-record.json",
-                    "DeploymentContext": "PerfLab",
+                    "DeploymentContext": "perflab",
                     "JsonArtifactFiles": [
                       "CfnDeploy_PerfLab::stack-outputs.json",
                       "CfnAuthDeploy_PerfLab_UsEast1::stack-outputs.json"
