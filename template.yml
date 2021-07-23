@@ -1006,7 +1006,7 @@ Resources:
           Value: !Ref GetUsersAlarmLambda
       MetricName: "Errors"
       Namespace: AWS/Lambda
-      Period: 10
+      Period: 60
       Statistic: Sum
       TreatMissingData: notBreaching
 
