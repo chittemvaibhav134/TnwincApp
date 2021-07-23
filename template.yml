@@ -995,8 +995,8 @@ Resources:
     Properties:
       LogGroupName: !Join  ["", ["/aws/lambda/", !Ref GetUsersAlarmLambda]]
       # Example log we are looking for
-      # "Failed to retrieve users from keycloak. Check status of keycloak"
-      FilterPattern: '""Failed to retrieve users from keycloak. Check status of keycloak""'
+      # ERROR - 2021-07-23 11:07:00,588] Failed to retrieve users from keycloak. Check status of keycloak
+      FilterPattern: '"ERROR"'
       MetricTransformations:
         -
           MetricValue: '1'
