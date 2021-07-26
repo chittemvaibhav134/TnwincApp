@@ -189,3 +189,9 @@ class KeyCloakApiProxy( ):
             self.remove_user_by_id(realm_name, user[0]['id'])
         else:
             self.logger.info(f"username '{username}' was not found in realm '{realm_name}''")
+
+    def get_users_response(self, realm_name):
+        self.logger.info(f"Getting users from realm '{realm_name}'")
+        endpoint = f"/admin/realms/navex/users"
+        r = self._make_request('GET', endpoint)
+        return r
