@@ -342,7 +342,7 @@ Resources:
                       "Parameters": {
                         "Subdomain": "id3",
                         "DnsHostedZone": "navexoneperformancelab.com",
-                        "DnsHostedZoneId": "Z101785815WDZHUQ49W77",
+                        "DnsHostedZoneId": "Z00692302C175TD6WNELH",
                         "Stage": "Development"
                       },
                       "Tags": {
