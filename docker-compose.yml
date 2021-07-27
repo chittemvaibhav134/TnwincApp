@@ -25,6 +25,7 @@ services:
       DB_PORT: '5432'
       DB_USER: keycloak
       DB_VENDOR: postgres
+      JGROUPS_DISCOVERY_PROTOCOL: JDBC_PING
     ports:
       - '8443:8443'
       - '9990:9990'
@@ -40,7 +41,7 @@ services:
       - ./import/variants/keycloak-app:/import:rw
     entrypoint:
       - /opt/jboss/tools/start.sh
-      - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import -Djboss.bind.address.management=0.0.0.0"
+      - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import"
 
   db:
     container_name: keycloak-app-db

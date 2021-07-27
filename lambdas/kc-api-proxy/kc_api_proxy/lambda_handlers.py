@@ -66,6 +66,17 @@ def cwe_remove_duplicant_users_alarm_handler(event, context):
             logger.exception(e)
             pass
 
+def check_get_users_endpoint(event, context):
+    try:
+        kc = get_keycloak_api_proxy_from_env()
+        response = kc.get_users_response("navex")
+        if(response.status_code != 200):
+            raise
+    except Exception as e:
+        logger.error(f"Failed to retrieve users from keycloak. Check status of keycloak")
+        logger.exception(e)
+        raise
+
 # This entry point will be called by codepipeline directly to cause
 # client secrets to rotate immediately following a deployment since they 
 # will get reset as is

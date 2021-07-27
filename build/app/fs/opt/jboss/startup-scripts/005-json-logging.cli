@@ -1,0 +1,18 @@
+# Set up JSON logging
+
+embed-server --server-config=standalone-ha.xml --std-out=echo
+
+batch
+
+# Create a new log formatter to output json with full stacktrace details
+/subsystem=logging/json-formatter=SUMO_FORMATTER:add(pretty-print=false, exception-output-type=detailed-and-formatted, print-details=false)
+# Disable the original console output that was in plain text format
+/subsystem=logging/console-handler=CONSOLE/:write-attribute(name=enabled,value=false)
+# Create a new console logger that uses the new json formatter
+/subsystem=logging/console-handler=SUMO_CONSOLE:add(enabled=true, named-formatter=SUMO_FORMATTER)
+# Make the root logger use the new console logger
+/subsystem=logging/root-logger=ROOT/:write-attribute(name=handlers,value=["SUMO_CONSOLE"])
+
+run-batch
+
+stop-embedded-server

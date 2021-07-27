@@ -158,10 +158,20 @@ Resources:
           FromPort: 7600
           ToPort: 7600
           Description: !Sub "KeyCloak AZ1 (${KeycloakSubnet1})"
+        - CidrIp: !GetAtt Cidrs.KCAZ1
+          IpProtocol: "TCP"
+          FromPort: 57600
+          ToPort: 57600
+          Description: !Sub "KeyCloak AZ1 (${KeycloakSubnet1})"
         - CidrIp: !GetAtt Cidrs.KCAZ2
           IpProtocol: "TCP"
           FromPort: 7600
           ToPort: 7600
+          Description: !Sub "KeyCloak AZ2 (${KeycloakSubnet2})"
+        - CidrIp: !GetAtt Cidrs.KCAZ2
+          IpProtocol: "TCP"
+          FromPort: 57600
+          ToPort: 57600
           Description: !Sub "KeyCloak AZ2 (${KeycloakSubnet2})"
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
@@ -223,27 +233,6 @@ Resources:
         - Type: forward
           TargetGroupArn: !Ref TargetGroup
 
-  LoadBalancerWildFlyListener:
-    Type: AWS::ElasticLoadBalancingV2::ListenerRule
-    Properties:
-      ListenerArn: !Ref LoadBalancerListenerHttps
-      Priority: 5
-      Conditions:
-        - Field: host-header
-          HostHeaderConfig:
-            Values:
-              - !Sub "${Subdomain}.${DnsHostedZone}"
-        - Field: path-pattern
-          PathPatternConfig:
-            Values:
-              - /health
-      Actions:
-        - Type: forward 
-          ForwardConfig:
-            TargetGroups:
-              - TargetGroupArn: !Ref WildFlyTargetGroup
-
-
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     DependsOn: LoadBalancer
@@ -267,36 +256,6 @@ Resources:
           Value: "true"
         - Key: stickiness.type
           Value: lb_cookie
-
-  WildFlyTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    DependsOn: LoadBalancer
-    Properties:
-      VpcId:
-        Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
-      Port: 9990
-      Protocol: HTTP
-      Matcher:
-        HttpCode: 200-299
-      HealthCheckIntervalSeconds: 60
-      HealthCheckPath: /health
-      HealthCheckProtocol: HTTP
-      HealthCheckTimeoutSeconds: 5
-      HealthyThresholdCount: 2
-      # Bandaid to fix eu deployments. The tasks are pretty consistently starting up
-      # and appear to working from the logs.. but then fail this healthcheck and get 
-      # torn back down. I suspect the Unhealthy threshold (default is 2) timer starts
-      # before the container is fully started and maybe the network overhead pulling from
-      # us-west-2 is causing it to tip over the boundary.
-
-      # Adding the newrelic agent was the straw that broke the camels back for the us deploys
-      # with the agent it takes almost exactly two minutes to stabilize and that is too much.
-      # Sans agent it takes like 10 seconds less
-      UnhealthyThresholdCount: 3
-      TargetType: "ip"
-      TargetGroupAttributes:
-        - Key: deregistration_delay.timeout_seconds
-          Value: "30"
 
   KeycloakCidrs:
     Type: Custom::KeycloakCidrFindr
@@ -375,6 +334,9 @@ Resources:
 
       Namespace: !Sub NAVEX/${AWS::StackName}
       DuplicateUserIdAttemptedLoginMetricName: DuplicateUserIdAttemptedLogin
+      InfinispanTimeoutMetricName: InfinispanTimeout
+      InfinispanCacheTimeoutMetricName: InfinispanCacheTimeout
+      JVMOutOfMemoryMetricName: JVMOutOfMemory
 
   DuplicateUserIdAttemptedLoginMetricFilter:
     Type: AWS::Logs::MetricFilter
@@ -402,6 +364,130 @@ Resources:
       Statistic: Sum
       TreatMissingData: notBreaching
 
+  InfinispanTimeoutMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref LogGroup
+      # Example log we are looking for
+      # [0m[31m17:17:54,048 ERROR [org.infinispan.interceptors.impl.InvocationContextInterceptor] (timeout-thread--p24-t1) ISPN000136: Error executing command ReplaceCommand on Cache 'sessions', writing keys [9222c3a4-ca85-4e15-81fa-e0c34c9c1eec]: org.infinispan.util.concurrent.TimeoutException: ISPN000476: Timed out waiting for responses for request 16082638 from ip-10-203-108-90
+      FilterPattern: '"ISPN000476"'
+      MetricTransformations:
+        -
+          MetricValue: '1'
+          MetricNamespace: !GetAtt CustomMetricConstants.Namespace
+          MetricName: !GetAtt CustomMetricConstants.InfinispanTimeoutMetricName
+
+  InfinispanTimeoutAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - Ref: AlarmSnsTopic
+      AlarmDescription: Alarm on logs that indicate that inifinspan requests are timing out
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 0
+      DatapointsToAlarm: 1
+      EvaluationPeriods: 1
+      MetricName: !GetAtt CustomMetricConstants.InfinispanTimeoutMetricName
+      Namespace: !GetAtt CustomMetricConstants.Namespace
+      Period: 10
+      Statistic: Sum
+      TreatMissingData: notBreaching
+  
+  InfinispanCacheTimeoutAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - Ref: AlarmSnsTopic
+      AlarmDescription: Alarm on logs that indicate that inifinspan cache requests are timing out
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 0
+      DatapointsToAlarm: 1
+      EvaluationPeriods: 1
+      MetricName: !GetAtt CustomMetricConstants.InfinispanCacheTimeoutMetricName
+      Namespace: !GetAtt CustomMetricConstants.Namespace
+      Period: 10
+      Statistic: Sum
+      TreatMissingData: notBreaching
+
+  InfinispanCacheTimeoutMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref LogGroup
+      # Example log we are looking for
+      # ISPN000136: Error executing command PutKeyValueCommand on Cache 'work', writing keys [task::ClearExpiredEvents]: org.infinispan.util.concurrent.TimeoutException: ISPN000476: Timed out waiting for responses for request 17063 from ip-10-202-108-87
+      FilterPattern: '"ISPN000136"'
+      MetricTransformations:
+        -
+          MetricValue: '1'
+          MetricNamespace: !GetAtt CustomMetricConstants.Namespace
+          MetricName: !GetAtt CustomMetricConstants.InfinispanCacheTimeoutMetricName
+  
+  JVMOutOfMemoryAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - Ref: AlarmSnsTopic
+      AlarmDescription: Alarm on logs that indicate that inifinspan requests are timing out
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 0
+      DatapointsToAlarm: 1
+      EvaluationPeriods: 1
+      MetricName: !GetAtt CustomMetricConstants.JVMOutOfMemoryMetricName
+      Namespace: !GetAtt CustomMetricConstants.Namespace
+      Period: 10
+      Statistic: Sum
+      TreatMissingData: notBreaching
+
+  JVMOutOfMemoryMetricFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref LogGroup
+      # Example log we are looking for
+      # ISPN000136: Connection.Receiver [10.202.108.87:7600 - 10.202.108.77:37097]-24,ejb,ip-10-202-108-87" java.lang.OutOfMemoryError: Java heap space
+      FilterPattern: '"OutOfMemoryError: Java heap space"'
+      MetricTransformations:
+        -
+          MetricValue: '1'
+          MetricNamespace: !GetAtt CustomMetricConstants.Namespace
+          MetricName: !GetAtt CustomMetricConstants.JVMOutOfMemoryMetricName
+  ECSMemoryAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Alarm when ECS instance allotted memory is greater than 70%.
+      AlarmActions:
+      - Ref: AlarmSnsTopic
+      MetricName: MemoryUtilization
+      Namespace: AWS/ECS
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 70
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+      - Name: ClusterName
+        Value: !Ref Cluster
+      - Name: ServiceName
+        Value: !GetAtt FargateService.Name
+  UnhealthyHostCountAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Alarm when there is any unhealthy target. 
+      AlarmActions:
+      - Ref: AlarmSnsTopic
+      MetricName: UnHealthyHostCount
+      Namespace: AWS/ApplicationELB
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+      - Name: TargetGroup
+        Value: !GetAtt TargetGroup.TargetGroupFullName
+      - Name: LoadBalancer
+        Value: !GetAtt LoadBalancer.LoadBalancerFullName
+  AlarmSnsTopic:
+    Type: AWS::SNS::Topic
 
   # Will reintroduce whenever i can get scaling reliably working :/
   # Seemed okay till stage and then caused itself a bit of a broadcast storm
@@ -459,14 +545,13 @@ Resources:
     Type: AWS::ECS::Service
     DependsOn:
       - LoadBalancerListenerHttps
-      - LoadBalancerWildFlyListener
     Properties:
       Cluster: !GetAtt Cluster.Arn
       DesiredCount: !Ref DesiredTaskCount
       TaskDefinition: !Ref TaskDefinition
       LaunchType: FARGATE
       PlatformVersion: 1.4.0
-      HealthCheckGracePeriodSeconds: 200
+      HealthCheckGracePeriodSeconds: 600
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
@@ -479,9 +564,6 @@ Resources:
         - ContainerName: Navex-Keycloak
           ContainerPort: 8443
           TargetGroupArn: !Ref TargetGroup
-        - ContainerName: Navex-Keycloak
-          ContainerPort: 9990
-          TargetGroupArn: !Ref WildFlyTargetGroup
 
   TaskExecutionRole:
     Type: AWS::IAM::Role
@@ -515,8 +597,8 @@ Resources:
           Essential: true
           PortMappings:
             - ContainerPort: 8443
-            - ContainerPort: 9990
             - ContainerPort: 7600
+            - ContainerPort: 57600
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -577,7 +659,6 @@ Resources:
               ValueFrom: !Ref LaunchDarklySdkKeySsmValue
           EntryPoint:
             - /opt/jboss/tools/start.sh
-            - "-Djboss.bind.address.management=0.0.0.0"
 
   ImportConfigTaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -818,7 +899,7 @@ Resources:
           SsmPrefix: !GetAtt ClientSecretRotationConstants.SsmPrefix
           RotateSecretTopicArn: !Ref RotateSecretTopic
 
-  CweRemoveDuplicateUsersRole:
+  LambdaKCApiProxyRole:
     Type: AWS::IAM::Role
     Properties:
       Path: /
@@ -858,7 +939,7 @@ Resources:
     Properties:
       Code: ./lambdas/kc-api-proxy/
       Runtime: python3.8
-      Role: !GetAtt CweRemoveDuplicateUsersRole.Arn
+      Role: !GetAtt LambdaKCApiProxyRole.Arn
       MemorySize: 256
       Timeout: 60
       Handler: kc_api_proxy.cwe_remove_duplicant_users_alarm_handler
@@ -894,6 +975,60 @@ Resources:
       Action: "lambda:InvokeFunction"
       Principal: "events.amazonaws.com"
       SourceArn: !GetAtt RemoveDuplicateUsersCloudwatchAlarmEvent.Arn
+
+  GetUsersAlarmLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: ./lambdas/kc-api-proxy/
+      Runtime: python3.8
+      Role: !GetAtt LambdaKCApiProxyRole.Arn
+      MemorySize: 256
+      Timeout: 60
+      Handler: kc_api_proxy.check_get_users_endpoint
+      Environment:
+        Variables:
+          KeyCloakBaseUrl: !Sub "https://navex.${Subdomain}.${DnsHostedZone}"
+          AdminClientId: !GetAtt ClientSecretRotationConstants.AdminClientId
+          AdminDefaultSecret: !Ref KeyCloakAdminApiDefaultSecret
+          AdminSecretSsmPath: !GetAtt ClientSecretRotationConstants.AdminSecretSsmPath
+          TaskDefinitionArn: !Ref TaskDefinition
+
+  GetUsersAlarmEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Schedule get users to monitor keycloak health"
+      ScheduleExpression: "rate(1 minute)"
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt GetUsersAlarmLambda.Arn
+          Id: "GetUsersAlarmLambda"
+
+  PermissionForEventsToGetUsersAlarmLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref GetUsersAlarmLambda
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt GetUsersAlarmEventRule.Arn
+
+  GetUsersErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmActions:
+        - Ref: AlarmSnsTopic
+      AlarmDescription: Alarm on logs that indicate that the get users api is failing and keycloak is possibly falling over
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: 0
+      DatapointsToAlarm: 1
+      EvaluationPeriods: 1
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref GetUsersAlarmLambda
+      MetricName: "Errors"
+      Namespace: AWS/Lambda
+      Period: 60
+      Statistic: Sum
+      TreatMissingData: notBreaching
 
   CpPostDeployLambda:
     Type: AWS::Lambda::Function
