@@ -32,19 +32,19 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-core</artifactId>
-            <version>11.0.3</version>
+            <version>14.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-common</artifactId>
-            <version>11.0.3</version>
+            <version>14.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-server-spi</artifactId>
-            <version>11.0.3</version>
+            <version>14.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
