@@ -1344,6 +1344,7 @@
     {
       "alwaysDisplayInConsole": false,
       "attributes": {
+        "client_credentials.use_refresh_token": "true",
         "display.on.consent.screen": "false",
         "exclude.session.state.from.auth.response": "false",
         "saml.assertion.signature": "false",
@@ -1356,7 +1357,8 @@
         "saml.server.signature": "false",
         "saml.server.signature.keyinfo.ext": "false",
         "saml_force_name_id_format": "false",
-        "tls.client.certificate.bound.access.tokens": "false"
+        "tls.client.certificate.bound.access.tokens": "false",
+        "use.refresh.tokens": "true"
       },
       "authenticationFlowBindingOverrides": {},
       "bearerOnly": false,
