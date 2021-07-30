@@ -233,6 +233,27 @@ Resources:
         - Type: forward
           TargetGroupArn: !Ref TargetGroup
 
+  ListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Condition: NotDevelopment
+    Properties:
+      ListenerArn: !Ref LoadBalancerListenerHttps
+      Priority: 1
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /auth/admin/navex/console*
+            - /auth/admin/master/console*
+            - /auth/admin
+            - /auth/admin/
+            - /auth
+            - /auth/
+      Actions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: fixed-response
+          FixedResponseConfig:
+            StatusCode: "404"
+
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     DependsOn: LoadBalancer
@@ -634,12 +655,6 @@ Resources:
               Value: !Sub ${AWS::StackName} (${AWS::Region}) - ${AWS::AccountId} 
             - Name: NEW_RELIC_AGENT_ENABLED
               Value: !If [ EnableNewRelicAgent, 'true', 'false' ] 
-            - !If
-              - NotDevelopment
-              -
-                Name: HIDE_CONSOLE
-                Value: yes-please
-              - !Ref AWS::NoValue
             - Name: MOONWATCH_API_BASE_URL
               Value: !Ref MoonwatchApiBaseUrl
             - Name: AWS_MW_REGION
