@@ -19,17 +19,20 @@ class KeyCloakApiProxy( ):
     def _get_credentials(self) -> tuple:
         return (self.client_id, self.secret)
 
-    def _set_token_info(self, token: dict, from_time: datetime.datetime = datetime.datetime.utcnow() ):
+    def _set_token_info(self, token: dict, from_time: datetime.datetime = None ):
+        from_time = from_time or datetime.datetime.utcnow()
         self.access_token = token['access_token']
         self.token_expiration = from_time + datetime.timedelta(seconds=token['expires_in'])
 
     def _get_access_token(self) -> str:
         return self.access_token
 
-    def _access_token_invalid(self, from_time: datetime.datetime = datetime.datetime.utcnow()) -> bool:
+    def _access_token_invalid(self, from_time: datetime.datetime = None) -> bool:
+        from_time = from_time or datetime.datetime.utcnow()
         return not self.access_token or self._token_expired(from_time)
 
-    def _token_expired(self, from_time: datetime.datetime = datetime.datetime.utcnow()) -> bool:
+    def _token_expired(self, from_time: datetime.datetime = None) -> bool:
+        from_time = from_time or datetime.datetime.utcnow()
         return self.token_expiration < from_time
 
     def _invalid_client_secret_response(self, response) -> bool:
