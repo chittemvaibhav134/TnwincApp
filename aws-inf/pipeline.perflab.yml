@@ -342,8 +342,8 @@ Resources:
                       "Parameters": {
                         "Subdomain": "id3",
                         "DnsHostedZone": "navexoneperformancelab.com",
-                        "DnsHostedZoneId": "Z101785815WDZHUQ49W77",
-                        "Stage": "Development"
+                        "DnsHostedZoneId": "Z00692302C175TD6WNELH",
+                        "Stage": "Production"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "perflab",

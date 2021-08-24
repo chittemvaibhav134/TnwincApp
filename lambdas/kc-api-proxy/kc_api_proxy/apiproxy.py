@@ -19,25 +19,20 @@ class KeyCloakApiProxy( ):
     def _get_credentials(self) -> tuple:
         return (self.client_id, self.secret)
 
-    def _set_token_info(self, token: dict, from_time: datetime.datetime = datetime.datetime.utcnow() ):
+    def _set_token_info(self, token: dict, from_time: datetime.datetime = None ):
+        from_time = from_time or datetime.datetime.utcnow()
         self.access_token = token['access_token']
-        self.refresh_token = token['refresh_token']
-        self.token_refresh_expiration = from_time + datetime.timedelta(seconds=token['refresh_expires_in'])
         self.token_expiration = from_time + datetime.timedelta(seconds=token['expires_in'])
 
     def _get_access_token(self) -> str:
         return self.access_token
 
-    def _get_refresh_token(self) -> str:
-        return self.refresh_token
+    def _access_token_invalid(self, from_time: datetime.datetime = None) -> bool:
+        from_time = from_time or datetime.datetime.utcnow()
+        return not self.access_token or self._token_expired(from_time)
 
-    def _access_token_invalid(self, from_time: datetime.datetime = datetime.datetime.utcnow()) -> bool:
-        return not self.access_token or (self.token_refresh_expiration and self.token_refresh_expiration < from_time)
-
-    def _token_refresh_expired(self, from_time: datetime.datetime = datetime.datetime.utcnow()) -> bool:
-        return self.token_refresh_expiration and self.token_refresh_expiration < from_time
-
-    def _token_expired(self, from_time: datetime.datetime = datetime.datetime.utcnow()) -> bool:
+    def _token_expired(self, from_time: datetime.datetime = None) -> bool:
+        from_time = from_time or datetime.datetime.utcnow()
         return self.token_expiration < from_time
 
     def _invalid_client_secret_response(self, response) -> bool:
@@ -58,13 +53,6 @@ class KeyCloakApiProxy( ):
             self.logger.info(f"Creating new access token with user {client_id}")
             payload = "grant_type=client_credentials"
             r = requests.post( auth=(client_id, secret), data=bytes(payload.encode('utf-8')), **request_args )
-            r.raise_for_status()
-            self._set_token_info(r.json(), now)
-        if self._token_expired(now):
-            client_id, _ = self._get_credentials()
-            self.logger.info(f"Cached access token has expired for {client_id}; refreshing it")
-            payload = f"refresh_token={self._get_refresh_token()}&client_id={client_id}&grant_type=refresh_token"
-            r = requests.post( data=bytes(payload.encode('utf-8')), **request_args )
             r.raise_for_status()
             self._set_token_info(r.json(), now)
         return {"Authorization": f"Bearer {self._get_access_token()}"}

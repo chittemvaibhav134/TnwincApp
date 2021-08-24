@@ -1,4 +1,4 @@
-FROM jboss/keycloak:11.0.3 AS base
+FROM jboss/keycloak:14.0.0 AS base
 
 FROM base as newrelic
 WORKDIR /nr
