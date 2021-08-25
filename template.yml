@@ -241,13 +241,14 @@ Resources:
       Priority: 1
       Conditions:
         - Field: path-pattern
-          Values:
-            - /auth/admin/navex/console*
-            - /auth/admin/master/console*
-            - /auth/admin
-            - /auth/admin/
-            - /auth
-            - /auth/
+          PathPatternConfig:
+            Values:
+              - /auth/admin/navex/console*
+              - /auth/admin/master/console*
+              - /auth/admin
+              - /auth/admin/
+              - /auth
+              - /auth/
       Actions:
         - Type: fixed-response
           FixedResponseConfig:
