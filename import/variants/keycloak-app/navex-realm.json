@@ -2273,6 +2273,106 @@
       "standardFlowEnabled": false,
       "surrogateAuthRequired": false,
       "webOrigins": []
+    },
+    {
+      "alwaysDisplayInConsole": false,
+      "attributes": {
+        "display.on.consent.screen": "false",
+        "exclude.session.state.from.auth.response": "false",
+        "saml.assertion.signature": "false",
+        "saml.authnstatement": "false",
+        "saml.client.signature": "false",
+        "saml.encrypt": "false",
+        "saml.force.post.binding": "false",
+        "saml.multivalued.roles": "false",
+        "saml.onetimeuse.condition": "false",
+        "saml.server.signature": "false",
+        "saml.server.signature.keyinfo.ext": "false",
+        "saml_force_name_id_format": "false",
+        "tls.client.certificate.bound.access.tokens": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "bearerOnly": false,
+      "clientAuthenticatorType": "client-secret",
+      "clientId": "moonwatch-api-proxy",
+      "consentRequired": false,
+      "defaultClientScopes": [
+        "email",
+        "profile",
+        "roles",
+        "web-origins"
+      ],
+      "directAccessGrantsEnabled": false,
+      "enabled": true,
+      "frontchannelLogout": false,
+      "fullScopeAllowed": true,
+      "id": "8f85ca79-c607-4df0-8ef8-d62607057212",
+      "implicitFlowEnabled": false,
+      "nodeReRegistrationTimeout": -1,
+      "notBefore": 0,
+      "optionalClientScopes": [
+        "address",
+        "microprofile-jwt",
+        "offline_access",
+        "phone"
+      ],
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "clientAddress",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.session.note": "clientAddress",
+            "userinfo.token.claim": "true"
+          },
+          "consentRequired": false,
+          "id": "0c9d8448-7d7f-4e73-b9f2-cc0e021ce501",
+          "name": "Client IP Address",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "clientHost",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.session.note": "clientHost",
+            "userinfo.token.claim": "true"
+          },
+          "consentRequired": false,
+          "id": "5b8af2e0-398e-4432-995e-409db51f6f21",
+          "name": "Client Host",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "clientId",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.session.note": "clientId",
+            "userinfo.token.claim": "true"
+          },
+          "consentRequired": false,
+          "id": "e70259cd-c7d4-4806-9e16-b14a3aa89081",
+          "name": "Client ID",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper"
+        }
+      ],
+      "publicClient": false,
+      "redirectUris": [
+        "*"
+      ],
+      "secret": "4d1e3de1-6f61-46b1-92a8-e1eccce61559",
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "surrogateAuthRequired": false,
+      "webOrigins": []
     }
   ],
   "components": {
@@ -3152,6 +3252,34 @@
       "serviceAccountClientId": "ncis-api",
       "totp": false,
       "username": "service-account-ncis-api"
+    },
+    {
+      "clientRoles": {
+        "account": [
+          "manage-account",
+          "view-profile"
+        ],
+        "realm-management": [
+          "view-users",
+          "manage-users"
+        ]
+      },
+      "createdTimestamp": 1584483310914,
+      "credentials": [],
+      "disableableCredentialTypes": [],
+      "emailVerified": false,
+      "enabled": true,
+      "groups": [],
+      "id": "82e5b539-1bfc-424f-8c1e-b34251934d81",
+      "notBefore": 0,
+      "realmRoles": [
+        "offline_access",
+        "uma_authorization"
+      ],
+      "requiredActions": [],
+      "serviceAccountClientId": "moonwatch-api-proxy",
+      "totp": false,
+      "username": "service-account-moonwatch-api-proxy"
     }
   ],
   "verifyEmail": false,
