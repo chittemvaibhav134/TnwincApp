@@ -249,8 +249,7 @@ Resources:
             - /auth
             - /auth/
       Actions:
-        - TargetGroupArn: !Ref TargetGroup
-          Type: fixed-response
+        - Type: fixed-response
           FixedResponseConfig:
             StatusCode: "404"
 
