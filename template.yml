@@ -245,6 +245,20 @@ Resources:
             Values:
               - /auth/admin/navex/console*
               - /auth/admin/master/console*
+      Actions:
+        - Type: fixed-response
+          FixedResponseConfig:
+            StatusCode: "404"
+  ListenerRule2:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Condition: NotDevelopment
+    Properties:
+      ListenerArn: !Ref LoadBalancerListenerHttps
+      Priority: 2
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
               - /auth/admin
               - /auth/admin/
               - /auth
