@@ -241,16 +241,30 @@ Resources:
       Priority: 1
       Conditions:
         - Field: path-pattern
-          Values:
-            - /auth/admin/navex/console*
-            - /auth/admin/master/console*
-            - /auth/admin
-            - /auth/admin/
-            - /auth
-            - /auth/
+          PathPatternConfig:
+            Values:
+              - /auth/admin/navex/console*
+              - /auth/admin/master/console*
       Actions:
-        - TargetGroupArn: !Ref TargetGroup
-          Type: fixed-response
+        - Type: fixed-response
+          FixedResponseConfig:
+            StatusCode: "404"
+  ListenerRule2:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Condition: NotDevelopment
+    Properties:
+      ListenerArn: !Ref LoadBalancerListenerHttps
+      Priority: 2
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - /auth/admin
+              - /auth/admin/
+              - /auth
+              - /auth/
+      Actions:
+        - Type: fixed-response
           FixedResponseConfig:
             StatusCode: "404"
 
