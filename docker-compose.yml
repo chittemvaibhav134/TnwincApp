@@ -31,7 +31,7 @@ services:
       - '9990:9990'
     build:
       context: ./build/app
-    image: navex/keycloak:14.0.0
+    image: navex/keycloak:15.0.2
     links:
       - db
     networks:

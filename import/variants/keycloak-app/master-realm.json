@@ -1591,7 +1591,7 @@
   "identityProviderMappers": [],
   "identityProviders": [],
   "internationalizationEnabled": false,
-  "keycloakVersion": "14.0.0",
+  "keycloakVersion": "15.0.2",
   "loginWithEmailAllowed": true,
   "maxDeltaTimeSeconds": 43200,
   "maxFailureWaitSeconds": 900,
