@@ -703,7 +703,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "46a63bf4-99e1-40c5-a448-2d22b026efdd",
-    "redirectUris" : [ "https://maint.pt.dev.local/oidc/coderedirector/*" ],
+    "redirectUris" : [ "https://maint.pt.dev.local/oidc/coderedirector/*", "https://doorman.dev.gw.local/*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
     "bearerOnly" : false,
