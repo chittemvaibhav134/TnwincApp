@@ -1,0 +1,399 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: >
+  Pipeline for unstable keycloak deployments
+Parameters:
+  ProjectName:
+    Type: String
+    Default: keycloak
+  GitHubOwner:
+    Type: String
+    Default: tnwinc
+  GitHubRepo:
+    Type: String
+    Default: platform-auth-keycloak
+  GitHubBranch:
+    Type: String
+    Default: develop
+  SubDomain:
+    Type: String
+  DnsHostedZone:
+    Type: String
+  DnsHostedZoneID:
+    Type: String
+  InfrastructureStackName:
+    Type: String
+  LaunchDarklySdkKeySsmValue:
+    Type: String
+  MoonwatchApiAccessPolicyArn:
+    Type: String
+  MoonwatchApiBaseUrl:
+    Type: String
+  MoonwatchApiRegion:
+    Type: String
+  
+  LambdaUpdateTrigger:
+    Type: "AWS::SSM::Parameter::Value<String>"
+    Default: "/mobile/ssm-update-trigger"
+    Description: Unique value to force lambda execution
+Resources:
+
+  GitHubTokenSsm:
+    Type: Custom::SsmGetParameter
+    Properties:
+      Name: /mobile/github-access-token
+      UpdateTrigger: !Ref LambdaUpdateTrigger
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cloudformation-get-ssm-param
+
+  NavexKcContainerRepository:
+    Type: AWS::ECR::Repository
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+
+  KCCodeBuild:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: !Ref CodePipelineServiceRole
+      Description: Builds the keycloak project
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: aws-inf/buildspec.yml
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:4.0
+        Type: LINUX_CONTAINER
+        PrivilegedMode: True
+        EnvironmentVariables:
+          - Name: ECR_REGION
+            Value: !Ref AWS::Region
+          - Name: REPOSITORY_URI
+            Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${NavexKcContainerRepository}
+
+  TransformCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: !Ref CodePipelineServiceRole
+      Description: Transforms / merges dc artifacts into template-configuration.json
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: app/aws-inf/buildspec.devtransform.yml
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:5.0
+        Type: LINUX_CONTAINER
+
+  PackageCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: !Ref CodePipelineServiceRole
+      Description: Packages various cfn customresource
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: aws-inf/buildspec.package.yml
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:4.0
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: S3_BUCKET
+            Value: keycloak-dev-artifacts
+          - Name: S3_PREFIX
+            Value: !Ref AWS::StackName
+          - Name: S3_Region
+            Value: !Ref AWS::Region
+
+  AuthPackageCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: !Ref CodePipelineServiceRole
+      Description: Packages keycloak lambdas
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: aws-inf/buildspec.auth.package.yml    
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:5.0
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: S3_BUCKET
+            Value: keycloak-dev-artifacts
+          - Name: S3_PREFIX
+            Value: !Ref AWS::StackName
+          - Name: S3_Region
+            Value: !Ref AWS::Region
+
+  PipelineWebhook:
+    Type: AWS::CodePipeline::Webhook
+    Properties:
+      Authentication: GITHUB_HMAC
+      AuthenticationConfiguration:
+        SecretToken: !GetAtt GitHubTokenSsm.Parameter.Value
+      Filters:
+        - 
+          JsonPath: "$.ref"
+          MatchEquals: !Sub "refs/heads/${GitHubBranch}"
+      TargetPipeline: !Ref Pipeline
+      TargetAction: App
+      Name: !Ref AWS::StackName
+      TargetPipelineVersion: !GetAtt Pipeline.Version
+      RegisterWithThirdParty: true
+
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Ref AWS::StackName
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: keycloak-dev-artifacts
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: App
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Version: "1"
+                Provider: GitHub
+              Configuration:
+                Owner: !Ref GitHubOwner
+                Repo: !Ref GitHubRepo
+                Branch: !Ref GitHubBranch
+                OAuthToken: !GetAtt GitHubTokenSsm.Parameter.Value
+                PollForSourceChanges: false
+              OutputArtifacts:
+                - Name: App
+              RunOrder: 1
+        - Name: Build
+          Actions:
+            - 
+              Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref KCCodeBuild
+              InputArtifacts:
+                - Name: App
+              OutputArtifacts:
+                - Name: BuildOutput
+              RunOrder: 1
+            - 
+              Name: Package
+              Region: !Ref AWS::Region
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref PackageCodeBuildProject
+              InputArtifacts:
+                - Name: App
+              OutputArtifacts:
+                - Name: Package
+              RunOrder: 2
+            - 
+              Name: AuthPackage
+              Region: !Ref AWS::Region
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref AuthPackageCodeBuildProject
+              InputArtifacts:
+                - Name: App
+              OutputArtifacts:
+                - Name: AuthPackage
+              RunOrder: 3
+        - 
+          Name: Dev
+          Actions:
+            - 
+              Name: Transform_Dev
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref TransformCodeBuildProject
+              InputArtifacts:
+                - Name: App
+              OutputArtifacts:
+                - Name: Transform_Dev
+              RunOrder: 1
+            - 
+              Name: CfnDeploy_Dev
+              Region: !Ref AWS::Region
+              RoleArn: !GetAtt CodePipelineServiceRole.Arn
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !GetAtt CodePipelineServiceRole.Arn
+                StackName: !Sub ${ProjectName}-${AWS::StackName}-dev
+                TemplatePath: "Package::app.packaged.yml"
+                ParameterOverrides: !Sub | 
+                  {
+                    "SubDomain": "${SubDomain}",
+                    "DnsHostedZone": "${DnsHostedZone}"
+                    "DnsHostedZoneID": "${DnsHostedZoneID}",
+                    "InfrastructureStackName": "${InfrastructureStackName}",
+                    "LaunchDarklySdkKeySsmValue": "${LaunchDarklySdkKeySsmValue}",
+                    "MoonwatchApiAccessPolicyArn": "${MoonwatchApiAccessPolicyArn}",
+                    "MoonwatchApiBaseUrl": "${MoonwatchApiBaseUrl}",
+                    "MoonwatchApiRegion": "${MoonwatchApiRegion}",
+                    "Stage" : "Development"
+                  }
+                OutputFileName: stack-outputs.json
+              InputArtifacts:
+                - Name: Package
+              OutputArtifacts:
+                - Name: CfnDeploy_Dev
+              RunOrder: 2
+            -
+              Name: ConfigUpload_Dev         
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              InputArtifacts:
+                - Name: CfnDeploy_Dev
+                - Name: Transform_Dev
+              Configuration:
+                FunctionName: CPS3Deploy
+                UserParameters: !Sub |
+                  {
+                    "S3BucketName": "CfnDeploy_Dev::stack-outputs.json:ConfigBucket",
+                    "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
+                    "ExcludeArtifactsFromUpload": ["CfnDeploy_Dev"],
+                    "Region": "${AWS::Region}"
+                  }
+              RunOrder: 3
+            - 
+              Name: FinalizedCfnAuthConfig_Dev
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json"
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "KCBaseUrl": "CfnDeploy_Dev::stack-outputs.json:Domain"
+                      }
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: CfnDeploy_Dev
+              OutputArtifacts:
+                - Name: FinalizedCfnAuthConfig_Dev
+              RunOrder: 4
+            - 
+              Name: CfnAuthDeploy_Dev
+              Region: !Ref AWS::Region
+              RoleArn: !GetAtt CodePipelineServiceRole.Arn
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !GetAtt CodePipelineServiceRole.Arn
+                StackName: !Sub ${ProjectName}-${AWS::StackName}-auth-dev
+                TemplatePath: "AuthPackage::auth.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnAuthConfig_Dev::template-configuration.json"
+                OutputFileName: stack-outputs.json
+              InputArtifacts:
+                - Name: AuthPackage
+                - Name: FinalizedCfnAuthConfig_Dev
+              OutputArtifacts:
+                - Name: CfnAuthDeploy_Dev
+              RunOrder: 5
+            -
+              Name: ImportConfig_Dev
+              RunOrder: 6
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_Dev::stack-outputs.json:CpConfigImportLambdaArn",
+                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "AccountId": "${AWS::AccountId}",
+                    "Region": "${AWS::Region}",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_Dev
+            -
+              Name: PostDeployApiActions_Dev
+              RunOrder: 7
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_AutoValid::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
+                    "AccountId": "${AWS::AccountId}",
+                    "Region": "${AWS::Region},
+                    "InvocationType": "RequestResponse",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_Dev
+
+
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+  
