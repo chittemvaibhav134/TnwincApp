@@ -250,9 +250,10 @@ Resources:
                 RoleArn: !GetAtt CodePipelineServiceRole.Arn
                 StackName: !Sub ${ProjectName}-${AWS::StackName}-dev
                 TemplatePath: "Package::app.packaged.yml"
+                TemplateConfiguration: "BuildOutput::template-configuration.json"
                 ParameterOverrides: !Sub | 
                   {
-                    "SubDomain": "${SubDomain}",
+                    "Subdomain": "${SubDomain}",
                     "DnsHostedZone": "${DnsHostedZone}"
                     "DnsHostedZoneId": "${DnsHostedZoneID}",
                     "InfrastructureStackName": "${InfrastructureStackName}",
