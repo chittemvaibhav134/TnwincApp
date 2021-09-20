@@ -266,6 +266,7 @@ Resources:
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: Package
+                - Name: BuildOutput
               OutputArtifacts:
                 - Name: CfnDeploy_Dev
               RunOrder: 2
