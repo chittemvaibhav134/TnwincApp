@@ -254,7 +254,7 @@ Resources:
                   {
                     "SubDomain": "${SubDomain}",
                     "DnsHostedZone": "${DnsHostedZone}"
-                    "DnsHostedZoneID": "${DnsHostedZoneID}",
+                    "DnsHostedZoneId": "${DnsHostedZoneID}",
                     "InfrastructureStackName": "${InfrastructureStackName}",
                     "LaunchDarklySdkKeySsmValue": "${LaunchDarklySdkKeySsmValue}",
                     "MoonwatchApiAccessPolicyArn": "${MoonwatchApiAccessPolicyArn}",
