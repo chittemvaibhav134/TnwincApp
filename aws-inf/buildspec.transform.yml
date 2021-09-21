@@ -63,7 +63,7 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellUserAppUrl"
       
       # Set cmd-backend client related urls 
-      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "${DoormanBaseUrl}/*"
       
       # Set cmd-frontend client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "https://maint.$CmdUiRootDomain/oidc/silentchecksso/*" -v "${DoormanBaseUrl}/*"

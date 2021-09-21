@@ -278,10 +278,10 @@ Resources:
       Protocol: HTTPS
       Matcher:
         HttpCode: 200-299
-      HealthCheckIntervalSeconds: 300
+      HealthCheckIntervalSeconds: 60
       HealthCheckPath: /auth/
       HealthCheckProtocol: HTTPS
-      HealthCheckTimeoutSeconds: 5
+      HealthCheckTimeoutSeconds: 10
       HealthyThresholdCount: 2
       TargetType: "ip"
       TargetGroupAttributes:
@@ -586,7 +586,7 @@ Resources:
       TaskDefinition: !Ref TaskDefinition
       LaunchType: FARGATE
       PlatformVersion: 1.4.0
-      HealthCheckGracePeriodSeconds: 600
+      HealthCheckGracePeriodSeconds: 300
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
@@ -1432,5 +1432,7 @@ Outputs:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/riskrate"
   AppShellBffClientSecretSsmArn:
     Value: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/appshell-bff"
+  MoonwatchSecretSsmArn:
+    Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/moonwatch-api-proxy"
   RotateSecretTopicArn:
     Value: !Ref RotateSecretTopic
