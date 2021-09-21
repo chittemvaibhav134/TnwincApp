@@ -254,7 +254,7 @@ Resources:
                 ParameterOverrides: !Sub | 
                   {
                     "Subdomain": "${SubDomain}",
-                    "DnsHostedZone": "${DnsHostedZone}"
+                    "DnsHostedZone": "${DnsHostedZone}",
                     "DnsHostedZoneId": "${DnsHostedZoneID}",
                     "InfrastructureStackName": "${InfrastructureStackName}",
                     "LaunchDarklySdkKeySsmValue": "${LaunchDarklySdkKeySsmValue}",
