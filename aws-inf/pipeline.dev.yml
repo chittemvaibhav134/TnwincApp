@@ -376,7 +376,7 @@ Resources:
                     "TargetFunctionName": "CfnDeploy_Dev::stack-outputs.json:CpPostDeployLambdaArn",
                     "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
                     "AccountId": "${AWS::AccountId}",
-                    "Region": "${AWS::Region},
+                    "Region": "${AWS::Region}",
                     "InvocationType": "RequestResponse",
                     "ParseResponse": true
                   }
