@@ -102,7 +102,7 @@ Resources:
         Type: LINUX_CONTAINER
         EnvironmentVariables:
           - Name: S3_BUCKET
-            Value: keycloak-dev-artifacts
+            Value: !Sub keycloak-dev-artifacts-${AWS::Region}
           - Name: S3_PREFIX
             Value: !Ref AWS::StackName
           - Name: S3_Region
@@ -124,7 +124,7 @@ Resources:
         Type: LINUX_CONTAINER
         EnvironmentVariables:
           - Name: S3_BUCKET
-            Value: keycloak-dev-artifacts
+            Value: !Sub keycloak-dev-artifacts-${AWS::Region}
           - Name: S3_PREFIX
             Value: !Ref AWS::StackName
           - Name: S3_Region
@@ -153,7 +153,7 @@ Resources:
       RoleArn: !GetAtt CodePipelineServiceRole.Arn
       ArtifactStore:
         Type: S3
-        Location: keycloak-dev-artifacts
+        Location: !Sub keycloak-dev-artifacts-${AWS::Region}
       Stages:
         - Name: Source
           Actions:
