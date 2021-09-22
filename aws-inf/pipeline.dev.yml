@@ -6,12 +6,6 @@ Parameters:
   ProjectName:
     Type: String
     Default: keycloak
-  GitHubOwner:
-    Type: String
-    Default: tnwinc
-  GitHubRepo:
-    Type: String
-    Default: platform-auth-keycloak
   GitHubBranch:
     Type: String
     Default: develop
@@ -20,8 +14,6 @@ Parameters:
   DnsHostedZone:
     Type: String
   DnsHostedZoneID:
-    Type: String
-  InfrastructureStackName:
     Type: String
   LaunchDarklySdkKeySsmValue:
     Type: String
@@ -49,6 +41,19 @@ Resources:
     Type: AWS::ECR::Repository
     DeletionPolicy: Delete
     UpdateReplacePolicy: Retain
+    Properties:    
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {"rules":[
+            {
+              "rulePriority":1,
+              "description":"Expire images older than 14 days",
+              "selection":{
+                "tagStatus":"untagged","countType":"sinceImagePushed","countUnit":"days","countNumber":14
+              },
+              "action":{"type":"expire"}
+            }
+          ]}
 
   KCCodeBuild:
     Type: AWS::CodeBuild::Project
@@ -164,8 +169,8 @@ Resources:
                 Version: "1"
                 Provider: GitHub
               Configuration:
-                Owner: !Ref GitHubOwner
-                Repo: !Ref GitHubRepo
+                Owner: tnwinc
+                Repo: platform-auth-keycloak
                 Branch: !Ref GitHubBranch
                 OAuthToken: !GetAtt GitHubTokenSsm.Parameter.Value
                 PollForSourceChanges: false
@@ -248,7 +253,7 @@ Resources:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
                 RoleArn: !GetAtt CodePipelineServiceRole.Arn
-                StackName: !Sub ${ProjectName}-${AWS::StackName}-dev
+                StackName: !Sub ${ProjectName}-${AWS::StackName}-dev-app
                 TemplatePath: "Package::app.packaged.yml"
                 TemplateConfiguration: "BuildOutput::template-configuration.json"
                 ParameterOverrides: !Sub | 
@@ -256,7 +261,7 @@ Resources:
                     "Subdomain": "${SubDomain}",
                     "DnsHostedZone": "${DnsHostedZone}",
                     "DnsHostedZoneId": "${DnsHostedZoneID}",
-                    "InfrastructureStackName": "${InfrastructureStackName}",
+                    "InfrastructureStackName": "aws-inf-shared",
                     "LaunchDarklySdkKeySsmValue": "${LaunchDarklySdkKeySsmValue}",
                     "MoonwatchApiAccessPolicyArn": "${MoonwatchApiAccessPolicyArn}",
                     "MoonwatchApiBaseUrl": "${MoonwatchApiBaseUrl}",
@@ -331,7 +336,7 @@ Resources:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
                 RoleArn: !GetAtt CodePipelineServiceRole.Arn
-                StackName: !Sub ${ProjectName}-${AWS::StackName}-auth-dev
+                StackName: !Sub ${ProjectName}-${AWS::StackName}-dev-authorizer
                 TemplatePath: "AuthPackage::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_Dev::template-configuration.json"
                 OutputFileName: stack-outputs.json
