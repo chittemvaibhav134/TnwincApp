@@ -1954,7 +1954,7 @@
     "xContentTypeOptions" : "nosniff",
     "xRobotsTag" : "none",
     "xFrameOptions" : "SAMEORIGIN",
-    "contentSecurityPolicy" : "frame-src 'self'; frame-ancestors 'self' https://doorman.dev.gw.local; object-src 'none';",
+    "contentSecurityPolicy" : "frame-src 'self'; frame-ancestors 'self' *.navex-pe.com:* https://doorman.dev.gw.local; object-src 'none';",
     "xXSSProtection" : "1; mode=block",
     "strictTransportSecurity" : "max-age=31536000; includeSubDomains"
   },
