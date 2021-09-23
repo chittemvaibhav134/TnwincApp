@@ -60,6 +60,11 @@ From the repo root, in PowerShell:
 
 The exported configuration is now in the `import` directory. It should be committed to source control if any important changes have been made. NOTE: KeyCloak generates new IDs for most config elements during export. They will show up as diffs. This is annoying, but normal.
 
+## Deploying your own AWS stack to Cloudformation
+To deploy your own keycloak stack and authorizer, you can go to cloudformation and deploy the aws-inf/pipeline.dev.yml. Either us-west-2 or us-east-1 will work. This will create a pipeline that you can point at a branch. Any updates to the branch or if you manually start the pipeline will deploy a keycloak and an authorizer stack. 
+
+When tearing down your stack, delete the authorizer and the keycloak stack first before deleting the pipeline stack. The log group and s3 bucket the keycloak stack creates will need to be manually deleted. If you get the error that ECR still has images when trying to delete, go into ECR and your pipelines ecr images manually.
+
 ## SNS Topic
 
 Microservices can subscribe to the output ```RotateSecretTopicArn``` in order to receive messages when Keycloak secrets are rotated. The new secrets can be retrieved from SSM. Example message:
