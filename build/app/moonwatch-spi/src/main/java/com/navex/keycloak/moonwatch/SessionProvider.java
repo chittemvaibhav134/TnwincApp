@@ -39,7 +39,7 @@ public class SessionProvider implements EventListenerProvider {
             }
 
             Logger.writeInfo(logContext, "userId:" + userId);
-            var user = userDb.getUserById(userId, sessionContext.getRealm());
+            var user = userDb.getUserById( sessionContext.getRealm(), userId);
 
             clientKey = user.getFirstAttribute("clientkey");
 
