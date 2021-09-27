@@ -39,7 +39,7 @@ public class SessionProviderConfig {
             return localToggles.getOrDefault(toggleName.toLowerCase(), defaultValue);
         }
         try {
-            return GetToggleState(toggleName, new LDUser(clientKey), defaultValue, null);
+            return GetToggleState(toggleName, new LDUser.Builder(clientKey).custom("clientKey", clientKey).build(), defaultValue, null);
         }
         catch(Exception ex) {
             Logger.writeError("Global", ex.toString());
