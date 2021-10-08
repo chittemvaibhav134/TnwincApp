@@ -2,34 +2,77 @@ AWSTemplateFormatVersion: 2010-09-09
 
 Description: >
   Pipeline for unstable keycloak deployments
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Names"
+        Parameters:
+          - ProjectName
+          - SubDomain
+      - Label:
+          default: "Build Configuration"
+        Parameters:
+          - GitHubBranch
+      - Label:
+          default: "Moonwatch"
+        Parameters:
+          - MoonwatchApiRegion
+          - MoonwatchApiBaseUrl
+          - MoonwatchApiAccessPolicyArn
+      - Label:
+          default: "Configuration you might need to change"
+        Parameters:
+          - LaunchDarklySdkKeySsmValue
+          - LambdaUpdateTrigger
+      - Label:
+          default: "DNS Configuration you probably don't need to change"
+        Parameters:
+          - DnsHostedZone
+          - DnsHostedZoneID
+
 Parameters:
   ProjectName:
     Type: String
     Default: keycloak
+    Description: Prefix to the name of the stack that will be created and updated by this pipeline
   GitHubBranch:
     Type: String
     Default: develop
+    Description: The pipeline will deploy code from this branch of the platform-auth-keycloak repo on GitHub
   SubDomain:
     Type: String
+    Description: Custom subdomain to appear in the URL that will point to the built KeyCloak instance
   DnsHostedZone:
     Type: String
+    Default: navex-dev.com
+    Description: The top-level domain where the built KeyCloak instance will be hosted
   DnsHostedZoneID:
     Type: String
+    Default: Z2MMPRIXFHA7UM
+    Description: The ID of the hosted zone that contains the record for the top-level domain DnsHostedZone
   LaunchDarklySdkKeySsmValue:
     Type: String
+    Default: arn:aws:ssm:us-west-2:552242929734:parameter/launch-darkly
+    Description: >
+      ARN for the SSM value that contains the LaunchDarkly SDK key to use for checking LaunchDarkly feature flags.
+      The default value works for the us-west-2 region; you must change this to suit the region you are deploying to.
   MoonwatchApiAccessPolicyArn:
     Type: String
+    Description: The ApiAccessPolicy output from the moonwatch-api stack the KeyCloak instance will link to
   MoonwatchApiBaseUrl:
     Type: String
+    Description: The Url output from the moonwatch-api stack the KeyCloak instance will link to
   MoonwatchApiRegion:
     Type: String
-  
+    Description: The region of the moonwatch-api stack in the KeyCloak instance will link to
   LambdaUpdateTrigger:
     Type: "AWS::SSM::Parameter::Value<String>"
     Default: "/mobile/ssm-update-trigger"
     Description: Unique value to force lambda execution
-Resources:
 
+Resources:
   GitHubTokenSsm:
     Type: Custom::SsmGetParameter
     Properties:
@@ -41,7 +84,7 @@ Resources:
     Type: AWS::ECR::Repository
     DeletionPolicy: Delete
     UpdateReplacePolicy: Retain
-    Properties:    
+    Properties:
       LifecyclePolicy:
         LifecyclePolicyText: |
           {"rules":[
@@ -122,7 +165,7 @@ Resources:
         Type: CODEPIPELINE
       Source:
         Type: CODEPIPELINE
-        BuildSpec: aws-inf/buildspec.auth.package.yml    
+        BuildSpec: aws-inf/buildspec.auth.package.yml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:5.0
@@ -142,7 +185,7 @@ Resources:
       AuthenticationConfiguration:
         SecretToken: !GetAtt GitHubTokenSsm.Parameter.Value
       Filters:
-        - 
+        -
           JsonPath: "$.ref"
           MatchEquals: !Sub "refs/heads/${GitHubBranch}"
       TargetPipeline: !Ref Pipeline
@@ -179,7 +222,7 @@ Resources:
               RunOrder: 1
         - Name: Build
           Actions:
-            - 
+            -
               Name: Build
               ActionTypeId:
                 Category: Build
@@ -193,7 +236,7 @@ Resources:
               OutputArtifacts:
                 - Name: BuildOutput
               RunOrder: 1
-            - 
+            -
               Name: Package
               Region: !Ref AWS::Region
               ActionTypeId:
@@ -208,7 +251,7 @@ Resources:
               OutputArtifacts:
                 - Name: Package
               RunOrder: 2
-            - 
+            -
               Name: AuthPackage
               Region: !Ref AWS::Region
               ActionTypeId:
@@ -223,10 +266,10 @@ Resources:
               OutputArtifacts:
                 - Name: AuthPackage
               RunOrder: 3
-        - 
+        -
           Name: Dev
           Actions:
-            - 
+            -
               Name: Transform_Dev
               ActionTypeId:
                 Category: Build
@@ -240,7 +283,7 @@ Resources:
               OutputArtifacts:
                 - Name: Transform_Dev
               RunOrder: 1
-            - 
+            -
               Name: CfnDeploy_Dev
               Region: !Ref AWS::Region
               RoleArn: !GetAtt CodePipelineServiceRole.Arn
@@ -256,7 +299,7 @@ Resources:
                 StackName: !Sub ${ProjectName}-${AWS::StackName}-dev-app
                 TemplatePath: "Package::app.packaged.yml"
                 TemplateConfiguration: "BuildOutput::template-configuration.json"
-                ParameterOverrides: !Sub | 
+                ParameterOverrides: !Sub |
                   {
                     "Subdomain": "${SubDomain}",
                     "DnsHostedZone": "${DnsHostedZone}",
@@ -276,7 +319,7 @@ Resources:
                 - Name: CfnDeploy_Dev
               RunOrder: 2
             -
-              Name: ConfigUpload_Dev         
+              Name: ConfigUpload_Dev
               ActionTypeId:
                 Category: Invoke
                 Owner: AWS
@@ -296,7 +339,7 @@ Resources:
                     "Region": "${AWS::Region}"
                   }
               RunOrder: 3
-            - 
+            -
               Name: FinalizedCfnAuthConfig_Dev
               ActionTypeId:
                 Category: Invoke
@@ -323,7 +366,7 @@ Resources:
               OutputArtifacts:
                 - Name: FinalizedCfnAuthConfig_Dev
               RunOrder: 4
-            - 
+            -
               Name: CfnAuthDeploy_Dev
               Region: !Ref AWS::Region
               RoleArn: !GetAtt CodePipelineServiceRole.Arn
@@ -411,4 +454,7 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
 
-  
+Outputs:
+  KeyCloakConsoleUrl:
+    Description: URL of KeyCloak console
+    Value: !Sub https://${SubDomain}.${DnsHostedZone}/auth/
