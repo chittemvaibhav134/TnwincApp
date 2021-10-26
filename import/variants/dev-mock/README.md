@@ -2,11 +2,12 @@
 
 This is a configuration of KeyCloak that serves as a local authentication stub. It contains the following users:
 
-client  | username  | password   | PUID                                 | role
-------- | --------- | ---------- | ------------------------------------ | -------------------
-navex   | `dvader`  | `password` | 00000000-0000-0000-0000-000000000006 | Navex Admin user
-trial12 | `shiva`   | `test1`    | C785A0FB-8B1A-E511-AF9F-00155D103480 | Platform Admin user
-trial12 | `okenobi` | `password` | 00000000-0000-0000-0000-000000000066 | platform user
+client  | username       | password   | PUID                                 | role
+------- | -------------- | ---------- | ------------------------------------ | -------------------
+navex   | `dvader`       | `password` | 00000000-0000-0000-0000-000000000006 | Navex Admin user
+trial12 | `shiva`        | `test1`    | C785A0FB-8B1A-E511-AF9F-00155D103480 | Platform Admin user
+trial12 | `okenobi`      | `password` | 00000000-0000-0000-0000-000000000066 | platform user
+dm1     | `martinsruser` | `1234`     | af18d5a8-c944-e911-a964-00050300073d | DM user
 
 NOTE: The [original JIRA story](https://jira.navexglobal.com/browse/SSO-6913) requesting this configuration included, as can be seen above, a "client" value for each user. However, the issue with this is that KeyCloak has no concept of "client" in the way that it's expressed here. "Client" is a NAVEX concept. We access KeyCloak at `<clientkey>.<keycloakhost>`, but this is just a convenience to allow Doorman to detect the client authentication context by deriving it from the Referer header. The `<clientkey>` value in the url does not influence KeyCloak behavior in any way. So all the users listed in the table here will exist at whatever URL KeyCloak is accessed from.
 
