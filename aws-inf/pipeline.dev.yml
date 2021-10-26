@@ -15,6 +15,7 @@ Metadata:
           default: "Build Configuration"
         Parameters:
           - GitHubBranch
+          - ImportConfigVariant
       - Label:
           default: "Moonwatch"
         Parameters:
@@ -41,6 +42,13 @@ Parameters:
     Type: String
     Default: develop
     Description: The pipeline will deploy code from this branch of the platform-auth-keycloak repo on GitHub
+  ImportConfigVariant:
+    Type: String
+    Default: "DevMock"
+    AllowedValues:
+      - DevMock
+      - KeycloakApp
+    Description: Selects which configuration should be imported by the deployed stack
   SubDomain:
     Type: String
     Description: Custom subdomain to appear in the URL that will point to the built KeyCloak instance
@@ -71,6 +79,9 @@ Parameters:
     Type: "AWS::SSM::Parameter::Value<String>"
     Default: "/mobile/ssm-update-trigger"
     Description: Unique value to force lambda execution
+
+Conditions:
+  DevMock: !Equals [ !Ref ImportConfigVariant, "DevMock" ]
 
 Resources:
   GitHubTokenSsm:
@@ -128,7 +139,7 @@ Resources:
         Type: CODEPIPELINE
       Source:
         Type: CODEPIPELINE
-        BuildSpec: aws-inf/buildspec.devtransform.yml
+        BuildSpec: !If [ DevMock, 'aws-inf/buildspec.devmocktransform.yml', 'aws-inf/buildspec.devtransform.yml' ]
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:5.0
