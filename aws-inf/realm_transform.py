@@ -34,12 +34,12 @@ def update_client_property(realm_dict: dict, client_id: str, property: str, valu
         raise RuntimeError(f"append=True specified but {property} is not an array on the client object")
     elif not is_prop_list and len(value) > 1:
         raise RuntimeError(f"Multiple values passed in for client property {property} that is not a list")
-        
+
 
 def update_sso_config(realm_dict: dict, idp_alias: str, metadata_url: str) -> None:
     http = PoolManager(cert_reqs='CERT_NONE', assert_hostname=False)
     print(f"Fetching metadata xml from: {metadata_url}")
-    
+
     metadata_xml_string = http.request('GET', metadata_url).data.decode('utf-8')
     xml = xml_fromstring(metadata_xml_string)
     cert = xml.find('.//{http://www.w3.org/2000/09/xmldsig#}X509Certificate').text
@@ -54,7 +54,7 @@ def update_sso_config(realm_dict: dict, idp_alias: str, metadata_url: str) -> No
     idp['config']['singleLogoutServiceUrl'] = ss_out_uri
     print(f"Setting singleSignOnServiceUrl to: {ss_in_uri}")
     idp['config']['singleSignOnServiceUrl'] = ss_in_uri
-    
+
 def update_csp_header(realm_dict: dict, domains: List[str], prepend_wildcard: bool = False) -> None:
     domains = domains if isinstance(domains, list) else [domains]
     domains = [d.strip() for d in domains]
@@ -81,17 +81,17 @@ if __name__== "__main__":
 
     parser.add_argument("--idp-alias", type=str, help="identityProviders alias to update sso config from metadata url", required=False)
     parser.add_argument("--idp-metadata-url", type=str, help="Url to metadata of identity provider", required=False)
-    
+
     parser.add_argument("--csp-header", type=str.lower, help="Comma delimited list of allowed domains", required=False)
     parser.add_argument("--wildcard-prefix", action='store_true', help="Prefix each domain with a *", required=False)
-    
+
     parser.add_argument("--client-id", type=str, help="client name in realm file that needs transforming")
     parser.add_argument("-p", "--client-property", type=str, help="client property that needs to be set. ex: redirectUris, adminUrl")
     parser.add_argument("-v", "--client-value", type=str, action='append', help="List of values to set for a client property", default=[])
     parser.add_argument("--append", action='store_true', help="Add onto existing list; if not supplied the list is replaced")
 
     args = parser.parse_args()
-    
+
     realm_dict = load_json_file(args.realm_file)
     print(f"Transforming keycloak v{realm_dict['keycloakVersion']} realm file: {args.realm_file}")
 
