@@ -1341,7 +1341,8 @@
       "alwaysDisplayInConsole": false,
       "attributes": {
         "backchannel.logout.revoke.offline.tokens": "false",
-        "backchannel.logout.session.required": "false",
+        "backchannel.logout.session.required": "true",
+        "backchannel.logout.url": "http://admin.devlocal.navex-pe.com:3000/auth/backchannel-logout",
         "client_credentials.use_refresh_token": "false",
         "display.on.consent.screen": "false",
         "exclude.session.state.from.auth.response": "false",
