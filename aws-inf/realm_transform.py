@@ -16,24 +16,36 @@ def save_dict_as_json(file_path: str, dictionary: dict) -> None:
     with open(file_path, 'w') as f:
         json.dump(dictionary, f, indent=2)
 
+def index_via_property_list(dictionary, properties: List[str]):
+    """
+    Indexes into dictionary via properties, which is just a list of the property names.
+    Thus index_via_property_list(d, ["a","b","c"]) should be equivalent to d["a"]["b"]["c"]
+    """
+    for prop in properties:
+        dictionary = dictionary[prop]
+    return dictionary
+
 def update_client_property(realm_dict: dict, client_id: str, property: str, value: List[str], append: bool) -> None:
     value = value if isinstance(value, list) else [value]
     print(f"Searching for client id {client_id} in realm file...")
     client = next( c for c in realm_dict['clients'] if c['clientId'] == client_id )
-    is_prop_list = isinstance(client[property], list)
+    property_list = property.split(":")
+    property_ref = index_via_property_list(client, property_list)
+    property_display_string = ".".join(property_list)
+    is_prop_list = isinstance(property_ref, list)
     if not is_prop_list and len(value) < 2:
-        print(f"Setting {client_id}.{property} to: {value[0]}")
-        client[property] = value[0]
+        print(f"Setting {client_id}.{property_display_string} to: {value[0]}")
+        property_ref = value[0]
     elif is_prop_list and not append:
-        print(f"Setting {client_id}.{property} to: {value}")
-        client[property] = value
+        print(f"Setting {client_id}.{property_display_string} to: {value}")
+        property_ref = value
     elif is_prop_list and append:
-        print(f"Appending {value} to existing {client_id}.{property} list...")
-        client[property] = client[property] + value
+        print(f"Appending {value} to existing {client_id}.{property_display_string} list...")
+        property_ref = property_ref + value
     elif not is_prop_list and append:
-        raise RuntimeError(f"append=True specified but {property} is not an array on the client object")
+        raise RuntimeError(f"append=True specified but {property_display_string} is not an array on the client object")
     elif not is_prop_list and len(value) > 1:
-        raise RuntimeError(f"Multiple values passed in for client property {property} that is not a list")
+        raise RuntimeError(f"Multiple values passed in for client property {property_display_string} that is not a list")
 
 
 def update_sso_config(realm_dict: dict, idp_alias: str, metadata_url: str) -> None:
