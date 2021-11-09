@@ -1426,6 +1426,8 @@ Outputs:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/cmd-backend"
   EpimIemClientSecretSsmArn:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/epim-iem"
+  EpadminClientSecretSsmArn:
+    Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/epadmin"	    
   InsightsClientSecretSsmArn:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/insights"
   RiskRateClientSecretSsmArn:
