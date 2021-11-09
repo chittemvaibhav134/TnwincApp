@@ -32,7 +32,7 @@ phases:
       - MoonwatchApiAccessPolicyArn=$(jq -r '.ApiAccessPolicy' "$DC_ART_DIR/moonwatch")
       - MoonwatchApiRegion=$(jq -r '.AwsRegion' "$DC_ART_DIR/moonwatch")
       - LaunchDarklySdkKeySsmValue=$(jq -r '.LaunchDarklySdkKeySsmArn' "$DC_ART_DIR/global-configuration")
-      - EpadminRootDomain=$(Jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")      
+      - EpadminRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")      
       - mkdir transformed-import
       - |
         TransformScript="$APP_DIR/aws-inf/realm_transform.py"
