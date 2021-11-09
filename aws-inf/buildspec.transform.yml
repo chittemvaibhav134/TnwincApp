@@ -80,6 +80,7 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p adminUrl -v "https://${EpadminRootDomain}/" 
       - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p redirectUris -v "https://${EpadminRootDomain}/*" -v "${DoormanBaseUrl}/*"      
       - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p rootUrl -v "https://${EpadminRootDomain}/"       
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p webOrigins -v "https://${EpadminRootDomain}"      
 
       # Set coi client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
