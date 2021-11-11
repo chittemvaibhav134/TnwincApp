@@ -6,7 +6,7 @@ env:
     APP_DIR: "app"
     # contains json files with the name of the projects listed in deployspec DependsOn
     DC_ART_DIR: "dc_art"
-    # determines if master-users-0.json is included in the transformed input 
+    # determines if master-users-0.json is included in the transformed input
     INCLUDE_ADMIN_USER_IMPORT: "false"
 
 phases:
@@ -32,8 +32,9 @@ phases:
       - MoonwatchApiAccessPolicyArn=$(jq -r '.ApiAccessPolicy' "$DC_ART_DIR/moonwatch")
       - MoonwatchApiRegion=$(jq -r '.AwsRegion' "$DC_ART_DIR/moonwatch")
       - LaunchDarklySdkKeySsmValue=$(jq -r '.LaunchDarklySdkKeySsmArn' "$DC_ART_DIR/global-configuration")
+      - EpadminRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")      
       - mkdir transformed-import
-      - | 
+      - |
         TransformScript="$APP_DIR/aws-inf/realm_transform.py"
         chmod +x $TransformScript
       - NavexRealmJson="$APP_DIR/import/variants/keycloak-app/navex-realm.json"
@@ -50,21 +51,22 @@ phases:
       - cp "$MasterRealmJson" transformed-import/master-realm.json
       # Set idp config off of doorman metadata
       - $TransformScript -r "$NavexRealmJson" -i --idp-alias doorman --idp-metadata-url $DoormanMetadataUrl
-      
+
       # Set CSP header to allow navex root domains. Script will parse the comma delimited list that NavexRootDomains is
       - $TransformScript -r "$NavexRealmJson" -i --csp-header "$NavexRootDomains" --wildcard-prefix
-      
+
       # Set appshell client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p baseUrl -v "$AppshellUserAppUrl"
-      
+
       # Set appshell-bff client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellUserAppUrl"
-      
-      # Set cmd-backend client related urls 
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p attributes:backchannel.logout.url -v "$AppshellAdminUrl/auth/backchannel-logout"
+
+      # Set cmd-backend client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "${DoormanBaseUrl}/*"
-      
+
       # Set cmd-frontend client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "https://maint.$CmdUiRootDomain/oidc/silentchecksso/*" -v "${DoormanBaseUrl}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p webOrigins -v "https://maint.$CmdUiRootDomain"
@@ -73,10 +75,16 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p adminUrl -v "https://${EpimIemRootDomain}/"
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p redirectUris -v "https://${EpimIemRootDomain}/*" -v "${DoormanBaseUrl}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p webOrigins -v "https://${EpimIemRootDomain}"
+      
+      # Set epadmin client related urls 
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p adminUrl -v "https://${EpadminRootDomain}/" 
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p redirectUris -v "https://${EpadminRootDomain}/*" -v "${DoormanBaseUrl}/*"      
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p rootUrl -v "https://${EpadminRootDomain}/"       
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p webOrigins -v "https://${EpadminRootDomain}"      
 
       # Set coi client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
-      
+
       # Set insights client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p redirectUris -v "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" -v "${DoormanBaseUrl}/*"
 

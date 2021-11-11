@@ -3,7 +3,8 @@
 import argparse,json
 from urllib3 import PoolManager
 from xml.etree.ElementTree import fromstring as xml_fromstring
-from typing import List
+from typing import Any, List
+import collections.abc
 
 
 def load_json_file(file_path: str) -> dict:
@@ -16,30 +17,59 @@ def save_dict_as_json(file_path: str, dictionary: dict) -> None:
     with open(file_path, 'w') as f:
         json.dump(dictionary, f, indent=2)
 
+def index_via_property_list(dictionary, properties: List[str]):
+    """
+    Indexes into dictionary via properties, which is just a list of the property names.
+    Thus index_via_property_list(d, ["a","b","c"]) should be equivalent to d["a"]["b"]["c"]
+    """
+    for prop in properties:
+        dictionary = dictionary[prop]
+    return dictionary
+
+def create_dict_from_prop_list(prop_list: List[str], value: Any) -> dict:
+    dictionary = dict()
+    for prop in reversed(prop_list):
+        value = {prop: value}
+        dictionary = value
+    return dictionary
+
+# yoinked from https://stackoverflow.com/a/3233356
+def update(d, u):
+    for k, v in u.items():
+        if isinstance(v, collections.abc.Mapping):
+            d[k] = update(d.get(k, {}), v)
+        else:
+            d[k] = v
+    return d
+
 def update_client_property(realm_dict: dict, client_id: str, property: str, value: List[str], append: bool) -> None:
     value = value if isinstance(value, list) else [value]
     print(f"Searching for client id {client_id} in realm file...")
     client = next( c for c in realm_dict['clients'] if c['clientId'] == client_id )
-    is_prop_list = isinstance(client[property], list)
+    property_list = property.split(":")
+    property_ref = index_via_property_list(client, property_list)
+    is_prop_list = isinstance(property_ref, list)
     if not is_prop_list and len(value) < 2:
-        print(f"Setting {client_id}.{property} to: {value[0]}")
-        client[property] = value[0]
+        print(f"Setting {client_id}:{property} to: {value[0]}")
+        property_ref = value[0]
     elif is_prop_list and not append:
-        print(f"Setting {client_id}.{property} to: {value}")
-        client[property] = value
+        print(f"Setting {client_id}:{property} to: {value}")
+        property_ref = value
     elif is_prop_list and append:
-        print(f"Appending {value} to existing {client_id}.{property} list...")
-        client[property] = client[property] + value
+        print(f"Appending {value} to existing {client_id}:{property} list...")
+        property_ref = property_ref + value
     elif not is_prop_list and append:
         raise RuntimeError(f"append=True specified but {property} is not an array on the client object")
     elif not is_prop_list and len(value) > 1:
         raise RuntimeError(f"Multiple values passed in for client property {property} that is not a list")
-        
+    temp_dict = create_dict_from_prop_list(property_list, property_ref)
+    update(client, temp_dict)
+
 
 def update_sso_config(realm_dict: dict, idp_alias: str, metadata_url: str) -> None:
     http = PoolManager(cert_reqs='CERT_NONE', assert_hostname=False)
     print(f"Fetching metadata xml from: {metadata_url}")
-    
+
     metadata_xml_string = http.request('GET', metadata_url).data.decode('utf-8')
     xml = xml_fromstring(metadata_xml_string)
     cert = xml.find('.//{http://www.w3.org/2000/09/xmldsig#}X509Certificate').text
@@ -54,7 +84,7 @@ def update_sso_config(realm_dict: dict, idp_alias: str, metadata_url: str) -> No
     idp['config']['singleLogoutServiceUrl'] = ss_out_uri
     print(f"Setting singleSignOnServiceUrl to: {ss_in_uri}")
     idp['config']['singleSignOnServiceUrl'] = ss_in_uri
-    
+
 def update_csp_header(realm_dict: dict, domains: List[str], prepend_wildcard: bool = False) -> None:
     domains = domains if isinstance(domains, list) else [domains]
     domains = [d.strip() for d in domains]
@@ -81,17 +111,17 @@ if __name__== "__main__":
 
     parser.add_argument("--idp-alias", type=str, help="identityProviders alias to update sso config from metadata url", required=False)
     parser.add_argument("--idp-metadata-url", type=str, help="Url to metadata of identity provider", required=False)
-    
+
     parser.add_argument("--csp-header", type=str.lower, help="Comma delimited list of allowed domains", required=False)
     parser.add_argument("--wildcard-prefix", action='store_true', help="Prefix each domain with a *", required=False)
-    
+
     parser.add_argument("--client-id", type=str, help="client name in realm file that needs transforming")
     parser.add_argument("-p", "--client-property", type=str, help="client property that needs to be set. ex: redirectUris, adminUrl")
     parser.add_argument("-v", "--client-value", type=str, action='append', help="List of values to set for a client property", default=[])
     parser.add_argument("--append", action='store_true', help="Add onto existing list; if not supplied the list is replaced")
 
     args = parser.parse_args()
-    
+
     realm_dict = load_json_file(args.realm_file)
     print(f"Transforming keycloak v{realm_dict['keycloakVersion']} realm file: {args.realm_file}")
 

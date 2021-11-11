@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - mkdir transformed-import
+      - NavexRealmJson="./import/variants/dev-mock/navex-realm.json"
+      - MasterRealmJson="./import/variants/dev-mock/master-realm.json"
+  build:
+    commands:
+      # copy updated realm file to captured artifact dir
+      - cp "$MasterRealmJson" transformed-import/master-realm.json
+      # copy updated realm file to captured artifact dir
+      - cp "$NavexRealmJson" transformed-import/navex-realm.json
+artifacts:
+  files:
+    - "transformed-import/*.json"
