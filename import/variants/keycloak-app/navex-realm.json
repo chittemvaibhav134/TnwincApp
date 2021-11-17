@@ -2464,8 +2464,7 @@
       ],
       "publicClient": true,
       "redirectUris": [
-        "*",
-        "https://doorman.qa1.gw.navex-pe.com/*"
+        "*"
       ],
       "serviceAccountsEnabled": false,
       "standardFlowEnabled": true,
