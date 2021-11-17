@@ -3,7 +3,8 @@
 import argparse,json
 from urllib3 import PoolManager
 from xml.etree.ElementTree import fromstring as xml_fromstring
-from typing import List
+from typing import Any, List
+import collections.abc
 
 
 def load_json_file(file_path: str) -> dict:
@@ -25,6 +26,22 @@ def index_via_property_list(dictionary, properties: List[str]):
         dictionary = dictionary[prop]
     return dictionary
 
+def create_dict_from_prop_list(prop_list: List[str], value: Any) -> dict:
+    dictionary = dict()
+    for prop in reversed(prop_list):
+        value = {prop: value}
+        dictionary = value
+    return dictionary
+
+# yoinked from https://stackoverflow.com/a/3233356
+def update(d, u):
+    for k, v in u.items():
+        if isinstance(v, collections.abc.Mapping):
+            d[k] = update(d.get(k, {}), v)
+        else:
+            d[k] = v
+    return d
+
 def update_client_property(realm_dict: dict, client_id: str, property: str, value: List[str], append: bool) -> None:
     value = value if isinstance(value, list) else [value]
     print(f"Searching for client id {client_id} in realm file...")
@@ -45,6 +62,8 @@ def update_client_property(realm_dict: dict, client_id: str, property: str, valu
         raise RuntimeError(f"append=True specified but {property} is not an array on the client object")
     elif not is_prop_list and len(value) > 1:
         raise RuntimeError(f"Multiple values passed in for client property {property} that is not a list")
+    temp_dict = create_dict_from_prop_list(property_list, property_ref)
+    update(client, temp_dict)
 
 
 def update_sso_config(realm_dict: dict, idp_alias: str, metadata_url: str) -> None:

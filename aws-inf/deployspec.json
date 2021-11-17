@@ -64,6 +64,15 @@
       ]
     },
     {
+      "Project": "epim-standard-epadmin",
+      "Artifacts": [
+        {
+          "Name": "UiRootDomain",
+          "DefaultValue": "secure.dev.ep.local"
+        }
+      ]
+    },	
+    {
       "Project": "coi-ui",
       "Artifacts": [
         {
