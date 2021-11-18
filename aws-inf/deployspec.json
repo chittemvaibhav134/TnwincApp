@@ -76,7 +76,7 @@
       "Project": "ng-learning-platform",
       "Artifacts": [
         {
-          "Name": "ApiBaseUrlTemplate",
+          "Name": "ApiBaseUrl",
           "DefaultValue": "https://webapi-integration.lcms.navex-pe.com"
         }
       ]
