@@ -33,6 +33,7 @@ phases:
       - MoonwatchApiRegion=$(jq -r '.AwsRegion' "$DC_ART_DIR/moonwatch")
       - LaunchDarklySdkKeySsmValue=$(jq -r '.LaunchDarklySdkKeySsmArn' "$DC_ART_DIR/global-configuration")
       - EpadminRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")      
+      - CcAuthRedirectUrl=$(jq -r '.ApiBaseUrlTemplate' "$DC_ART_DIR/ng-learning-platform")
       - mkdir transformed-import
       - |
         TransformScript="$APP_DIR/aws-inf/realm_transform.py"
@@ -82,6 +83,9 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p redirectUris -v "https://${EpadminRootDomain}/*" -v "${DoormanBaseUrl}/*"      
       - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p rootUrl -v "https://${EpadminRootDomain}/"       
       - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p webOrigins -v "https://${EpadminRootDomain}"
+
+      # Set course customizer client related urls
+      - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p redirectUris -v "${CcAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
 
       # Set coi client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"

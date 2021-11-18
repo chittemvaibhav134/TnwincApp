@@ -2530,7 +2530,11 @@
       ],
       "publicClient": true,
       "redirectUris": [
-        "*"
+        "https://cc.devlocal.navex-pe.com:13372/*",
+        "https://webapi-integration.lcms.navex-pe.com/*",
+        "https://webapi-dev.lcms.navex-pe.com/*",
+        "https://webapi-staging.lcms.navexglobal.com/*",
+        "https://webapi.lcms.navexglobal.com/*"
       ],
       "serviceAccountsEnabled": false,
       "standardFlowEnabled": true,

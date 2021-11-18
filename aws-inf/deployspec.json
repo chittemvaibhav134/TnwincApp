@@ -71,7 +71,16 @@
           "DefaultValue": "secure.dev.ep.local"
         }
       ]
-    },	
+    },
+    {
+      "Project": "ng-learning-platform",
+      "Artifacts": [
+        {
+          "Name": "ApiBaseUrlTemplate",
+          "DefaultValue": "https://webapi-integration.lcms.navex-pe.com"
+        }
+      ]
+    },		
     {
       "Project": "coi-ui",
       "Artifacts": [
