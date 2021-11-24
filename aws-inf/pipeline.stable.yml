@@ -745,7 +745,7 @@ Resources:
                         "DnsHostedZone": "navex-stage.eu",
                         "DnsHostedZoneId": "Z343M2SX2SYHUN",
                         "Stage": "Production",
-                        "DbaAccessCidr": "10.162.24614/31"
+                        "DbaAccessCidr": "10.162.26.14/31"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "stageEU",
@@ -1292,7 +1292,7 @@ Resources:
                         "DnsHostedZoneId": "Z22ECC3Q0NT9H2",
                         "Stage": "Production",
                         "DesiredTaskCount": "3",
-                        "DbaAccessCidr": "10.162.24614/31"
+                        "DbaAccessCidr": "10.162.26.14/31"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "prodEU",
