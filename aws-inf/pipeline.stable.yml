@@ -1196,14 +1196,15 @@ Resources:
                 - Name: CfnDeploy_StageUS
                 - Name: CfnAuthDeploy_StageUS_UsEast1                 
               RunOrder: 9
-            -
-              Name: ManualGate_StageUS
+        - Name: ApproveDeployToProductionEU
+          Actions:
+            - Name: Production_EU_Manual_Gate
+              RunOrder: 1
               ActionTypeId:
                 Category: Approval
                 Owner: AWS
                 Version: "1"
                 Provider: Manual
-              RunOrder: 10
         - Name: ProdEU
           Actions:
             - 
@@ -1473,14 +1474,15 @@ Resources:
                 - Name: CfnDeploy_ProdEU
                 - Name: CfnAuthDeploy_ProdEU_EuCentral1                 
               RunOrder: 9
-            -
-              Name: ManualGate_ProdEU
+        - Name: ApproveDeployToProductionUS
+          Actions:
+            - Name: Production_US_Manual_Gate
+              RunOrder: 1
               ActionTypeId:
                 Category: Approval
                 Owner: AWS
                 Version: "1"
                 Provider: Manual
-              RunOrder: 10
         - Name: ProdUS
           Actions:
             - 
