@@ -18,8 +18,6 @@ Parameters:
   GitHubToken:
     Type: String
     NoEcho: true
-  RegionalPackageStackName:
-    Type: String
   IntegrationAccountId:
     Type: String
     Default: "455920928861"
@@ -29,25 +27,6 @@ Parameters:
   ProductionAccountId:
     Type: String
     Default: "618036221923"
-  SkipToProdEU:
-    Type: String
-    Description: Skip deployment of int-stable, stageEU and stageUS. Temporary shortcut for resetting pipeline state.
-    AllowedValues:
-      - "yes"
-      - "no"
-    Default: "no"
-  SkipToProdUS:
-    Type: String
-    Description: Skip deployment of int-stable, stageEU, stageUS and prodEU. Temporary shortcut for resetting pipeline state.
-    AllowedValues:
-      - "yes"
-      - "no"
-    Default: "no"
-
-Conditions:
-  SkipToProdEU: !Equals [ !Ref SkipToProdEU, 'yes' ]
-  SkipToProdUS: !Equals [ !Ref SkipToProdUS, 'yes' ]
-  SkipIntAndStage: !Or [ Condition: SkipToProdEU, Condition: SkipToProdUS ]
 
 Resources:
   NavexKcContainerRepository:
@@ -412,1125 +391,1097 @@ Resources:
                 - Name: ProjectVersion
               RunOrder: 2
 
-        - !If
-          - SkipIntAndStage
-          - !Ref AWS::NoValue
-          - 
-            Name: IntegrationAccount
-            Actions:
-              - 
-                Name: GetDcArt_IntStable
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPGetDCArtFromBuildInfo
-                  UserParameters: !Sub |
-                    {
-                      "SourceProjectId": "${ProjectName}_navexint_us-west-2",
-                      "DeploymentContext": "int-stable",
-                      "BuildInfoFile": "ProjectVersion::build-record.json",
-                      "ProjectIds": {"aws-inf": "aws-inf_navexint_us-west-2"}
+        - Name: IntegrationAccount
+          Actions:
+            - 
+              Name: GetDcArt_IntStable
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPGetDCArtFromBuildInfo
+                UserParameters: !Sub |
+                  {
+                    "SourceProjectId": "${ProjectName}_navexint_us-west-2",
+                    "DeploymentContext": "int-stable",
+                    "BuildInfoFile": "ProjectVersion::build-record.json",
+                    "ProjectIds": {"aws-inf": "aws-inf_navexint_us-west-2"}
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+              OutputArtifacts:
+                - Name: GetDcArt_IntStable
+              RunOrder: 1
+            -
+              Name: MergeArtifacts_IntStable
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPMergeArtifacts
+                UserParameters: |
+                  {
+                    "ArtifactPrefixMap":{
+                      "GetDcArt_IntStable": "dc_art",
+                      "App": "app"
                     }
-                InputArtifacts:
-                  - Name: ProjectVersion
-                OutputArtifacts:
-                  - Name: GetDcArt_IntStable
-                RunOrder: 1
-              -
-                Name: MergeArtifacts_IntStable
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPMergeArtifacts
-                  UserParameters: |
-                    {
-                      "ArtifactPrefixMap":{
-                        "GetDcArt_IntStable": "dc_art",
-                        "App": "app"
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+                - Name: GetDcArt_IntStable
+                - Name: App
+              OutputArtifacts:
+                - Name: MergeArtifacts_IntStable
+              RunOrder: 2
+            - 
+              Name: Transform_IntStable
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref TransformCodeBuildProject
+                EnvironmentVariables: |
+                  [
+                    {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "true", "type": "PLAINTEXT"}
+                  ]
+              InputArtifacts:
+                - Name: MergeArtifacts_IntStable
+              OutputArtifacts:
+                - Name: Transform_IntStable
+              RunOrder: 3
+            - 
+              Name: FinalizedCfnConfig_IntStable
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json",
+                      "BuildOutput::template-configuration.json", 
+                      "Transform_IntStable::template-configuration.json" 
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "Subdomain": "id3",
+                        "DnsHostedZone": "navex-int.com",
+                        "DnsHostedZoneId": "Z3KPLDK2FOBNKU",
+                        "Stage": "Development"
+                      },
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "int-stable",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
                       }
-                    }
-                InputArtifacts:
-                  - Name: ProjectVersion
-                  - Name: GetDcArt_IntStable
-                  - Name: App
-                OutputArtifacts:
-                  - Name: MergeArtifacts_IntStable
-                RunOrder: 2
-              - 
-                Name: Transform_IntStable
-                ActionTypeId:
-                  Category: Build
-                  Owner: AWS
-                  Version: "1"
-                  Provider: CodeBuild
-                Configuration:
-                  ProjectName: !Ref TransformCodeBuildProject
-                  EnvironmentVariables: |
-                    [
-                      {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "true", "type": "PLAINTEXT"}
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: BuildOutput
+                - Name: ProjectVersion
+                - Name: Transform_IntStable
+              OutputArtifacts:
+                - Name: FinalizedCfnConfig_IntStable
+              RunOrder: 4
+            - 
+              Name: CfnDeploy_IntStable
+              Region: us-west-2
+              RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-stable
+                TemplatePath: "PackageUsWest2::app.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnConfig_IntStable::template-configuration.json"
+                OutputFileName: stack-outputs.json
+              InputArtifacts:
+                - Name: PackageUsWest2
+                - Name: FinalizedCfnConfig_IntStable
+              OutputArtifacts:
+                - Name: CfnDeploy_IntStable
+              RunOrder: 5
+            -
+              Name: ConfigUpload_IntStable          
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              InputArtifacts:
+                - Name: Transform_IntStable
+                - Name: CfnDeploy_IntStable
+              Configuration:
+                FunctionName: CPS3Deploy
+                UserParameters: !Sub |
+                  {
+                    "S3BucketName": "CfnDeploy_IntStable::stack-outputs.json:ConfigBucket",
+                    "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
+                    "ExcludeArtifactsFromUpload": ["CfnDeploy_IntStable"],
+                    "AccountId": "${IntegrationAccountId}",
+                    "Region": "us-west-2"
+                  }
+              RunOrder: 6
+            - 
+              Name: FinalizedCfnAuthConfig_IntStable
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json"
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "KCBaseUrl": "CfnDeploy_IntStable::stack-outputs.json:Domain"
+                      },
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "int-stable",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      } 
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: ProjectVersion
+                - Name: CfnDeploy_IntStable
+              OutputArtifacts:
+                - Name: FinalizedCfnAuthConfig_IntStable
+              RunOrder: 6
+            - 
+              Name: CfnAuthDeploy_IntStable_UsWest2
+              Region: us-west-2
+              RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-stable-auth
+                TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnAuthConfig_IntStable::template-configuration.json"
+                OutputFileName: stack-outputs.json
+              InputArtifacts:
+                - Name: AuthPackageUsWest2
+                - Name: FinalizedCfnAuthConfig_IntStable
+              OutputArtifacts:
+                - Name: CfnAuthDeploy_IntStable_UsWest2
+              RunOrder: 7
+            -
+              Name: ImportConfig_IntStable
+              RunOrder: 7
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_IntStable::stack-outputs.json:CpConfigImportLambdaArn",
+                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "AccountId": "${IntegrationAccountId}",
+                    "Region": "us-west-2",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_IntStable
+            -
+              Name: PostDeployApiActions_IntStable
+              RunOrder: 8
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_IntStable::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
+                    "AccountId": "${IntegrationAccountId}",
+                    "Region": "us-west-2",
+                    "InvocationType": "RequestResponse",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_IntStable
+            - 
+              Name: PublishDeployment_IntStable
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPSetDeploymentContext
+                UserParameters: !Sub |
+                  {
+                    "ProjectId": "${ProjectName}_navexint_us-west-2",
+                    "BuildInfoFile": "ProjectVersion::build-record.json",
+                    "DeploymentContext": "int-stable",
+                    "JsonArtifactFiles": [
+                      "CfnDeploy_IntStable::stack-outputs.json",
+                      "CfnAuthDeploy_IntStable_UsWest2::stack-outputs.json"
                     ]
-                InputArtifacts:
-                  - Name: MergeArtifacts_IntStable
-                OutputArtifacts:
-                  - Name: Transform_IntStable
-                RunOrder: 3
-              - 
-                Name: FinalizedCfnConfig_IntStable
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPUpdateJsonFile
-                  UserParameters: |
-                    {
-                      "JsonFiles": [
-                        "App::aws-inf/template-configuration.json",
-                        "BuildOutput::template-configuration.json", 
-                        "Transform_IntStable::template-configuration.json" 
-                      ],
-                      "Json": {
-                        "Parameters": {
-                          "Subdomain": "id3",
-                          "DnsHostedZone": "navex-int.com",
-                          "DnsHostedZoneId": "Z3KPLDK2FOBNKU",
-                          "Stage": "Development"
-                        },
-                        "Tags": {
-                          "Navex:Technical:DeploymentContext": "int-stable",
-                          "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
-                        }
-                      },
-                      "OutputFile": "template-configuration.json"
-                    }
-                InputArtifacts:
-                  - Name: App
-                  - Name: BuildOutput
-                  - Name: ProjectVersion
-                  - Name: Transform_IntStable
-                OutputArtifacts:
-                  - Name: FinalizedCfnConfig_IntStable
-                RunOrder: 4
-              - 
-                Name: CfnDeploy_IntStable
-                Region: us-west-2
-                RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-codepipelineassume
-                ActionTypeId:
-                  Category: Deploy
-                  Owner: AWS
-                  Version: "1"
-                  Provider: CloudFormation
-                Configuration:
-                  ActionMode: CREATE_UPDATE
-                  Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                  RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
-                  StackName: !Sub ${ProjectName}-stable
-                  TemplatePath: "PackageUsWest2::app.packaged.yml"
-                  TemplateConfiguration: "FinalizedCfnConfig_IntStable::template-configuration.json"
-                  OutputFileName: stack-outputs.json
-                InputArtifacts:
-                  - Name: PackageUsWest2
-                  - Name: FinalizedCfnConfig_IntStable
-                OutputArtifacts:
-                  - Name: CfnDeploy_IntStable
-                RunOrder: 5
-              -
-                Name: ConfigUpload_IntStable          
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                InputArtifacts:
-                  - Name: Transform_IntStable
-                  - Name: CfnDeploy_IntStable
-                Configuration:
-                  FunctionName: CPS3Deploy
-                  UserParameters: !Sub |
-                    {
-                      "S3BucketName": "CfnDeploy_IntStable::stack-outputs.json:ConfigBucket",
-                      "BaseDirectory": "transformed-import",
-                      "PurgeDirectories": "enabled",
-                      "ExcludeArtifactsFromUpload": ["CfnDeploy_IntStable"],
-                      "AccountId": "${IntegrationAccountId}",
-                      "Region": "us-west-2"
-                    }
-                RunOrder: 6
-              - 
-                Name: FinalizedCfnAuthConfig_IntStable
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPUpdateJsonFile
-                  UserParameters: |
-                    {
-                      "JsonFiles": [
-                        "App::aws-inf/template-configuration.json"
-                      ],
-                      "Json": {
-                        "Parameters": {
-                          "KCBaseUrl": "CfnDeploy_IntStable::stack-outputs.json:Domain"
-                        },
-                        "Tags": {
-                          "Navex:Technical:DeploymentContext": "int-stable",
-                          "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
-                        } 
-                      },
-                      "OutputFile": "template-configuration.json"
-                    }
-                InputArtifacts:
-                  - Name: App
-                  - Name: ProjectVersion
-                  - Name: CfnDeploy_IntStable
-                OutputArtifacts:
-                  - Name: FinalizedCfnAuthConfig_IntStable
-                RunOrder: 6
-              - 
-                Name: CfnAuthDeploy_IntStable_UsWest2
-                Region: us-west-2
-                RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-codepipelineassume
-                ActionTypeId:
-                  Category: Deploy
-                  Owner: AWS
-                  Version: "1"
-                  Provider: CloudFormation
-                Configuration:
-                  ActionMode: CREATE_UPDATE
-                  Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                  RoleArn: !Sub arn:aws:iam::${IntegrationAccountId}:role/navex-deploymentservice
-                  StackName: !Sub ${ProjectName}-stable-auth
-                  TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
-                  TemplateConfiguration: "FinalizedCfnAuthConfig_IntStable::template-configuration.json"
-                  OutputFileName: stack-outputs.json
-                InputArtifacts:
-                  - Name: AuthPackageUsWest2
-                  - Name: FinalizedCfnAuthConfig_IntStable
-                OutputArtifacts:
-                  - Name: CfnAuthDeploy_IntStable_UsWest2
-                RunOrder: 7
-              -
-                Name: ImportConfig_IntStable
-                RunOrder: 7
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPInvokeLambda
-                  UserParameters: !Sub |
-                    {
-                      "TargetFunctionName": "CfnDeploy_IntStable::stack-outputs.json:CpConfigImportLambdaArn",
-                      "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
-                      "AccountId": "${IntegrationAccountId}",
-                      "Region": "us-west-2",
-                      "ParseResponse": true
-                    }
-                InputArtifacts:
-                  - Name: CfnDeploy_IntStable
-              -
-                Name: PostDeployApiActions_IntStable
-                RunOrder: 8
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPInvokeLambda
-                  UserParameters: !Sub |
-                    {
-                      "TargetFunctionName": "CfnDeploy_IntStable::stack-outputs.json:CpPostDeployLambdaArn",
-                      "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
-                      "AccountId": "${IntegrationAccountId}",
-                      "Region": "us-west-2",
-                      "InvocationType": "RequestResponse",
-                      "ParseResponse": true
-                    }
-                InputArtifacts:
-                  - Name: CfnDeploy_IntStable
-              - 
-                Name: PublishDeployment_IntStable
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPSetDeploymentContext
-                  UserParameters: !Sub |
-                    {
-                      "ProjectId": "${ProjectName}_navexint_us-west-2",
-                      "BuildInfoFile": "ProjectVersion::build-record.json",
-                      "DeploymentContext": "int-stable",
-                      "JsonArtifactFiles": [
-                        "CfnDeploy_IntStable::stack-outputs.json",
-                        "CfnAuthDeploy_IntStable_UsWest2::stack-outputs.json"
-                      ]
-                    }
-                InputArtifacts:
-                  - Name: ProjectVersion
-                  - Name: CfnDeploy_IntStable
-                  - Name: CfnAuthDeploy_IntStable_UsWest2                 
-                RunOrder: 9
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+                - Name: CfnDeploy_IntStable
+                - Name: CfnAuthDeploy_IntStable_UsWest2                 
+              RunOrder: 9
 
-        - !If
-          - SkipIntAndStage
-          - !Ref AWS::NoValue
-          - 
-            Name: StageEU
-            Actions:
-              - 
-                Name: GetDcArt_StageEU
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPGetDCArtFromBuildInfo
-                  UserParameters: !Sub |
-                    {
-                      "SourceProjectId": "${ProjectName}_navexstage_eu-central-1",
-                      "DeploymentContext": "stageEU",
-                      "BuildInfoFile": "ProjectVersion::build-record.json",
-                      "ProjectIds": {"aws-inf": "aws-inf_platform_navexstage_eu-central-1"}
+        - Name: StageEU
+          Actions:
+            - 
+              Name: GetDcArt_StageEU
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPGetDCArtFromBuildInfo
+                UserParameters: !Sub |
+                  {
+                    "SourceProjectId": "${ProjectName}_navexstage_eu-central-1",
+                    "DeploymentContext": "stageEU",
+                    "BuildInfoFile": "ProjectVersion::build-record.json",
+                    "ProjectIds": {"aws-inf": "aws-inf_platform_navexstage_eu-central-1"}
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+              OutputArtifacts:
+                - Name: GetDcArt_StageEU
+              RunOrder: 1
+            -
+              Name: MergeArtifacts_StageEU
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPMergeArtifacts
+                UserParameters: |
+                  {
+                    "ArtifactPrefixMap":{
+                      "GetDcArt_StageEU": "dc_art",
+                      "App": "app"
                     }
-                InputArtifacts:
-                  - Name: ProjectVersion
-                OutputArtifacts:
-                  - Name: GetDcArt_StageEU
-                RunOrder: 1
-              -
-                Name: MergeArtifacts_StageEU
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPMergeArtifacts
-                  UserParameters: |
-                    {
-                      "ArtifactPrefixMap":{
-                        "GetDcArt_StageEU": "dc_art",
-                        "App": "app"
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+                - Name: GetDcArt_StageEU
+                - Name: App
+              OutputArtifacts:
+                - Name: MergeArtifacts_StageEU
+              RunOrder: 2
+            - 
+              Name: Transform_StageEU
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref TransformCodeBuildProject
+                EnvironmentVariables: |
+                  [
+                    {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "false", "type": "PLAINTEXT"}
+                  ]
+              InputArtifacts:
+                - Name: MergeArtifacts_StageEU
+              OutputArtifacts:
+                - Name: Transform_StageEU
+              RunOrder: 3
+            - 
+              Name: FinalizedCfnConfig_StageEU
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json",
+                      "BuildOutput::template-configuration.json", 
+                      "Transform_StageEU::template-configuration.json" 
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "Subdomain": "id3",
+                        "DnsHostedZone": "navex-stage.eu",
+                        "DnsHostedZoneId": "Z343M2SX2SYHUN",
+                        "Stage": "Production",
+                        "DbaAccessCidr": "10.162.24614/31"
+                      },
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "stageEU",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      } 
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: BuildOutput
+                - Name: ProjectVersion
+                - Name: Transform_StageEU
+              OutputArtifacts:
+                - Name: FinalizedCfnConfig_StageEU
+              RunOrder: 4
+            - 
+              Name: CfnDeploy_StageEU
+              Region: eu-central-1
+              RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-stable
+                TemplatePath: "PackageEuCentral1::app.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnConfig_StageEU::template-configuration.json"
+                OutputFileName: stack-outputs.json
+              InputArtifacts:
+                - Name: PackageEuCentral1
+                - Name: FinalizedCfnConfig_StageEU
+              OutputArtifacts:
+                - Name: CfnDeploy_StageEU
+              RunOrder: 5
+            -
+              Name: ConfigUpload_StageEU          
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              InputArtifacts:
+                - Name: Transform_StageEU
+                - Name: CfnDeploy_StageEU
+              Configuration:
+                FunctionName: CPS3Deploy
+                UserParameters: !Sub |
+                  {
+                    "S3BucketName": "CfnDeploy_StageEU::stack-outputs.json:ConfigBucket",
+                    "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
+                    "ExcludeArtifactsFromUpload": ["CfnDeploy_StageEU"],
+                    "AccountId": "${StageAccountId}",
+                    "Region": "eu-central-1"
+                  }
+              RunOrder: 6
+            - 
+              Name: FinalizedCfnAuthConfig_StageEU
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json"
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "KCBaseUrl": "CfnDeploy_StageEU::stack-outputs.json:Domain"
+                      },
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "stageEU",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      } 
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: ProjectVersion
+                - Name: CfnDeploy_StageEU
+              OutputArtifacts:
+                - Name: FinalizedCfnAuthConfig_StageEU
+              RunOrder: 6
+            - 
+              Name: CfnAuthDeploy_StageEU_EuCentral1
+              Region: eu-central-1
+              RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-stable-auth
+                TemplatePath: "AuthPackageEuCentral1::auth.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnAuthConfig_StageEU::template-configuration.json"
+                OutputFileName: stack-outputs.json
+              InputArtifacts:
+                - Name: AuthPackageEuCentral1
+                - Name: FinalizedCfnAuthConfig_StageEU
+              OutputArtifacts:
+                - Name: CfnAuthDeploy_StageEU_EuCentral1
+              RunOrder: 7
+            -
+              Name: ImportConfig_StageEU
+              RunOrder: 7
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_StageEU::stack-outputs.json:CpConfigImportLambdaArn",
+                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "AccountId": "${StageAccountId}",
+                    "Region": "eu-central-1",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_StageEU
+            -
+              Name: PostDeployApiActions_StageEU
+              RunOrder: 8
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_StageEU::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
+                    "AccountId": "${StageAccountId}",
+                    "Region": "eu-central-1",
+                    "InvocationType": "RequestResponse",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_StageEU
+            - 
+              Name: PublishDeployment_StageEU
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPSetDeploymentContext
+                UserParameters: !Sub |
+                  {
+                    "ProjectId": "${ProjectName}_navexstage_eu-central-1",
+                    "BuildInfoFile": "ProjectVersion::build-record.json",
+                    "DeploymentContext": "stageEU",
+                    "JsonArtifactFiles": [
+                      "CfnDeploy_StageEU::stack-outputs.json",
+                      "CfnAuthDeploy_StageEU_EuCentral1::stack-outputs.json"
+                    ]
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+                - Name: CfnDeploy_StageEU
+                - Name: CfnAuthDeploy_StageEU_EuCentral1                 
+              RunOrder: 9            
+        - Name: StageUS
+          Actions:
+            - 
+              Name: GetDcArt_StageUS
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPGetDCArtFromBuildInfo
+                UserParameters: !Sub |
+                  {
+                    "SourceProjectId": "${ProjectName}_navexstage_us-east-1",
+                    "DeploymentContext": "stageUS",
+                    "BuildInfoFile": "ProjectVersion::build-record.json",
+                    "ProjectIds": {"aws-inf": "aws-inf_platform_navexstage_us-east-1"}
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+              OutputArtifacts:
+                - Name: GetDcArt_StageUS
+              RunOrder: 1
+            -
+              Name: MergeArtifacts_StageUS
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPMergeArtifacts
+                UserParameters: |
+                  {
+                    "ArtifactPrefixMap":{
+                      "GetDcArt_StageUS": "dc_art",
+                      "App": "app"
+                    }
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+                - Name: GetDcArt_StageUS
+                - Name: App
+              OutputArtifacts:
+                - Name: MergeArtifacts_StageUS
+              RunOrder: 2
+            - 
+              Name: Transform_StageUS
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref TransformCodeBuildProject
+                EnvironmentVariables: |
+                  [
+                    {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "false", "type": "PLAINTEXT"}
+                  ]
+              InputArtifacts:
+                - Name: MergeArtifacts_StageUS
+              OutputArtifacts:
+                - Name: Transform_StageUS
+              RunOrder: 3
+            - 
+              Name: FinalizedCfnConfig_StageUS
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json",
+                      "BuildOutput::template-configuration.json", 
+                      "Transform_StageUS::template-configuration.json" 
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "Subdomain": "id3",
+                        "DnsHostedZone": "navex-stage.com",
+                        "DnsHostedZoneId": "Z1GXJLTUOO7LYC",
+                        "Stage": "Production",
+                        "DesiredTaskCount": "3",
+                        "DbaAccessCidr": "10.98.26.14/31"
+                      },
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "stageUS",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
                       }
-                    }
-                InputArtifacts:
-                  - Name: ProjectVersion
-                  - Name: GetDcArt_StageEU
-                  - Name: App
-                OutputArtifacts:
-                  - Name: MergeArtifacts_StageEU
-                RunOrder: 2
-              - 
-                Name: Transform_StageEU
-                ActionTypeId:
-                  Category: Build
-                  Owner: AWS
-                  Version: "1"
-                  Provider: CodeBuild
-                Configuration:
-                  ProjectName: !Ref TransformCodeBuildProject
-                  EnvironmentVariables: |
-                    [
-                      {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "false", "type": "PLAINTEXT"}
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: BuildOutput
+                - Name: ProjectVersion
+                - Name: Transform_StageUS
+              OutputArtifacts:
+                - Name: FinalizedCfnConfig_StageUS
+              RunOrder: 4
+            - 
+              Name: CfnDeploy_StageUS
+              Region: us-east-1
+              RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-stable
+                TemplatePath: "PackageUsEast1::app.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnConfig_StageUS::template-configuration.json"
+                OutputFileName: stack-outputs.json
+              InputArtifacts:
+                - Name: PackageUsEast1
+                - Name: FinalizedCfnConfig_StageUS
+              OutputArtifacts:
+                - Name: CfnDeploy_StageUS
+              RunOrder: 5
+            -
+              Name: ConfigUpload_StageUS          
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              InputArtifacts:
+                - Name: Transform_StageUS
+                - Name: CfnDeploy_StageUS
+              Configuration:
+                FunctionName: CPS3Deploy
+                UserParameters: !Sub |
+                  {
+                    "S3BucketName": "CfnDeploy_StageUS::stack-outputs.json:ConfigBucket",
+                    "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
+                    "ExcludeArtifactsFromUpload": ["CfnDeploy_StageUS"],
+                    "AccountId": "${StageAccountId}",
+                    "Region": "us-east-1"
+                  }
+              RunOrder: 6
+            - 
+              Name: FinalizedCfnAuthConfig_StageUS
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json"
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "KCBaseUrl": "CfnDeploy_StageUS::stack-outputs.json:Domain"
+                      },
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "stageUS",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      } 
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: ProjectVersion
+                - Name: CfnDeploy_StageUS
+              OutputArtifacts:
+                - Name: FinalizedCfnAuthConfig_StageUS
+              RunOrder: 6
+            - 
+              Name: CfnAuthDeploy_StageUS_UsEast1
+              Region: us-east-1
+              RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-stable-auth
+                TemplatePath: "AuthPackageUsEast1::auth.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnAuthConfig_StageUS::template-configuration.json"
+                OutputFileName: stack-outputs.json
+              InputArtifacts:
+                - Name: AuthPackageUsEast1
+                - Name: FinalizedCfnAuthConfig_StageUS
+              OutputArtifacts:
+                - Name: CfnAuthDeploy_StageUS_UsEast1
+              RunOrder: 7
+            -
+              Name: ImportConfig_StageUS
+              RunOrder: 7
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_StageUS::stack-outputs.json:CpConfigImportLambdaArn",
+                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "AccountId": "${StageAccountId}",
+                    "Region": "us-east-1",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_StageUS
+            -
+              Name: PostDeployApiActions_StageUS
+              RunOrder: 8
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_StageUS::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
+                    "AccountId": "${StageAccountId}",
+                    "Region": "us-east-1",
+                    "InvocationType": "RequestResponse",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_StageUS
+            - 
+              Name: PublishDeployment_StageUS
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPSetDeploymentContext
+                UserParameters: !Sub |
+                  {
+                    "ProjectId": "${ProjectName}_navexstage_us-east-1",
+                    "BuildInfoFile": "ProjectVersion::build-record.json",
+                    "DeploymentContext": "stageUS",
+                    "JsonArtifactFiles": [
+                      "CfnDeploy_StageUS::stack-outputs.json",
+                      "CfnAuthDeploy_StageUS_UsEast1::stack-outputs.json"
                     ]
-                InputArtifacts:
-                  - Name: MergeArtifacts_StageEU
-                OutputArtifacts:
-                  - Name: Transform_StageEU
-                RunOrder: 3
-              - 
-                Name: FinalizedCfnConfig_StageEU
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPUpdateJsonFile
-                  UserParameters: |
-                    {
-                      "JsonFiles": [
-                        "App::aws-inf/template-configuration.json",
-                        "BuildOutput::template-configuration.json", 
-                        "Transform_StageEU::template-configuration.json" 
-                      ],
-                      "Json": {
-                        "Parameters": {
-                          "Subdomain": "id3",
-                          "DnsHostedZone": "navex-stage.eu",
-                          "DnsHostedZoneId": "Z343M2SX2SYHUN",
-                          "Stage": "Production",
-                          "DbaAccessCidr": "10.162.24614/31"
-                        },
-                        "Tags": {
-                          "Navex:Technical:DeploymentContext": "stageEU",
-                          "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
-                        } 
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+                - Name: CfnDeploy_StageUS
+                - Name: CfnAuthDeploy_StageUS_UsEast1                 
+              RunOrder: 9
+            -
+              Name: ManualGate_StageUS
+              ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Version: "1"
+                Provider: Manual
+              RunOrder: 10
+        - Name: ProdEU
+          Actions:
+            - 
+              Name: GetDcArt_ProdEU
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPGetDCArtFromBuildInfo
+                UserParameters: !Sub |
+                  {
+                    "SourceProjectId": "${ProjectName}_navexprod_eu-central-1",
+                    "DeploymentContext": "prodEU",
+                    "BuildInfoFile": "ProjectVersion::build-record.json",
+                    "ProjectIds": {"aws-inf": "aws-inf_platform_navexprod_eu-central-1"}
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+              OutputArtifacts:
+                - Name: GetDcArt_ProdEU
+              RunOrder: 1
+            -
+              Name: MergeArtifacts_ProdEU
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPMergeArtifacts
+                UserParameters: |
+                  {
+                    "ArtifactPrefixMap":{
+                      "GetDcArt_ProdEU": "dc_art",
+                      "App": "app"
+                    }
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+                - Name: GetDcArt_ProdEU
+                - Name: App
+              OutputArtifacts:
+                - Name: MergeArtifacts_ProdEU
+              RunOrder: 2
+            - 
+              Name: Transform_ProdEU
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref TransformCodeBuildProject
+                EnvironmentVariables: |
+                  [
+                    {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "false", "type": "PLAINTEXT"}
+                  ]
+              InputArtifacts:
+                - Name: MergeArtifacts_ProdEU
+              OutputArtifacts:
+                - Name: Transform_ProdEU
+              RunOrder: 3
+            - 
+              Name: FinalizedCfnConfig_ProdEU
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json",
+                      "BuildOutput::template-configuration.json", 
+                      "Transform_ProdEU::template-configuration.json" 
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "Subdomain": "id3",
+                        "DnsHostedZone": "navexone.eu",
+                        "DnsHostedZoneId": "Z22ECC3Q0NT9H2",
+                        "Stage": "Production",
+                        "DesiredTaskCount": "3",
+                        "DbaAccessCidr": "10.162.24614/31"
                       },
-                      "OutputFile": "template-configuration.json"
-                    }
-                InputArtifacts:
-                  - Name: App
-                  - Name: BuildOutput
-                  - Name: ProjectVersion
-                  - Name: Transform_StageEU
-                OutputArtifacts:
-                  - Name: FinalizedCfnConfig_StageEU
-                RunOrder: 4
-              - 
-                Name: CfnDeploy_StageEU
-                Region: eu-central-1
-                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
-                ActionTypeId:
-                  Category: Deploy
-                  Owner: AWS
-                  Version: "1"
-                  Provider: CloudFormation
-                Configuration:
-                  ActionMode: CREATE_UPDATE
-                  Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                  RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
-                  StackName: !Sub ${ProjectName}-stable
-                  TemplatePath: "PackageEuCentral1::app.packaged.yml"
-                  TemplateConfiguration: "FinalizedCfnConfig_StageEU::template-configuration.json"
-                  OutputFileName: stack-outputs.json
-                InputArtifacts:
-                  - Name: PackageEuCentral1
-                  - Name: FinalizedCfnConfig_StageEU
-                OutputArtifacts:
-                  - Name: CfnDeploy_StageEU
-                RunOrder: 5
-              -
-                Name: ConfigUpload_StageEU          
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                InputArtifacts:
-                  - Name: Transform_StageEU
-                  - Name: CfnDeploy_StageEU
-                Configuration:
-                  FunctionName: CPS3Deploy
-                  UserParameters: !Sub |
-                    {
-                      "S3BucketName": "CfnDeploy_StageEU::stack-outputs.json:ConfigBucket",
-                      "BaseDirectory": "transformed-import",
-                      "PurgeDirectories": "enabled",
-                      "ExcludeArtifactsFromUpload": ["CfnDeploy_StageEU"],
-                      "AccountId": "${StageAccountId}",
-                      "Region": "eu-central-1"
-                    }
-                RunOrder: 6
-              - 
-                Name: FinalizedCfnAuthConfig_StageEU
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPUpdateJsonFile
-                  UserParameters: |
-                    {
-                      "JsonFiles": [
-                        "App::aws-inf/template-configuration.json"
-                      ],
-                      "Json": {
-                        "Parameters": {
-                          "KCBaseUrl": "CfnDeploy_StageEU::stack-outputs.json:Domain"
-                        },
-                        "Tags": {
-                          "Navex:Technical:DeploymentContext": "stageEU",
-                          "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
-                        } 
-                      },
-                      "OutputFile": "template-configuration.json"
-                    }
-                InputArtifacts:
-                  - Name: App
-                  - Name: ProjectVersion
-                  - Name: CfnDeploy_StageEU
-                OutputArtifacts:
-                  - Name: FinalizedCfnAuthConfig_StageEU
-                RunOrder: 6
-              - 
-                Name: CfnAuthDeploy_StageEU_EuCentral1
-                Region: eu-central-1
-                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
-                ActionTypeId:
-                  Category: Deploy
-                  Owner: AWS
-                  Version: "1"
-                  Provider: CloudFormation
-                Configuration:
-                  ActionMode: CREATE_UPDATE
-                  Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                  RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
-                  StackName: !Sub ${ProjectName}-stable-auth
-                  TemplatePath: "AuthPackageEuCentral1::auth.packaged.yml"
-                  TemplateConfiguration: "FinalizedCfnAuthConfig_StageEU::template-configuration.json"
-                  OutputFileName: stack-outputs.json
-                InputArtifacts:
-                  - Name: AuthPackageEuCentral1
-                  - Name: FinalizedCfnAuthConfig_StageEU
-                OutputArtifacts:
-                  - Name: CfnAuthDeploy_StageEU_EuCentral1
-                RunOrder: 7
-              -
-                Name: ImportConfig_StageEU
-                RunOrder: 7
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPInvokeLambda
-                  UserParameters: !Sub |
-                    {
-                      "TargetFunctionName": "CfnDeploy_StageEU::stack-outputs.json:CpConfigImportLambdaArn",
-                      "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
-                      "AccountId": "${StageAccountId}",
-                      "Region": "eu-central-1",
-                      "ParseResponse": true
-                    }
-                InputArtifacts:
-                  - Name: CfnDeploy_StageEU
-              -
-                Name: PostDeployApiActions_StageEU
-                RunOrder: 8
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPInvokeLambda
-                  UserParameters: !Sub |
-                    {
-                      "TargetFunctionName": "CfnDeploy_StageEU::stack-outputs.json:CpPostDeployLambdaArn",
-                      "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
-                      "AccountId": "${StageAccountId}",
-                      "Region": "eu-central-1",
-                      "InvocationType": "RequestResponse",
-                      "ParseResponse": true
-                    }
-                InputArtifacts:
-                  - Name: CfnDeploy_StageEU
-              - 
-                Name: PublishDeployment_StageEU
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPSetDeploymentContext
-                  UserParameters: !Sub |
-                    {
-                      "ProjectId": "${ProjectName}_navexstage_eu-central-1",
-                      "BuildInfoFile": "ProjectVersion::build-record.json",
-                      "DeploymentContext": "stageEU",
-                      "JsonArtifactFiles": [
-                        "CfnDeploy_StageEU::stack-outputs.json",
-                        "CfnAuthDeploy_StageEU_EuCentral1::stack-outputs.json"
-                      ]
-                    }
-                InputArtifacts:
-                  - Name: ProjectVersion
-                  - Name: CfnDeploy_StageEU
-                  - Name: CfnAuthDeploy_StageEU_EuCentral1                 
-                RunOrder: 9
-              # -
-              #   Name: ManualGate_StageEU
-              #   ActionTypeId:
-              #     Category: Approval
-              #     Owner: AWS
-              #     Version: "1"
-              #     Provider: Manual
-              #   RunOrder: 9              
-
-        - !If
-          - SkipIntAndStage
-          - !Ref AWS::NoValue
-          - 
-            Name: StageUS
-            Actions:
-              - 
-                Name: GetDcArt_StageUS
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPGetDCArtFromBuildInfo
-                  UserParameters: !Sub |
-                    {
-                      "SourceProjectId": "${ProjectName}_navexstage_us-east-1",
-                      "DeploymentContext": "stageUS",
-                      "BuildInfoFile": "ProjectVersion::build-record.json",
-                      "ProjectIds": {"aws-inf": "aws-inf_platform_navexstage_us-east-1"}
-                    }
-                InputArtifacts:
-                  - Name: ProjectVersion
-                OutputArtifacts:
-                  - Name: GetDcArt_StageUS
-                RunOrder: 1
-              -
-                Name: MergeArtifacts_StageUS
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPMergeArtifacts
-                  UserParameters: |
-                    {
-                      "ArtifactPrefixMap":{
-                        "GetDcArt_StageUS": "dc_art",
-                        "App": "app"
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "prodEU",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
                       }
-                    }
-                InputArtifacts:
-                  - Name: ProjectVersion
-                  - Name: GetDcArt_StageUS
-                  - Name: App
-                OutputArtifacts:
-                  - Name: MergeArtifacts_StageUS
-                RunOrder: 2
-              - 
-                Name: Transform_StageUS
-                ActionTypeId:
-                  Category: Build
-                  Owner: AWS
-                  Version: "1"
-                  Provider: CodeBuild
-                Configuration:
-                  ProjectName: !Ref TransformCodeBuildProject
-                  EnvironmentVariables: |
-                    [
-                      {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "false", "type": "PLAINTEXT"}
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: BuildOutput
+                - Name: ProjectVersion
+                - Name: Transform_ProdEU
+              OutputArtifacts:
+                - Name: FinalizedCfnConfig_ProdEU
+              RunOrder: 4
+            - 
+              Name: CfnDeploy_ProdEU
+              Region: eu-central-1
+              RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-stable
+                TemplatePath: "PackageEuCentral1::app.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnConfig_ProdEU::template-configuration.json"
+                OutputFileName: stack-outputs.json
+              InputArtifacts:
+                - Name: PackageEuCentral1
+                - Name: FinalizedCfnConfig_ProdEU
+              OutputArtifacts:
+                - Name: CfnDeploy_ProdEU
+              RunOrder: 5
+            -
+              Name: ConfigUpload_ProdEU          
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              InputArtifacts:
+                - Name: Transform_ProdEU
+                - Name: CfnDeploy_ProdEU
+              Configuration:
+                FunctionName: CPS3Deploy
+                UserParameters: !Sub |
+                  {
+                    "S3BucketName": "CfnDeploy_ProdEU::stack-outputs.json:ConfigBucket",
+                    "BaseDirectory": "transformed-import",
+                    "PurgeDirectories": "enabled",
+                    "ExcludeArtifactsFromUpload": ["CfnDeploy_ProdEU"],
+                    "AccountId": "${ProductionAccountId}",
+                    "Region": "eu-central-1"
+                  }
+              RunOrder: 6
+            - 
+              Name: FinalizedCfnAuthConfig_ProdEU
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPUpdateJsonFile
+                UserParameters: |
+                  {
+                    "JsonFiles": [
+                      "App::aws-inf/template-configuration.json"
+                    ],
+                    "Json": {
+                      "Parameters": {
+                        "KCBaseUrl": "CfnDeploy_ProdEU::stack-outputs.json:Domain"
+                      },
+                      "Tags": {
+                        "Navex:Technical:DeploymentContext": "prodEU",
+                        "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
+                      } 
+                    },
+                    "OutputFile": "template-configuration.json"
+                  }
+              InputArtifacts:
+                - Name: App
+                - Name: ProjectVersion
+                - Name: CfnDeploy_ProdEU
+              OutputArtifacts:
+                - Name: FinalizedCfnAuthConfig_ProdEU
+              RunOrder: 6
+            - 
+              Name: CfnAuthDeploy_ProdEU_EuCentral1
+              Region: eu-central-1
+              RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-codepipelineassume
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-deploymentservice
+                StackName: !Sub ${ProjectName}-stable-auth
+                TemplatePath: "AuthPackageEuCentral1::auth.packaged.yml"
+                TemplateConfiguration: "FinalizedCfnAuthConfig_ProdEU::template-configuration.json"
+                OutputFileName: stack-outputs.json
+              InputArtifacts:
+                - Name: AuthPackageEuCentral1
+                - Name: FinalizedCfnAuthConfig_ProdEU
+              OutputArtifacts:
+                - Name: CfnAuthDeploy_ProdEU_EuCentral1
+              RunOrder: 7
+            -
+              Name: ImportConfig_ProdEU
+              RunOrder: 7
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_ProdEU::stack-outputs.json:CpConfigImportLambdaArn",
+                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "AccountId": "${ProductionAccountId}",
+                    "Region": "eu-central-1",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_ProdEU
+            -
+              Name: PostDeployApiActions_ProdEU
+              RunOrder: 8
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPInvokeLambda
+                UserParameters: !Sub |
+                  {
+                    "TargetFunctionName": "CfnDeploy_ProdEU::stack-outputs.json:CpPostDeployLambdaArn",
+                    "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
+                    "AccountId": "${ProductionAccountId}",
+                    "Region": "eu-central-1",
+                    "InvocationType": "RequestResponse",
+                    "ParseResponse": true
+                  }
+              InputArtifacts:
+                - Name: CfnDeploy_ProdEU
+            - 
+              Name: PublishDeployment_ProdEU
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Version: "1"
+                Provider: Lambda
+              Configuration:
+                FunctionName: CPSetDeploymentContext
+                UserParameters: !Sub |
+                  {
+                    "ProjectId": "${ProjectName}_navexprod_eu-central-1",
+                    "BuildInfoFile": "ProjectVersion::build-record.json",
+                    "DeploymentContext": "prodEU",
+                    "JsonArtifactFiles": [
+                      "CfnDeploy_ProdEU::stack-outputs.json",
+                      "CfnAuthDeploy_ProdEU_EuCentral1::stack-outputs.json"
                     ]
-                InputArtifacts:
-                  - Name: MergeArtifacts_StageUS
-                OutputArtifacts:
-                  - Name: Transform_StageUS
-                RunOrder: 3
-              - 
-                Name: FinalizedCfnConfig_StageUS
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPUpdateJsonFile
-                  UserParameters: |
-                    {
-                      "JsonFiles": [
-                        "App::aws-inf/template-configuration.json",
-                        "BuildOutput::template-configuration.json", 
-                        "Transform_StageUS::template-configuration.json" 
-                      ],
-                      "Json": {
-                        "Parameters": {
-                          "Subdomain": "id3",
-                          "DnsHostedZone": "navex-stage.com",
-                          "DnsHostedZoneId": "Z1GXJLTUOO7LYC",
-                          "Stage": "Production",
-                          "DesiredTaskCount": "3",
-                          "DbaAccessCidr": "10.98.26.14/31"
-                        },
-                        "Tags": {
-                          "Navex:Technical:DeploymentContext": "stageUS",
-                          "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
-                        }
-                      },
-                      "OutputFile": "template-configuration.json"
-                    }
-                InputArtifacts:
-                  - Name: App
-                  - Name: BuildOutput
-                  - Name: ProjectVersion
-                  - Name: Transform_StageUS
-                OutputArtifacts:
-                  - Name: FinalizedCfnConfig_StageUS
-                RunOrder: 4
-              - 
-                Name: CfnDeploy_StageUS
-                Region: us-east-1
-                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
-                ActionTypeId:
-                  Category: Deploy
-                  Owner: AWS
-                  Version: "1"
-                  Provider: CloudFormation
-                Configuration:
-                  ActionMode: CREATE_UPDATE
-                  Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                  RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
-                  StackName: !Sub ${ProjectName}-stable
-                  TemplatePath: "PackageUsEast1::app.packaged.yml"
-                  TemplateConfiguration: "FinalizedCfnConfig_StageUS::template-configuration.json"
-                  OutputFileName: stack-outputs.json
-                InputArtifacts:
-                  - Name: PackageUsEast1
-                  - Name: FinalizedCfnConfig_StageUS
-                OutputArtifacts:
-                  - Name: CfnDeploy_StageUS
-                RunOrder: 5
-              -
-                Name: ConfigUpload_StageUS          
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                InputArtifacts:
-                  - Name: Transform_StageUS
-                  - Name: CfnDeploy_StageUS
-                Configuration:
-                  FunctionName: CPS3Deploy
-                  UserParameters: !Sub |
-                    {
-                      "S3BucketName": "CfnDeploy_StageUS::stack-outputs.json:ConfigBucket",
-                      "BaseDirectory": "transformed-import",
-                      "PurgeDirectories": "enabled",
-                      "ExcludeArtifactsFromUpload": ["CfnDeploy_StageUS"],
-                      "AccountId": "${StageAccountId}",
-                      "Region": "us-east-1"
-                    }
-                RunOrder: 6
-              - 
-                Name: FinalizedCfnAuthConfig_StageUS
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPUpdateJsonFile
-                  UserParameters: |
-                    {
-                      "JsonFiles": [
-                        "App::aws-inf/template-configuration.json"
-                      ],
-                      "Json": {
-                        "Parameters": {
-                          "KCBaseUrl": "CfnDeploy_StageUS::stack-outputs.json:Domain"
-                        },
-                        "Tags": {
-                          "Navex:Technical:DeploymentContext": "stageUS",
-                          "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
-                        } 
-                      },
-                      "OutputFile": "template-configuration.json"
-                    }
-                InputArtifacts:
-                  - Name: App
-                  - Name: ProjectVersion
-                  - Name: CfnDeploy_StageUS
-                OutputArtifacts:
-                  - Name: FinalizedCfnAuthConfig_StageUS
-                RunOrder: 6
-              - 
-                Name: CfnAuthDeploy_StageUS_UsEast1
-                Region: us-east-1
-                RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-codepipelineassume
-                ActionTypeId:
-                  Category: Deploy
-                  Owner: AWS
-                  Version: "1"
-                  Provider: CloudFormation
-                Configuration:
-                  ActionMode: CREATE_UPDATE
-                  Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                  RoleArn: !Sub arn:aws:iam::${StageAccountId}:role/navex-deploymentservice
-                  StackName: !Sub ${ProjectName}-stable-auth
-                  TemplatePath: "AuthPackageUsEast1::auth.packaged.yml"
-                  TemplateConfiguration: "FinalizedCfnAuthConfig_StageUS::template-configuration.json"
-                  OutputFileName: stack-outputs.json
-                InputArtifacts:
-                  - Name: AuthPackageUsEast1
-                  - Name: FinalizedCfnAuthConfig_StageUS
-                OutputArtifacts:
-                  - Name: CfnAuthDeploy_StageUS_UsEast1
-                RunOrder: 7
-              -
-                Name: ImportConfig_StageUS
-                RunOrder: 7
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPInvokeLambda
-                  UserParameters: !Sub |
-                    {
-                      "TargetFunctionName": "CfnDeploy_StageUS::stack-outputs.json:CpConfigImportLambdaArn",
-                      "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
-                      "AccountId": "${StageAccountId}",
-                      "Region": "us-east-1",
-                      "ParseResponse": true
-                    }
-                InputArtifacts:
-                  - Name: CfnDeploy_StageUS
-              -
-                Name: PostDeployApiActions_StageUS
-                RunOrder: 8
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPInvokeLambda
-                  UserParameters: !Sub |
-                    {
-                      "TargetFunctionName": "CfnDeploy_StageUS::stack-outputs.json:CpPostDeployLambdaArn",
-                      "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
-                      "AccountId": "${StageAccountId}",
-                      "Region": "us-east-1",
-                      "InvocationType": "RequestResponse",
-                      "ParseResponse": true
-                    }
-                InputArtifacts:
-                  - Name: CfnDeploy_StageUS
-              - 
-                Name: PublishDeployment_StageUS
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPSetDeploymentContext
-                  UserParameters: !Sub |
-                    {
-                      "ProjectId": "${ProjectName}_navexstage_us-east-1",
-                      "BuildInfoFile": "ProjectVersion::build-record.json",
-                      "DeploymentContext": "stageUS",
-                      "JsonArtifactFiles": [
-                        "CfnDeploy_StageUS::stack-outputs.json",
-                        "CfnAuthDeploy_StageUS_UsEast1::stack-outputs.json"
-                      ]
-                    }
-                InputArtifacts:
-                  - Name: ProjectVersion
-                  - Name: CfnDeploy_StageUS
-                  - Name: CfnAuthDeploy_StageUS_UsEast1                 
-                RunOrder: 9
-              -
-                Name: ManualGate_StageUS
-                ActionTypeId:
-                  Category: Approval
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Manual
-                RunOrder: 10
-
-        - !If
-          - SkipToProdUS
-          - !Ref AWS::NoValue
-          - 
-            Name: ProdEU
-            Actions:
-              - 
-                Name: GetDcArt_ProdEU
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPGetDCArtFromBuildInfo
-                  UserParameters: !Sub |
-                    {
-                      "SourceProjectId": "${ProjectName}_navexprod_eu-central-1",
-                      "DeploymentContext": "prodEU",
-                      "BuildInfoFile": "ProjectVersion::build-record.json",
-                      "ProjectIds": {"aws-inf": "aws-inf_platform_navexprod_eu-central-1"}
-                    }
-                InputArtifacts:
-                  - Name: ProjectVersion
-                OutputArtifacts:
-                  - Name: GetDcArt_ProdEU
-                RunOrder: 1
-              -
-                Name: MergeArtifacts_ProdEU
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPMergeArtifacts
-                  UserParameters: |
-                    {
-                      "ArtifactPrefixMap":{
-                        "GetDcArt_ProdEU": "dc_art",
-                        "App": "app"
-                      }
-                    }
-                InputArtifacts:
-                  - Name: ProjectVersion
-                  - Name: GetDcArt_ProdEU
-                  - Name: App
-                OutputArtifacts:
-                  - Name: MergeArtifacts_ProdEU
-                RunOrder: 2
-              - 
-                Name: Transform_ProdEU
-                ActionTypeId:
-                  Category: Build
-                  Owner: AWS
-                  Version: "1"
-                  Provider: CodeBuild
-                Configuration:
-                  ProjectName: !Ref TransformCodeBuildProject
-                  EnvironmentVariables: |
-                    [
-                      {"name": "INCLUDE_ADMIN_USER_IMPORT", "value": "false", "type": "PLAINTEXT"}
-                    ]
-                InputArtifacts:
-                  - Name: MergeArtifacts_ProdEU
-                OutputArtifacts:
-                  - Name: Transform_ProdEU
-                RunOrder: 3
-              - 
-                Name: FinalizedCfnConfig_ProdEU
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPUpdateJsonFile
-                  UserParameters: |
-                    {
-                      "JsonFiles": [
-                        "App::aws-inf/template-configuration.json",
-                        "BuildOutput::template-configuration.json", 
-                        "Transform_ProdEU::template-configuration.json" 
-                      ],
-                      "Json": {
-                        "Parameters": {
-                          "Subdomain": "id3",
-                          "DnsHostedZone": "navexone.eu",
-                          "DnsHostedZoneId": "Z22ECC3Q0NT9H2",
-                          "Stage": "Production",
-                          "DesiredTaskCount": "3",
-                          "DbaAccessCidr": "10.162.24614/31"
-                        },
-                        "Tags": {
-                          "Navex:Technical:DeploymentContext": "prodEU",
-                          "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
-                        }
-                      },
-                      "OutputFile": "template-configuration.json"
-                    }
-                InputArtifacts:
-                  - Name: App
-                  - Name: BuildOutput
-                  - Name: ProjectVersion
-                  - Name: Transform_ProdEU
-                OutputArtifacts:
-                  - Name: FinalizedCfnConfig_ProdEU
-                RunOrder: 4
-              - 
-                Name: CfnDeploy_ProdEU
-                Region: eu-central-1
-                RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-codepipelineassume
-                ActionTypeId:
-                  Category: Deploy
-                  Owner: AWS
-                  Version: "1"
-                  Provider: CloudFormation
-                Configuration:
-                  ActionMode: CREATE_UPDATE
-                  Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                  RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-deploymentservice
-                  StackName: !Sub ${ProjectName}-stable
-                  TemplatePath: "PackageEuCentral1::app.packaged.yml"
-                  TemplateConfiguration: "FinalizedCfnConfig_ProdEU::template-configuration.json"
-                  OutputFileName: stack-outputs.json
-                InputArtifacts:
-                  - Name: PackageEuCentral1
-                  - Name: FinalizedCfnConfig_ProdEU
-                OutputArtifacts:
-                  - Name: CfnDeploy_ProdEU
-                RunOrder: 5
-              -
-                Name: ConfigUpload_ProdEU          
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                InputArtifacts:
-                  - Name: Transform_ProdEU
-                  - Name: CfnDeploy_ProdEU
-                Configuration:
-                  FunctionName: CPS3Deploy
-                  UserParameters: !Sub |
-                    {
-                      "S3BucketName": "CfnDeploy_ProdEU::stack-outputs.json:ConfigBucket",
-                      "BaseDirectory": "transformed-import",
-                      "PurgeDirectories": "enabled",
-                      "ExcludeArtifactsFromUpload": ["CfnDeploy_ProdEU"],
-                      "AccountId": "${ProductionAccountId}",
-                      "Region": "eu-central-1"
-                    }
-                RunOrder: 6
-              - 
-                Name: FinalizedCfnAuthConfig_ProdEU
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPUpdateJsonFile
-                  UserParameters: |
-                    {
-                      "JsonFiles": [
-                        "App::aws-inf/template-configuration.json"
-                      ],
-                      "Json": {
-                        "Parameters": {
-                          "KCBaseUrl": "CfnDeploy_ProdEU::stack-outputs.json:Domain"
-                        },
-                        "Tags": {
-                          "Navex:Technical:DeploymentContext": "prodEU",
-                          "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
-                        } 
-                      },
-                      "OutputFile": "template-configuration.json"
-                    }
-                InputArtifacts:
-                  - Name: App
-                  - Name: ProjectVersion
-                  - Name: CfnDeploy_ProdEU
-                OutputArtifacts:
-                  - Name: FinalizedCfnAuthConfig_ProdEU
-                RunOrder: 6
-              - 
-                Name: CfnAuthDeploy_ProdEU_EuCentral1
-                Region: eu-central-1
-                RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-codepipelineassume
-                ActionTypeId:
-                  Category: Deploy
-                  Owner: AWS
-                  Version: "1"
-                  Provider: CloudFormation
-                Configuration:
-                  ActionMode: CREATE_UPDATE
-                  Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
-                  RoleArn: !Sub arn:aws:iam::${ProductionAccountId}:role/navex-deploymentservice
-                  StackName: !Sub ${ProjectName}-stable-auth
-                  TemplatePath: "AuthPackageEuCentral1::auth.packaged.yml"
-                  TemplateConfiguration: "FinalizedCfnAuthConfig_ProdEU::template-configuration.json"
-                  OutputFileName: stack-outputs.json
-                InputArtifacts:
-                  - Name: AuthPackageEuCentral1
-                  - Name: FinalizedCfnAuthConfig_ProdEU
-                OutputArtifacts:
-                  - Name: CfnAuthDeploy_ProdEU_EuCentral1
-                RunOrder: 7
-              -
-                Name: ImportConfig_ProdEU
-                RunOrder: 7
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPInvokeLambda
-                  UserParameters: !Sub |
-                    {
-                      "TargetFunctionName": "CfnDeploy_ProdEU::stack-outputs.json:CpConfigImportLambdaArn",
-                      "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
-                      "AccountId": "${ProductionAccountId}",
-                      "Region": "eu-central-1",
-                      "ParseResponse": true
-                    }
-                InputArtifacts:
-                  - Name: CfnDeploy_ProdEU
-              -
-                Name: PostDeployApiActions_ProdEU
-                RunOrder: 8
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPInvokeLambda
-                  UserParameters: !Sub |
-                    {
-                      "TargetFunctionName": "CfnDeploy_ProdEU::stack-outputs.json:CpPostDeployLambdaArn",
-                      "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
-                      "AccountId": "${ProductionAccountId}",
-                      "Region": "eu-central-1",
-                      "InvocationType": "RequestResponse",
-                      "ParseResponse": true
-                    }
-                InputArtifacts:
-                  - Name: CfnDeploy_ProdEU
-              - 
-                Name: PublishDeployment_ProdEU
-                ActionTypeId:
-                  Category: Invoke
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Lambda
-                Configuration:
-                  FunctionName: CPSetDeploymentContext
-                  UserParameters: !Sub |
-                    {
-                      "ProjectId": "${ProjectName}_navexprod_eu-central-1",
-                      "BuildInfoFile": "ProjectVersion::build-record.json",
-                      "DeploymentContext": "prodEU",
-                      "JsonArtifactFiles": [
-                        "CfnDeploy_ProdEU::stack-outputs.json",
-                        "CfnAuthDeploy_ProdEU_EuCentral1::stack-outputs.json"
-                      ]
-                    }
-                InputArtifacts:
-                  - Name: ProjectVersion
-                  - Name: CfnDeploy_ProdEU
-                  - Name: CfnAuthDeploy_ProdEU_EuCentral1                 
-                RunOrder: 9
-              -
-                Name: ManualGate_ProdEU
-                ActionTypeId:
-                  Category: Approval
-                  Owner: AWS
-                  Version: "1"
-                  Provider: Manual
-                RunOrder: 10
-
-        - 
-          Name: ProdUS
+                  }
+              InputArtifacts:
+                - Name: ProjectVersion
+                - Name: CfnDeploy_ProdEU
+                - Name: CfnAuthDeploy_ProdEU_EuCentral1                 
+              RunOrder: 9
+            -
+              Name: ManualGate_ProdEU
+              ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Version: "1"
+                Provider: Manual
+              RunOrder: 10
+        - Name: ProdUS
           Actions:
             - 
               Name: GetDcArt_ProdUS
