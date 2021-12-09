@@ -89,7 +89,7 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p redirectUris -v "${CcAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
 
       # Set coi client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*" -v "${SingleDomainUrl}/disclosures/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "${SingleDomainUrl}/disclosures/*"
 
       # Set insights client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p redirectUris -v "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" -v "${DoormanBaseUrl}/*"
