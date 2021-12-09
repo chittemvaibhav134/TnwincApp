@@ -122,6 +122,9 @@
         {
           "Name": "LaunchDarklySdkKeySsmArn",
           "DefaultValue": "None"
+        },
+        {
+          "Name": "SingleDomain"
         }
       ]
     },

@@ -34,6 +34,7 @@ phases:
       - LaunchDarklySdkKeySsmValue=$(jq -r '.LaunchDarklySdkKeySsmArn' "$DC_ART_DIR/global-configuration")
       - EpadminRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")      
       - CcAuthRedirectUrl=$(jq -r '.ApiBaseUrl' "$DC_ART_DIR/ng-learning-platform")
+      - SingleDomainUrl=$(jq -r '.SingleDomain' "$DC_ART_DIR/global-configuration")
       - mkdir transformed-import
       - |
         TransformScript="$APP_DIR/aws-inf/realm_transform.py"
@@ -88,7 +89,7 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p redirectUris -v "${CcAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
 
       # Set coi client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "${SingleDomainUrl}/disclosures/*"
 
       # Set insights client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p redirectUris -v "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" -v "${DoormanBaseUrl}/*"

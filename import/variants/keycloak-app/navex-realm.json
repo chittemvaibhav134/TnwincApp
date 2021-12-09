@@ -2142,10 +2142,8 @@
       ],
       "publicClient": true,
       "redirectUris": [
-        "https://auth.coi.devlocal.navex-pe.com:18443/*",
         "https://auth.coi.devlocal.navex-pe.com:6443/*",
-        "https://auth.coi.devlocal.navex-pe.com:8443/*",
-        "https://doorman.dev.gw.local/*"
+        "https://auth.devlocal.navex-pe.com:6443/*"
       ],
       "secret": "9bcd2fa1-b504-4949-89ca-5ab076dcc6f8",
       "serviceAccountsEnabled": false,
