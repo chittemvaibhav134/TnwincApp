@@ -354,6 +354,7 @@
     "attributes" : {
       "puid" : [ "00000000-0000-0000-0000-000000000006" ],
       "clientkey" : [ "navex" ],
+      "tenantid" : [ "01EXFYMCTR3G9CYX502GA12RTK" ],
       "preferred_username" : [ "dvader" ],
       "middle_name" : [ "" ],
       "locale" : [ "en-US" ],
@@ -387,6 +388,7 @@
     "attributes" : {
       "puid" : [ "403aec57-1eba-e911-81f6-de2e8f915f9a" ],
       "clientkey" : [ "aperturelabs" ],
+      "tenantid" : [ "01EXFYMB6YTHQ06GVWHKBX3163" ],
       "preferred_username" : [ "glados" ],
       "middle_name" : [ "" ],
       "locale" : [ "en-US" ],
@@ -420,6 +422,7 @@
     "attributes" : {
       "puid" : [ "7a957313-cad3-e711-96bd-00155de1162b" ],
       "clientkey" : [ "trial17" ],
+      "tenantid" : [ "01EXFYMDF38B7FQSSSEHSS9DHG" ],
       "preferred_username" : [ "jbrewer2" ],
       "middle_name" : [ "Trial17" ],
       "locale" : [ "en-US" ],
@@ -453,6 +456,7 @@
     "attributes" : {
       "puid" : [ "7b957313-cad3-e711-96bd-00155de1162b" ],
       "clientkey" : [ "trial17" ],
+      "tenantid" : [ "01EXFYMDF38B7FQSSSEHSS9DHG" ],
       "preferred_username" : [ "shiva" ],
       "middle_name" : [ "Xy" ],
       "locale" : [ "en-US" ],
@@ -486,6 +490,7 @@
     "attributes" : {
       "puid" : [ "b7dfdbac-b92b-e911-a960-00050300073d" ],
       "clientkey" : [ "dm1" ],
+      "tenantid" : [ "01EXFYMBRRHYH6C9534DNDKEQ8" ],
       "preferred_username" : [ "mheade" ],
       "middle_name" : [ "" ],
       "locale" : [ "en-US" ],
@@ -519,6 +524,7 @@
     "attributes" : {
       "puid" : [ "c785a0fb-8b1a-e511-af9f-00155d103480" ],
       "clientkey" : [ "trial12" ],
+      "tenantid" : [ "01EXFYMD2BW2K4QC2P6ACGB1CW" ],
       "preferred_username" : [ "shiva" ],
       "middle_name" : [ "CanUpdateMiddleName-1549420977" ],
       "locale" : [ "en-US" ],
@@ -558,6 +564,7 @@
     "attributes" : {
       "puid" : [ "1c981e5c-6e85-eb11-a97f-00050300073d" ],
       "clientkey" : [ "dna01" ],
+      "tenantid" : [ "01FEH91R3KMJ7P6PFN0RCKAEPQ" ],
       "preferred_username" : [ "dna01user" ],
       "locale" : [ "en-US" ],
       "middle_name" : [ "dna01" ],
@@ -608,10 +615,11 @@
     "lastName" : "Vader",
     "email" : "dvader@deathstar.com",
     "attributes" : {
-      "preferred_username" : [ "dvader" ],
       "puid" : [ "00000000-0000-0000-0000-000000000006" ],
-      "locale" : [ "en-US" ],
       "clientkey" : [ "navex" ],
+      "tenantid" : [ "01EXFYMCTR3G9CYX502GA12RTK" ],
+      "preferred_username" : [ "dvader" ],
+      "locale" : [ "en-US" ],
       "user_store_role" : [ "NavexAdministrator" ]
     },
     "credentials" : [ {
@@ -638,10 +646,11 @@
     "totp" : false,
     "emailVerified" : false,
     "attributes" : {
-      "preferred_username" : [ "jbrewer2" ],
       "puid" : [ "7A957313-CAD3-E711-96BD-00155DE1162B" ],
-      "locale" : [ "en-US" ],
       "clientkey" : [ "trial17" ],
+      "tenantid" : [ "01EXFYMDF38B7FQSSSEHSS9DHG" ],
+      "preferred_username" : [ "jbrewer2" ],
+      "locale" : [ "en-US" ],
       "user_store_role" : [ "UserStoreAdministrator" ]
     },
     "credentials" : [ {
@@ -672,6 +681,7 @@
     "attributes" : {
       "puid" : [ "f204ca07-c276-eb11-a97f-00050300073d" ],
       "clientkey" : [ "neon" ],
+      "tenantid" : [ "01FPK2BRGWFD0FGV1331MW1329" ],
       "preferred_username" : [ "neon" ],
       "locale" : [ "en-US" ],
       "middle_name" : [ "neon" ],
@@ -703,10 +713,11 @@
     "lastName" : "Kenobi",
     "email" : "t@t.com",
     "attributes" : {
-      "preferred_username" : [ "okenobi" ],
       "puid" : [ "00000000-0000-0000-0000-000000000066" ],
-      "locale" : [ "en-US" ],
       "clientkey" : [ "trial12" ],
+      "tenantid" : [ "01EXFYMD2BW2K4QC2P6ACGB1CW" ],
+      "preferred_username" : [ "okenobi" ],
+      "locale" : [ "en-US" ],
       "user_store_role" : [ "GatewayUser" ]
     },
     "credentials" : [ {
@@ -737,6 +748,7 @@
     "attributes" : {
       "puid" : [ "e09a088b-d3df-e911-a96b-00050300073d" ],
       "clientkey" : [ "insightsqalocal1" ],
+      "tenantid" : [ "01EXFYMCKETCBE7NS5AZJG38M4" ],
       "preferred_username" : [ "qauser1" ],
       "locale" : [ "en-US" ],
       "middle_name" : [ "insightsqalocal" ],
@@ -804,6 +816,7 @@
     "attributes" : {
       "puid" : [ "c785a0fb-8b1a-e511-af9f-00155d103480" ],
       "clientkey" : [ "trial12" ],
+      "tenantid" : [ "01EXFYMD2BW2K4QC2P6ACGB1CW" ],
       "preferred_username" : [ "shiva" ],
       "locale" : [ "en-US" ],
       "middle_name" : [ "CanUpdateMiddleName-1549420977" ],
@@ -837,6 +850,7 @@
     "attributes" : {
       "puid" : [ "06951e40-8082-eb11-a97f-00050300073d" ],
       "clientkey" : [ "tophat" ],
+      "tenantid" : [ "01F0KM5AJE3474PXT76TPQSS0P" ],
       "preferred_username" : [ "tophat" ],
       "middle_name" : [ "tophat" ],
       "locale" : [ "en-US" ],
@@ -1582,6 +1596,20 @@
         "jsonType.label" : "String"
       }
     }, {
+      "id" : "6e0736ca-f843-4440-8458-36812a131148",
+      "name" : "TenantId",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usermodel-attribute-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "userinfo.token.claim" : "true",
+        "user.attribute" : "tenantid",
+        "id.token.claim" : "true",
+        "access.token.claim" : "true",
+        "claim.name" : "tenantid",
+        "jsonType.label" : "String"
+      }
+    }, {
       "id" : "df8faa77-6c94-428d-a5d9-4e8144c82cbb",
       "name" : "Client ID",
       "protocol" : "openid-connect",
@@ -2269,18 +2297,7 @@
     }
   } ],
   "identityProviderMappers" : [ {
-    "id" : "396c8818-aabb-4d99-bc2c-4ed719708193",
-    "name" : "Puid",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
-    "config" : {
-      "syncMode" : "LEGACY",
-      "user.attribute" : "puid",
-      "attributes" : "[]",
-      "attribute.name" : "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
-    }
-  }, {
-    "id" : "7abf8a82-a75a-4947-a261-faf95603913e",
+    "id" : "d8c61199-0507-4d49-9543-c8bb2b7b631c",
     "name" : "LastName",
     "identityProviderAlias" : "doorman",
     "identityProviderMapper" : "saml-user-attribute-idp-mapper",
@@ -2291,84 +2308,7 @@
       "attribute.name" : "http://schemas.navexglobal.com/identity/claims/LastName"
     }
   }, {
-    "id" : "99d60c39-e1ce-411a-9f57-5882f3b077c3",
-    "name" : "MiddleName",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
-    "config" : {
-      "syncMode" : "LEGACY",
-      "user.attribute" : "middle_name",
-      "attributes" : "[]",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/MiddleName"
-    }
-  }, {
-    "id" : "325b8db9-9369-4611-99ba-ff2d02a2d89f",
-    "name" : "UserStoreRole",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
-    "config" : {
-      "syncMode" : "LEGACY",
-      "user.attribute" : "user_store_role",
-      "attributes" : "[]",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/UserStoreRole"
-    }
-  }, {
-    "id" : "ac650d49-95dd-424a-a438-6170d897e385",
-    "name" : "MoonwatchSessionId",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
-    "config" : {
-      "syncMode" : "LEGACY",
-      "user.attribute" : "moonwatch_session_id",
-      "attributes" : "[]",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/MoonwatchSessionId"
-    }
-  }, {
-    "id" : "88bdc99e-dce8-4421-8267-f4c8d786ba66",
-    "name" : "FirstName",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
-    "config" : {
-      "syncMode" : "LEGACY",
-      "user.attribute" : "firstName",
-      "attributes" : "[]",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/FirstName"
-    }
-  }, {
-    "id" : "2de25c6e-5b7d-4ff7-9c51-41634d4644c4",
-    "name" : "Preferred Username",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
-    "config" : {
-      "syncMode" : "LEGACY",
-      "user.attribute" : "preferred_username",
-      "attributes" : "[]",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/UserName"
-    }
-    }, {
-    "id" : "88b26c5e-1c38-4237-8914-c07493f362f5",
-    "name" : "PreferredLanguageRegion",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
-    "config" : {
-      "syncMode" : "LEGACY",
-      "user.attribute" : "locale",
-      "attributes" : "[]",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/PreferredLanguageRegion"
-    }
-  }, {
-    "id" : "9f0c643b-9916-49aa-adab-e7b1828997b1",
-    "name" : "ClientKey",
-    "identityProviderAlias" : "doorman",
-    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
-    "config" : {
-      "syncMode" : "LEGACY",
-      "user.attribute" : "clientkey",
-      "attributes" : "[]",
-      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/DoormanClientKey"
-    }
-  }, {
-    "id" : "516ad1c1-0500-477e-8bba-ae165d050cab",
+    "id" : "95c184b0-2e62-44a1-acb7-07b60ccbb4d3",
     "name" : "EmailAddress",
     "identityProviderAlias" : "doorman",
     "identityProviderMapper" : "saml-user-attribute-idp-mapper",
@@ -2379,7 +2319,29 @@
       "attribute.name" : "http://schemas.navexglobal.com/identity/claims/EmailAddress"
     }
   }, {
-    "id" : "1ff9ebb9-5b3c-48dd-9fc2-e767d827160a",
+    "id" : "d3948483-b747-432c-adea-95e90ed4339a",
+    "name" : "ClientKey",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "syncMode" : "LEGACY",
+      "user.attribute" : "clientkey",
+      "attributes" : "[]",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/DoormanClientKey"
+    }
+  }, {
+    "id" : "7e1d731a-65b2-4824-bd97-d4f415f65f5f",
+    "name" : "Puid",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "syncMode" : "LEGACY",
+      "user.attribute" : "puid",
+      "attributes" : "[]",
+      "attribute.name" : "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+    }
+  }, {
+    "id" : "e7a41f85-5dfb-48b4-863f-c02e088aec4b",
     "name" : "UserName",
     "identityProviderAlias" : "doorman",
     "identityProviderMapper" : "saml-username-idp-mapper",
@@ -2387,6 +2349,83 @@
       "template" : "${ATTRIBUTE.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name}",
       "syncMode" : "LEGACY",
       "attributes" : "[]"
+    }
+  }, {
+    "id" : "f0124178-62c3-481d-b68b-a47a55a6928d",
+    "name" : "UserStoreRole",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "syncMode" : "LEGACY",
+      "user.attribute" : "user_store_role",
+      "attributes" : "[]",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/UserStoreRole"
+    }
+  }, {
+    "id" : "444d3e12-a71b-428b-aab7-6c8f0658c004",
+    "name" : "TenantId",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "syncMode" : "INHERIT",
+      "user.attribute" : "tenantid",
+      "attributes" : "[]",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/TenantId"
+    }
+  }, {
+    "id" : "425ce097-fd98-48a4-9f49-ca270bd29e6f",
+    "name" : "FirstName",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "syncMode" : "LEGACY",
+      "user.attribute" : "firstName",
+      "attributes" : "[]",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/FirstName"
+    }
+  }, {
+    "id" : "9888e04e-7e5e-4b11-aa22-59cf66cb92df",
+    "name" : "MiddleName",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "syncMode" : "LEGACY",
+      "user.attribute" : "middle_name",
+      "attributes" : "[]",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/MiddleName"
+    }
+  }, {
+    "id" : "6ae29352-4e4e-4fb4-b1b7-02ef1a214241",
+    "name" : "PreferredLanguageRegion",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "syncMode" : "LEGACY",
+      "user.attribute" : "locale",
+      "attributes" : "[]",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/PreferredLanguageRegion"
+    }
+  }, {
+    "id" : "06cfd687-8cb8-4c8b-a08b-d918c7ca3cd5",
+    "name" : "Preferred Username",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "syncMode" : "LEGACY",
+      "user.attribute" : "preferred_username",
+      "attributes" : "[]",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/UserName"
+    }
+  }, {
+    "id" : "1caa4c46-380e-4735-9b3d-37bce3901534",
+    "name" : "MoonwatchSessionId",
+    "identityProviderAlias" : "doorman",
+    "identityProviderMapper" : "saml-user-attribute-idp-mapper",
+    "config" : {
+      "syncMode" : "LEGACY",
+      "user.attribute" : "moonwatch_session_id",
+      "attributes" : "[]",
+      "attribute.name" : "http://schemas.navexglobal.com/identity/claims/MoonwatchSessionId"
     }
   } ],
   "components" : {
