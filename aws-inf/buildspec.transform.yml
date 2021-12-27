@@ -78,6 +78,7 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p redirectUris -v "https://${EpimIemRootDomain}/*" -v "${DoormanBaseUrl}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p webOrigins -v "https://${EpimIemRootDomain}"
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p rootUrl -v "https://${EpimIemRootDomain}/"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p attributes:backchannel.logout.url -v "https://${EpimIemRootDomain}/authorization/authoidc/backchannellogout"
       
       # Set epadmin client related urls 
       - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p adminUrl -v "https://${EpadminRootDomain}/" 
