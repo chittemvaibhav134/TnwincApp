@@ -14,7 +14,7 @@ phases:
   pre_build:
     commands:
       - echo $DockerhubPassword | docker login --username $DockerhubUsername --password-stdin
-      - cd ./lambdas/oidc-custom-authorizer && npm ci --only=prod && cd -
+      - cd ./lambdas/oidc-custom-authorizer && npm install-ci-test && cd -
   build:
     commands:
       - echo Running cfn-lint to validate cfn templates
@@ -23,6 +23,4 @@ phases:
       - cfn-lint --include-checks I -t template.authorizer.yml
       - echo Building the Docker image... 
       - docker build -t navex/keycloak:pr ./build/app
-      - cd ./lambdas/oidc-custom-authorizer && npm test && cd -
-
 
