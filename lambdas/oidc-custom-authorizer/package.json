@@ -4,7 +4,8 @@
   "description": "An AWS Lambda function to provide a Custom Authenticator for AWS API Gateway that verifies RS* signed tokens",
   "main": "index.js",
   "scripts": {
-    "test": "lambda-local --timeout 300 --lambda-path index.js --event-path event.json",
+    "start": "lambda-local --timeout 300 --lambda-path index.js --event-path event.json",
+    "test": "jest",
     "bundle": "rm -f custom-authorizer.zip ; zip custom-authorizer.zip -r *.js *.json node_modules/"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
   },
   "devDependencies": {
     "aws-sdk": "^2.963.0",
+    "jest": "^27.4.5",
     "lambda-local": "^2.0.0"
   }
 }
