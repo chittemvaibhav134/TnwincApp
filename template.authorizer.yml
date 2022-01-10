@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
 Description: Lambda Authorizer for securing APIs.
 
 Metadata:
@@ -76,4 +77,59 @@ Resources:
                   - lambda:InvokeAsync
                   - lambda:InvokeFunction
                 Resource: !GetAtt CustomOidcAuthorizerLambda.Arn
-  
+
+  Api:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      DefinitionBody:
+        openapi: 3.0.1
+        info:
+          version: "2.0"
+          title: !Ref "AWS::StackName"
+        components:
+          securitySchemes:
+            sigv4:
+              type: apiKey
+              name: Authorization
+              in: header
+              x-amazon-apigateway-authtype: awsSigv4
+            OidcCustomAuthorizer:
+              type: apiKey
+              name: Authorization
+              in: header
+              x-amazon-apigateway-authorizer:
+                identitySource: $request.header.Authorization
+                authorizerUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CustomOidcAuthorizerLambda}/invocations"
+                authorizerCredentials: !Sub "arn:aws:iam::${AWS::AccountId}:role/${ApiGatewayAuthorizerRole}"
+                authorizerPayloadFormatVersion: "2.0"
+                authorizerResultTtlInSeconds: 240
+                type: request
+                enableSimpleResponses: false
+        paths:
+          /health:
+            get:
+              produces:
+                - "application/json"
+              responses: {}
+              x-amazon-apigateway-integration:
+                payloadFormatVersion: "2.0"
+                httpMethod: "GET"
+                type: aws_proxy
+                uri: !Sub >-
+                  arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DemoFunction.Arn}/invocations
+
+  DemoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: "nodejs14.x"
+      InlineCode: |
+        exports.handler = function(event, context, callback) {
+            console.log(event);
+            const response = {
+                statusCode: 200,
+                body: JSON.stringify('Hello World')
+            };
+            callback(null, response);
+        };
+    
