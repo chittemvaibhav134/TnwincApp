@@ -113,10 +113,17 @@ Resources:
               responses: {}
               x-amazon-apigateway-integration:
                 payloadFormatVersion: "2.0"
-                httpMethod: "GET"
+                httpMethod: "POST"
                 type: aws_proxy
                 uri: !Sub >-
                   arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DemoFunction.Arn}/invocations
+
+  DemoLambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref DemoFunction
+      Action: "lambda:InvokeFunction"
+      Principal: apigateway.amazonaws.com
 
   DemoFunction:
     Type: AWS::Serverless::Function
