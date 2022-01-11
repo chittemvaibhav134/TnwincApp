@@ -111,9 +111,39 @@ Resources:
               produces:
                 - "application/json"
               responses: {}
+              security:
+                - OidcCustomAuthorizer: []
               x-amazon-apigateway-integration:
                 payloadFormatVersion: "2.0"
                 httpMethod: "POST"
+                type: aws_proxy
+                uri: !Sub >-
+                  arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DemoFunction.Arn}/invocations
+
+  RestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: MyLambdaRequestAuth
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          MyLambdaRequestAuth:
+            FunctionArn: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CustomOidcAuthorizerLambda}
+            FunctionInvokeRole: !Sub arn:aws:iam::${AWS::AccountId}:role/${ApiGatewayAuthorizerRole}
+            FunctionPayloadType: TOKEN
+            Identity:
+              ReauthorizeEvery: 240
+      DefinitionBody:
+        swagger: "2.0"
+        info:
+          version: "1.0"
+          title: !Ref "AWS::StackName"
+        paths:
+          /health:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
                 type: aws_proxy
                 uri: !Sub >-
                   arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DemoFunction.Arn}/invocations
