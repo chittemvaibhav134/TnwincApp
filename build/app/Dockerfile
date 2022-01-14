@@ -17,6 +17,7 @@ RUN mvn clean package assembly:single
 FROM base AS final
 ENV NEW_RELIC_BROWSER_MONITORING_AUTO_INSTRUMENT false
 ENV NEW_RELIC_LOG_LEVEL off
+ENV X509_CA_BUNDLE "/CA_bundle/yodadc.cer /CA_bundle/obiwandc.cer /CA_bundle/ep-dev.pem"
 USER 1000
 COPY --chown=jboss:root fs /
 RUN chmod +x /opt/jboss/tools/start.sh && chmod +x /opt/jboss/startup-scripts/*.sh
