@@ -26,7 +26,6 @@ services:
       DB_USER: keycloak
       DB_VENDOR: postgres
       JGROUPS_DISCOVERY_PROTOCOL: JDBC_PING
-      ENV X509_CA_BUNDLE: '/CA_bundle/yodadc.cer /CA_bundle/obiwandc.cer /CA_bundle/ep-dev.pem'
     ports:
       - '8443:8443'
       - '9990:9990'
@@ -43,6 +42,8 @@ services:
     entrypoint:
       - /opt/jboss/tools/start.sh
       - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import"
+    extra_hosts:
+      - "dev.ep.local:192.168.65.2"  
 
   db:
     container_name: keycloak-app-db
