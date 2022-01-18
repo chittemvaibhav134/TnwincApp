@@ -42,6 +42,8 @@ services:
     entrypoint:
       - /opt/jboss/tools/start.sh
       - "-Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/import"
+    extra_hosts:
+      - "dev.ep.local:192.168.65.2"  
 
   db:
     container_name: keycloak-app-db
