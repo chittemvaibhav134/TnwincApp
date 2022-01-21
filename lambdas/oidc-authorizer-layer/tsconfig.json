@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "module": "ES2020",
+        "outDir": "output/nodejs/node_modules/oidc-authorizer",
+        "moduleResolution": "Node"
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}
