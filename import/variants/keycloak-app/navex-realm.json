@@ -1477,7 +1477,8 @@
         "http://admin.devlocal.navex-pe.com:3000/*",
         "http://navexadmin.devlocal.navex-pe.com:3000/*",
         "http://user.app.devlocal.navex-pe.com:3000/*",
-        "https://doorman.dev.gw.local/*"
+        "https://doorman.dev.gw.local/*", 
+        "https://auth.devlocal.navex-pe.com:3000/*"
       ],
       "secret": "9b630071-25ec-4089-b31b-483d8860cefa",
       "serviceAccountsEnabled": false,
@@ -1540,7 +1541,8 @@
         "http://admin.devlocal.navex-pe.com:3000/*",
         "http://navexadmin.devlocal.navex-pe.com:3000/*",
         "http://user.app.devlocal.navex-pe.com:3000/*",
-        "https://doorman.dev.gw.local/*"
+        "https://doorman.dev.gw.local/*",
+        "https://auth.devlocal.navex-pe.com:3000/*"
       ],
       "secret": "3d4ca889-bbdc-43e8-8092-6a2ce1f27782",
       "serviceAccountsEnabled": false,
