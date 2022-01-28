@@ -675,6 +675,11 @@ Resources:
               Value: !Ref MoonwatchApiRegion
             - Name: CACHE_OWNERS
               Value: !Ref InfiniSpanCacheOwners
+            - !If
+              - Development
+              - Name: X509_CA_BUNDLE
+                Value: "/CA_bundle/*.cer"
+              - !Ref AWS::NoValue
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
