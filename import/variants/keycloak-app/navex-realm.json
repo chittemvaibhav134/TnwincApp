@@ -1402,7 +1402,7 @@
       "protocol": "openid-connect",
       "publicClient": false,
       "redirectUris": [
-        "https://dev.ep.local/*",
+        "https://secure.dev.ep.local/*",
         "https://doorman.dev.gw.local/*"
       ],
       "rootUrl": "https://secure.dev.ep.local",
