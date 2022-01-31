@@ -3,10 +3,11 @@
     "version": "1.0.0",
     "description": "[owner:komodo]",
     "scripts": {
-        "clean": "rm -r output/",
+        "clean": "tsc --build --clean",
         "build": "tsc",
         "test": "npm run build && jest",
-        "bundle": "npm run clean && npm run build && cp package.json package-lock.json output/nodejs/node_modules/oidc-authorizer/"
+        "bundle-install-deps": "mkdir output && cd output && mkdir nodejs && cd .. && cp package.json package-lock.json output/nodejs/ && cd output/nodejs/ && npm install && cd ../..",
+        "bundle": "npm run clean && npm run bundle-install-deps && npm run build && cp package.json package-lock.json output/nodejs/node_modules/oidc-authorizer/ "
     },
     "private": true,
     "keywords": [],
