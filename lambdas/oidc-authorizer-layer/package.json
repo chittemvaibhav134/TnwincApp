@@ -6,7 +6,7 @@
         "clean": "tsc --build --clean",
         "build": "tsc",
         "test": "npm run build && jest",
-        "bundle-install-deps": "mkdir -p output/nodejs && cp package.json package-lock.json output/nodejs/ && cd output/nodejs/ && npm install && cd ../..",
+        "bundle-install-deps": "mkdir -p output/nodejs && cp package.json package-lock.json output/nodejs/ && cd output/nodejs/ && npm ci --only=prod && cd ../..",
         "bundle": "npm run clean && npm run bundle-install-deps && npm run build && cp package.json package-lock.json output/nodejs/node_modules/oidc-authorizer/ "
     },
     "private": true,
