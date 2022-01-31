@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "module": "ES2020",
+        "module": "CommonJS",
         "outDir": "output/nodejs/node_modules/oidc-authorizer",
         "moduleResolution": "Node"
     },
