@@ -5,5 +5,5 @@ export default
   preset: 'ts-jest',
   testEnvironment: 'node',
   testPathIgnorePatterns : ['/node_modules/', '/output/'],
-  testMatch: ['<rootDir>/tests/*.test.ts']
+  testMatch: ['**/?(*.)+(spec|test).[jt]s?(x)']
 };
