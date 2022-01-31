@@ -6,8 +6,8 @@
     "scripts": {
         "clean": "rm -r output/",
         "build": "tsc",
-        "test": "npm run build; jest",
-        "bundle": "npm run clean; npm run build; cp package.json package-lock.json output/nodejs/node_modules/oidc-authorizer/"
+        "test": "npm run build && jest",
+        "bundle": "npm run clean && npm run build && cp package.json package-lock.json output/nodejs/node_modules/oidc-authorizer/"
     },
     "private": true,
     "keywords": [],
