@@ -1,6 +1,6 @@
 import { JwksClient } from 'jwks-rsa';
 import { decode as jwtdecode, verify as jwtverify } from 'jsonwebtoken';
-import { APIGatewayAuthorizerEvent, APIGatewayRequestAuthorizerEvent, PolicyDocument } from 'aws-lambda';
+import { APIGatewayAuthorizerEvent, APIGatewayRequestAuthorizerEvent, APIGatewayRequestAuthorizerEventV2, PolicyDocument } from 'aws-lambda';
 import { areAllElementsStrings } from './util';
 import { verifyScope } from './scope';
 import { NavexJwt, NavexJwtPayload } from './navexjwts';
@@ -25,7 +25,7 @@ const getToken = (params: APIGatewayAuthorizerEvent): string => {
     if (eventType === 'TOKEN') {
         const tokenString = params.authorizationToken;
         if (!tokenString) {
-            throw new Error('Expected "event.headers.Authorization" parameter to be set');
+            throw new Error('Expected "event.authorizationToken" parameter to be set');
         }
         return getRequestToken(tokenString);
     } else if (eventType === 'REQUEST') {
@@ -112,21 +112,33 @@ function getJwksClient(token: NavexJwt): JwksClient {
     }
 }
 
+function getMethodArn(authorizerEvent: APIGatewayAuthorizerEvent): string {
+    if (authorizerEvent.type == 'REQUEST') {
+        // test for a V2 request structure, if it is, then use routeArn over methodArn
+        const authEventV2 = <APIGatewayRequestAuthorizerEventV2><unknown>authorizerEvent;
+        if ( authEventV2.version ) { return authEventV2.routeArn; }
+        else { return authorizerEvent.methodArn; }
+    }
+    else if (!authorizerEvent.methodArn) { throw new Error('authorizerEvent.methodArn must be set') }
+    else { return authorizerEvent.methodArn; }
+}
 /**
  * 
  * @param {*} authorizerEvent 
  * @returns 
  */
 export async function authenticateToken(authorizerEvent: APIGatewayAuthorizerEvent, audiences: string[], scopes: string[] ) {
-    if (!authorizerEvent) { throw new Error('authorizerEvent is required and should match APIGateAuthorizerEvent') }
+    if (!authorizerEvent) { throw new Error('authorizerEvent is required and should match APIGatewayAuthorizerEvent') }
     if (!Array.isArray(audiences)) { throw new Error('audience is required and must be an array') }
     if (!Array.isArray(scopes)) { throw new Error('scopes is required and must be an array') }
-
+    
     if (audiences.length == 0) { throw new Error('audiences cannot be an empty array') }
     if (scopes.length == 0) { throw new Error('scopes cannot be an empty array') }
-
+    
     if (!areAllElementsStrings(audiences)) { throw new Error('all elements of audience must be of type string') }
     if (!areAllElementsStrings(scopes)) { throw new Error('all elements of scopes must be of type string') }
+    
+    const methodArn = getMethodArn(authorizerEvent);
 
     const token = getToken(authorizerEvent)
 
@@ -148,7 +160,7 @@ export async function authenticateToken(authorizerEvent: APIGatewayAuthorizerEve
     const verifiedPayload = <NavexJwtPayload>jwtverify(token, signingKey, { audience: audiences });
     return ({
         principalId: verifiedPayload.sub,
-        policyDocument: getPolicyDocument('Allow', authorizerEvent.methodArn),
+        policyDocument: getPolicyDocument('Allow', methodArn),
         context: { scope: verifiedPayload.scope, session_state: verifiedPayload.session_state, clientkey: verifiedPayload.clientkey }
     });
 }

@@ -2,7 +2,8 @@
     "compilerOptions": {
         "module": "CommonJS",
         "outDir": "output/nodejs/node_modules/oidc-authorizer",
-        "moduleResolution": "Node"
+        "moduleResolution": "Node",
+        
     },
     "exclude": [
         "node_modules"

@@ -4,7 +4,7 @@
     "description": "[owner:komodo]",
     "scripts": {
         "clean": "tsc --build --clean",
-        "build": "tsc",
+        "build": "tsc --declaration",
         "test": "npm run build && jest",
         "bundle-install-deps": "mkdir -p output/nodejs && cp package.json package-lock.json output/nodejs/ && cd output/nodejs/ && npm install && cd ../..",
         "bundle": "npm run clean && npm run bundle-install-deps && npm run build && cp package.json package-lock.json output/nodejs/node_modules/oidc-authorizer/ "
