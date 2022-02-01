@@ -1,0 +1,185 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: Sample API gateway with sample authorizer
+
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - W3002
+        - I3042
+
+Parameters:
+  UtilsLayerArn:
+    Type: String
+    Default: None
+  KCBaseUrl:
+    Type: String
+    Default: None
+
+Resources:
+
+  CustomOidcAuthorizerLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Handler: index.handler
+      Layers:
+        - !Sub ${UtilsLayerArn}
+      InlineCode: |
+        const {authenticateToken} = require('oidc-authorizer')
+        exports.handler = async (event, context) => {
+            console.log(event);
+            try {
+                const response = await authenticateToken(event, ['exampleapi'], ['exampleapiscope'])
+                console.log(response)
+                return response 
+            }
+            catch (err) {
+              console.log(err);
+              return context.fail(`Unauthorized`);
+            }
+        };
+      Description: Authorize Endpoints for KeyCloak
+      Environment:
+        Variables:
+          JWKS_URI: !Sub https://${KCBaseUrl}/auth/realms/navex/protocol/openid-connect/certs
+      MemorySize: 256
+      Runtime: nodejs14.x
+      Timeout: 30
+
+  CustomOidcAuthorizerLambdaPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref CustomOidcAuthorizerLambda
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*"
+  
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  ApiGatewayAuthorizerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - Effect: "Allow"
+            Principal: 
+              Service: "apigateway.amazonaws.com"
+            Action: sts:AssumeRole
+      Policies: 
+        - PolicyName: "InvokeAuthorizerFunction"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: "Allow"
+                Action:
+                  - lambda:InvokeAsync
+                  - lambda:InvokeFunction
+                Resource: !GetAtt CustomOidcAuthorizerLambda.Arn
+
+  Api:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      DefinitionBody:
+        openapi: 3.0.1
+        info:
+          version: "2.0"
+          title: !Ref "AWS::StackName"
+        components:
+          securitySchemes:
+            sigv4:
+              type: apiKey
+              name: Authorization
+              in: header
+              x-amazon-apigateway-authtype: awsSigv4
+            OidcCustomAuthorizer:
+              type: apiKey
+              name: Authorization
+              in: header
+              x-amazon-apigateway-authorizer:
+                identitySource: $request.header.Authorization
+                authorizerUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CustomOidcAuthorizerLambda}/invocations"
+                authorizerCredentials: !Sub "arn:aws:iam::${AWS::AccountId}:role/${ApiGatewayAuthorizerRole}"
+                authorizerPayloadFormatVersion: "2.0"
+                authorizerResultTtlInSeconds: 240
+                type: request
+                enableSimpleResponses: false
+        paths:
+          /health:
+            get:
+              produces:
+                - "application/json"
+              responses: {}
+              security:
+                - OidcCustomAuthorizer: []
+              x-amazon-apigateway-integration:
+                payloadFormatVersion: "2.0"
+                httpMethod: "POST"
+                type: aws_proxy
+                uri: !Sub >-
+                  arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DemoFunction.Arn}/invocations
+
+  RestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: MyLambdaRequestAuth
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          MyLambdaRequestAuth:
+            FunctionArn: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CustomOidcAuthorizerLambda}
+            FunctionInvokeRole: !Sub arn:aws:iam::${AWS::AccountId}:role/${ApiGatewayAuthorizerRole}
+            FunctionPayloadType: TOKEN
+            Identity:
+              ReauthorizeEvery: 240
+      DefinitionBody:
+        swagger: "2.0"
+        info:
+          version: "1.0"
+          title: !Ref "AWS::StackName"
+        paths:
+          /health:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub >-
+                  arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DemoFunction.Arn}/invocations
+
+  DemoLambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref DemoFunction
+      Action: "lambda:InvokeFunction"
+      Principal: apigateway.amazonaws.com
+
+  DemoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: "nodejs14.x"
+      InlineCode: |
+        module.exports.handler = async (event, context) => {
+            console.log(event);
+            const response = {
+                statusCode: 200,
+                body: JSON.stringify('Hello World')
+            };
+            return response
+        };
+    
