@@ -37,7 +37,7 @@ export function generateAuthorizerTokenEvent(): APIGatewayTokenAuthorizerEvent {
 }
 export function generateAuthorizerRequestEvent(): APIGatewayRequestAuthorizerEvent {
   return {
-    type: <'REQUEST'>'REQUEST',
+    type: 'REQUEST' as const,
     headers: {
       authorization: "Bearer faketoken"
     },
