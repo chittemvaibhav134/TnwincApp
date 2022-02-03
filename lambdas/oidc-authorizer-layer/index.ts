@@ -19,28 +19,18 @@ const getPolicyDocument = (effect: string, resource: string): PolicyDocument => 
 }
 
 /** Extract and return the Bearer Token from the Lambda event parameters */
-const getToken = (params: APIGatewayAuthorizerEvent): string => {
+const getToken = (params: IAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken): string => {
     const eventType = params.type;
 
     if (eventType === 'TOKEN') {
-        const tokenString = params.authorizationToken;
-        if (!tokenString) {
-            throw new Error('Expected "event.authorizationToken" parameter to be set');
-        }
-        return getRequestToken(tokenString);
-    } else if (eventType === 'REQUEST') {
+        return getRequestToken(params.authorizationToken);
+    } else {
         const headers = params.headers;
-        if (!headers) {
-            throw new Error('Expected "event.headers" parameter to be set');
-        }
         if (headers.Connection === "upgrade" && headers.Upgrade === "websocket") {
             return getWebSocketRequestToken(params);
         } else {
-            const tokenString = headers["authorization"];
-            return getRequestToken(tokenString);
+            return getRequestToken(headers.authorization);
         }
-    } else {
-        throw new Error('Expected "event.type" parameter to have value "TOKEN" or "REQUEST"');
     }
 }
 
@@ -58,7 +48,7 @@ const getRequestToken = (tokenString: string): string => {
 /**
  * @returns The Bearer token from a WebSocket request
  */
-const getWebSocketRequestToken = (request: APIGatewayRequestAuthorizerEvent): string => {
+const getWebSocketRequestToken = (request: IRequestV1AuthEvent|IRequestV2AuthEvent): string => {
     const headers = request.headers;
     if (!headers) {
         throw new Error('Expected "event.headers" parameter to be set');
@@ -112,16 +102,50 @@ function getJwksClient(token: NavexJwt): JwksClient {
     }
 }
 
-function getMethodArn(authorizerEvent: APIGatewayAuthorizerEvent): string {
-    if (authorizerEvent.type == 'REQUEST') {
-        // test for a V2 request structure, if it is, then use routeArn over methodArn
-        const authEventV2 = <APIGatewayRequestAuthorizerEventV2><unknown>authorizerEvent;
-        if ( authEventV2.version ) { return authEventV2.routeArn; }
-        else { return authorizerEvent.methodArn; }
-    }
-    else if (!authorizerEvent.methodArn) { throw new Error('authorizerEvent.methodArn must be set') }
+function getMethodArn(authorizerEvent: IAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken): string {
+    if (isRequestV2(authorizerEvent)) { return authorizerEvent.routeArn; }
     else { return authorizerEvent.methodArn; }
 }
+
+interface ITokenAuthEvent {
+     type: "TOKEN";
+     methodArn: string;
+     authorizationToken: string;
+}
+function isTokenEvent(event: any): event is ITokenAuthEvent {
+    return typeof(event) === 'object' &&
+        event.type === 'TOKEN' &&
+        typeof(event.methodArn) === 'string' &&
+        typeof(event.authorizationToken) === 'string';
+}
+interface IRequestAuthEventCommonFields {
+    type: "REQUEST";
+    headers: {
+        [key: string]: string;
+    };
+}
+function isRequestAuthEvent(event: any): event is IRequestAuthEventCommonFields {
+    return typeof(event) === 'object' &&
+        event.type === 'REQUEST' &&
+        typeof(event.headers) === 'object';
+}
+interface IRequestV1AuthEvent extends IRequestAuthEventCommonFields {
+    methodArn: string;
+}
+function isRequestV1(event: any): event is IRequestV1AuthEvent {
+    return typeof(event) === 'object' && typeof(event.methodArn) === 'string' && isRequestAuthEvent(event);
+}
+interface IRequestV2AuthEvent extends IRequestAuthEventCommonFields {
+    routeArn: string;
+}
+function isRequestV2(event: any): event is IRequestV2AuthEvent {
+    return typeof(event) === 'object' && typeof(event.routeArn) === 'string' && isRequestAuthEvent(event);
+}
+function isAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken(event: IAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken): event is IAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken {
+    return isTokenEvent(event) || isRequestV1(event) || isRequestV2(event);
+}
+
+export type IAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken = ITokenAuthEvent|IRequestV1AuthEvent|IRequestV2AuthEvent;
 
 export interface IAuthenicateTokenOptions {
     /** The maximum number of search iterations to support when attempting to find a scope match. */
@@ -134,8 +158,8 @@ export interface IAuthenicateTokenOptions {
  * @returns 
  */
 // TODO: 
-export async function authenticateToken(authorizerEvent: APIGatewayAuthorizerEvent|any, audiences: string[]|any, scopes: string[]|any, options?: IAuthenicateTokenOptions|any ) {
-    if (!authorizerEvent) { throw new Error('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent') }
+export async function authenticateToken(authorizerEvent: IAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken|any, audiences: string[]|any, scopes: string[]|any, options?: IAuthenicateTokenOptions|any ) {
+    if (!isAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken(authorizerEvent)) { throw new Error('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent') }
     
 
     if (!isStringArray(audiences)) { throw new Error('audience (second param) must be an array of strings') }

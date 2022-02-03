@@ -12,7 +12,7 @@ describe('Authorizer Invalid calls to authenicateToken', function () {
         delete event.type;
 
         await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
-            .rejects.toThrowError('Expected "event.type" parameter to have value "TOKEN" or "REQUEST"')
+            .rejects.toThrowError('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent')
     })
 
     it('Invalid Event Type throws error', async () => {
@@ -21,7 +21,7 @@ describe('Authorizer Invalid calls to authenicateToken', function () {
         altEvent.type = 'invalidEvent';
 
         await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
-            .rejects.toThrowError('Expected "event.type" parameter to have value "TOKEN" or "REQUEST"')
+            .rejects.toThrowError('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent')
     })
 
     it('Token request with missing authorizationToken throws error', async () => {
@@ -29,7 +29,7 @@ describe('Authorizer Invalid calls to authenicateToken', function () {
         delete event.authorizationToken;
 
         await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
-            .rejects.toThrowError('Expected "event.authorizationToken" parameter to be set')
+            .rejects.toThrowError('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent')
     });
 
     it('Token request with missing methodArn throws error', async () => {
@@ -37,7 +37,7 @@ describe('Authorizer Invalid calls to authenicateToken', function () {
         delete event.methodArn;
 
         await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
-            .rejects.toThrowError('authorizerEvent.methodArn must be set')
+            .rejects.toThrowError('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent')
     });
 
     it('invalid format of Token request throws error', async () => {
@@ -53,7 +53,7 @@ describe('Authorizer Invalid calls to authenicateToken', function () {
         delete event.headers;
 
         await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
-            .rejects.toThrowError('Expected "event.headers" parameter to be set');
+            .rejects.toThrowError('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent');
     })
 
     it('invalid sub protocol for websocket request throws error', async () => {
