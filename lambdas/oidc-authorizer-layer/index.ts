@@ -1,7 +1,7 @@
 import { JwksClient } from 'jwks-rsa';
 import { decode as jwtdecode, verify as jwtverify } from 'jsonwebtoken';
 import { APIGatewayAuthorizerEvent, APIGatewayRequestAuthorizerEvent, APIGatewayRequestAuthorizerEventV2, PolicyDocument } from 'aws-lambda';
-import { areAllElementsStrings } from './util';
+import { isStringArray } from './util';
 import { verifyScope } from './scope';
 import { NavexJwt, NavexJwtPayload } from './navexjwts';
 
@@ -122,12 +122,18 @@ function getMethodArn(authorizerEvent: APIGatewayAuthorizerEvent): string {
     else if (!authorizerEvent.methodArn) { throw new Error('authorizerEvent.methodArn must be set') }
     else { return authorizerEvent.methodArn; }
 }
+
+export interface IAuthenicateTokenOptions {
+    /** The maximum number of search iterations to support when attempting to find a scope match. */
+    scopeComplexityLimit?: number;
+}
+
 /**
  * 
  * @param {*} authorizerEvent 
  * @returns 
  */
-export async function authenticateToken(authorizerEvent: APIGatewayAuthorizerEvent, audiences: string[], scopes: string[] ) {
+export async function authenticateToken(authorizerEvent: APIGatewayAuthorizerEvent, audiences: string[], scopes: string[], options?: IAuthenicateTokenOptions ) {
     if (!authorizerEvent) { throw new Error('authorizerEvent is required and should match APIGatewayAuthorizerEvent') }
     if (!Array.isArray(audiences)) { throw new Error('audience is required and must be an array') }
     if (!Array.isArray(scopes)) { throw new Error('scopes is required and must be an array') }
@@ -135,8 +141,13 @@ export async function authenticateToken(authorizerEvent: APIGatewayAuthorizerEve
     if (audiences.length == 0) { throw new Error('audiences cannot be an empty array') }
     if (scopes.length == 0) { throw new Error('scopes cannot be an empty array') }
     
-    if (!areAllElementsStrings(audiences)) { throw new Error('all elements of audience must be of type string') }
-    if (!areAllElementsStrings(scopes)) { throw new Error('all elements of scopes must be of type string') }
+    if (!isStringArray(audiences)) { throw new Error('all elements of audience must be of type string') }
+    if (!isStringArray(scopes)) { throw new Error('all elements of scopes must be of type string') }
+
+    options = {
+        scopeComplexityLimit: 500,
+        ...(options||{})
+    }
     
     const methodArn = getMethodArn(authorizerEvent);
 
@@ -151,7 +162,7 @@ export async function authenticateToken(authorizerEvent: APIGatewayAuthorizerEve
         throw new Error('invalid token payload')
     }
     
-    verifyScope(scopes, payload.scope);
+    verifyScope(new Set(scopes), payload.scope, options.scopeComplexityLimit);
 
     const client = getJwksClient(decoded);
 

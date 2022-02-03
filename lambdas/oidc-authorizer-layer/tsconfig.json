@@ -3,7 +3,7 @@
         "module": "CommonJS",
         "outDir": "output/nodejs/node_modules/oidc-authorizer",
         "moduleResolution": "Node",
-        
+        "target": "ES6"
     },
     "exclude": [
         "node_modules"
