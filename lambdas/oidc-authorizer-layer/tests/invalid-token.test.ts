@@ -12,12 +12,8 @@ describe('Authorizer Invalid Token Tests (TOKEN event)', function () {
         token.payload.scope = 'one-scope two-scope';
         mockOnceJwtDecodeAndVerify(token);
     
-        try {
-            await authenticateToken(event, ['my-audience'], ['two-scope']);
-        }
-        catch (e) {
-            expect(e.message).toMatch('token does not have clientkey')
-        }
+        await expect(authenticateToken(event, ['my-audience'], ['two-scope']))
+            .rejects.toThrowError('token does not have clientkey')
     });
 
     it('Invalid Scope in user token', async () => {
@@ -27,12 +23,8 @@ describe('Authorizer Invalid Token Tests (TOKEN event)', function () {
         token.payload.scope = 'one-scope two-scope';
         mockOnceJwtDecodeAndVerify(token);
 
-        try {
-            await authenticateToken(event, ['my-audience'], ['no-scope']);
-        }
-        catch (e) {
-            expect(e.message).toMatch('payload scope is not allowed')
-        }
+        await expect(authenticateToken(event, ['my-audience'], ['no-scope']))
+            .rejects.toThrowError('payload scope is not allowed')
     });
 
     it('Missing header in user token throws error', async () => {
@@ -40,12 +32,9 @@ describe('Authorizer Invalid Token Tests (TOKEN event)', function () {
         const token = generateJwtToken('trial12');
         delete token.header;
         mockOnceJwtDecodeAndVerify(token);
-        try {
-          await authenticateToken(event, ['no-audience'], ['no-scope'])
-        }
-        catch (e) {
-          expect(e.message).toMatch('invalid token')
-        }
+
+        await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
+            .rejects.toThrowError('invalid token')
       })
     
       it('Missing header.kid in user token throws error', async () => {
@@ -53,11 +42,8 @@ describe('Authorizer Invalid Token Tests (TOKEN event)', function () {
         const token = generateJwtToken('trial12');
         delete token.header.kid;
         mockOnceJwtDecodeAndVerify(token);
-        try {
-          await authenticateToken(event, ['no-audience'], ['no-scope'])
-        }
-        catch (e) {
-          expect(e.message).toMatch('invalid token')
-        }
+
+        await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
+            .rejects.toThrowError('invalid token')
       })
 });

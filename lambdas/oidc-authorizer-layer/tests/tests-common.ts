@@ -8,7 +8,7 @@ const mockGetSigningKey = jest.fn().mockImplementation((key) => {
     publicKey: 'publicKey',
     getPublicKey: function() { return 'publicKey' }
   };
-  return new Promise( (resolve, reject) => resolve(signingkey));
+  return new Promise( (resolve, _) => resolve(signingkey));
 });
 jest.mock('jwks-rsa', () => {
   return {
