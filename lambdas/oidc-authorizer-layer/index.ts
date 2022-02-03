@@ -70,9 +70,9 @@ const getClientKey = (decodedToken: NavexJwt): string => {
     return decodedToken.payload.clientkey
 }
 
-function buildJwksUriFromIssuer(token: NavexJwt): string {
+function buildJwksUriFromIssuer(token: NavexJwt, options: IAuthenicateTokenOptions): string {
     if (!token.payload.iss) { throw new Error('invalid issuer') }
-    const jwksTemplate = process.env.JWKS_URI
+    const jwksTemplate = options.jwksUri;
     const jwksHostname = new URL(jwksTemplate).hostname
     const issuerHostname = new URL(token.payload.iss).hostname
     if(jwksHostname.replace('*.', '') == issuerHostname) {
@@ -84,9 +84,8 @@ function buildJwksUriFromIssuer(token: NavexJwt): string {
 }
 
 const jwksClients = new Map<string, JwksClient>();
-function getJwksClient(token: NavexJwt): JwksClient {
-    
-    const jwksUri = buildJwksUriFromIssuer(token);
+function getJwksClient(token: NavexJwt, options: IAuthenicateTokenOptions): JwksClient {
+    const jwksUri = buildJwksUriFromIssuer(token, options);
     const client = jwksClients.get(jwksUri)
     if (client === undefined) {
         const newClient = new JwksClient({
@@ -150,6 +149,12 @@ export type IAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken = ITokenAu
 export interface IAuthenicateTokenOptions {
     /** The maximum number of search iterations to support when attempting to find a scope match. */
     scopeComplexityLimit?: number;
+    jwksUri: string;
+}
+function isAuthenicateTokenOptions(options: any): options is IAuthenicateTokenOptions {
+    return typeof(options) === 'object' &&
+        ['undefined', 'number'].includes(typeof(options.scopeComplexityLimit)) &&
+        typeof(options.jwksUri) === 'string';
 }
 
 /**
@@ -158,7 +163,7 @@ export interface IAuthenicateTokenOptions {
  * @returns 
  */
 // TODO: 
-export async function authenticateToken(authorizerEvent: IAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken|any, audiences: string[]|any, scopes: string[]|any, options?: IAuthenicateTokenOptions|any ) {
+export async function authenticateToken(authorizerEvent: IAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken, audiences: string[], scopes: string[], options: IAuthenicateTokenOptions ) {
     if (!isAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken(authorizerEvent)) { throw new Error('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent') }
     
 
@@ -168,10 +173,13 @@ export async function authenticateToken(authorizerEvent: IAPIGatewayAuthorizerEv
     if (audiences.length == 0) { throw new Error('audiences (second param) cannot be an empty array') }
     if (scopes.length == 0) { throw new Error('scopes (third param) cannot be an empty array') }
 
+    if (!isAuthenicateTokenOptions(options)) { throw new Error('options (fourth param) is required and must match IAuthenicateTokenOptions') }
+
+    // Provide default for scopeComplexityLimit
     options = {
         scopeComplexityLimit: 500,
-        ...(options||{})
-    }
+        ...options
+    };
     
     const methodArn = getMethodArn(authorizerEvent);
 
@@ -188,7 +196,7 @@ export async function authenticateToken(authorizerEvent: IAPIGatewayAuthorizerEv
     
     verifyScope(new Set(scopes), payload.scope, options.scopeComplexityLimit);
 
-    const client = getJwksClient(decoded);
+    const client = getJwksClient(decoded, options);
 
     const key = await client.getSigningKey(decoded.header.kid);
     const signingKey = key.getPublicKey();

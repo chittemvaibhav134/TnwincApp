@@ -1,17 +1,17 @@
 // Order matters (tests-common has mocking side effects)
-import { generateAuthorizerRequestEvent, generateAuthorizerTokenEvent, generateJwtToken, mockOnceJwtDecodeAndVerify } from "./tests-common";
+import { callDefaultOptions, generateAuthorizerRequestEvent, generateAuthorizerTokenEvent } from "./tests-common";
 import { authenticateToken } from "..";
 
 describe('Authorizer Invalid calls to authenicateToken', function () {
     it('Missing Event throws error', async () => {
-        await expect(authenticateToken(undefined, ['my-audience'], ['two-scope']))
+        await expect(authenticateToken(undefined, ['my-audience'], ['two-scope'], callDefaultOptions))
             .rejects.toThrowError('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent')
     });
     it('Missing Event Type throws error', async () => {
         const event = generateAuthorizerTokenEvent();
         delete event.type;
 
-        await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
+        await expect(authenticateToken(event, ['no-audience'], ['no-scope'], callDefaultOptions))
             .rejects.toThrowError('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent')
     })
 
@@ -20,7 +20,7 @@ describe('Authorizer Invalid calls to authenicateToken', function () {
         const altEvent = <any>event; // use casted reference to get around type checking
         altEvent.type = 'invalidEvent';
 
-        await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
+        await expect(authenticateToken(event, ['no-audience'], ['no-scope'], callDefaultOptions))
             .rejects.toThrowError('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent')
     })
 
@@ -28,7 +28,7 @@ describe('Authorizer Invalid calls to authenicateToken', function () {
         const event = generateAuthorizerTokenEvent();
         delete event.authorizationToken;
 
-        await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
+        await expect(authenticateToken(event, ['no-audience'], ['no-scope'], callDefaultOptions))
             .rejects.toThrowError('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent')
     });
 
@@ -36,7 +36,7 @@ describe('Authorizer Invalid calls to authenicateToken', function () {
         const event = generateAuthorizerTokenEvent();
         delete event.methodArn;
 
-        await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
+        await expect(authenticateToken(event, ['no-audience'], ['no-scope'], callDefaultOptions))
             .rejects.toThrowError('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent')
     });
 
@@ -44,7 +44,7 @@ describe('Authorizer Invalid calls to authenicateToken', function () {
         const event = generateAuthorizerTokenEvent();
         event.authorizationToken = 'invalid format';
 
-        await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
+        await expect(authenticateToken(event, ['no-audience'], ['no-scope'], callDefaultOptions))
             .rejects.toThrowError('Invalid Authorization token - invalid format does not match "Bearer .*"')
     });
 
@@ -52,7 +52,7 @@ describe('Authorizer Invalid calls to authenicateToken', function () {
         const event = generateAuthorizerRequestEvent();
         delete event.headers;
 
-        await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
+        await expect(authenticateToken(event, ['no-audience'], ['no-scope'], callDefaultOptions))
             .rejects.toThrowError('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent');
     })
 
@@ -64,31 +64,31 @@ describe('Authorizer Invalid calls to authenicateToken', function () {
         "Upgrade": "websocket"
       };
 
-        await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
+        await expect(authenticateToken(event, ['no-audience'], ['no-scope'], callDefaultOptions))
             .rejects.toThrowError('Invalid sub protocol.')
     });
 
     it('Empty audience array throw error', async () => {
         const event = generateAuthorizerTokenEvent();
-        await expect(authenticateToken(event, [], ['no-scope']))
+        await expect(authenticateToken(event, [], ['no-scope'], callDefaultOptions))
             .rejects.toThrowError('audiences (second param) cannot be an empty array')
     });
 
     it('Missing audience throws error', async () => {
         const event = generateAuthorizerTokenEvent();
-        await expect(authenticateToken(event, null, ['no-scope']))
+        await expect(authenticateToken(event, null, ['no-scope'], callDefaultOptions))
             .rejects.toThrowError('audience (second param) must be an array of strings')
     });
 
     it('Empty scope array throw error', async () => {
         const event = generateAuthorizerTokenEvent();
-        await expect(authenticateToken(event, ['no-audience'], []))
+        await expect(authenticateToken(event, ['no-audience'], [], callDefaultOptions))
             .rejects.toThrowError('scopes (third param) cannot be an empty array')
     });
 
     it('Missing scope throws error', async () => {
         const event = generateAuthorizerTokenEvent();
-        await expect(authenticateToken(event, ['no-audience'], undefined))
+        await expect(authenticateToken(event, ['no-audience'], undefined, callDefaultOptions))
             .rejects.toThrowError('scopes (third param) must be an array of strings');
     });
 

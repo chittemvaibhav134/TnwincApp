@@ -1,8 +1,7 @@
-const jwksBase = 'fakekeycloak.navex-dev.com';
-process.env.JWKS_URI = `https://*.${jwksBase}/path/to/realm`;
 import { APIGatewayRequestAuthorizerEvent, APIGatewayTokenAuthorizerEvent } from 'aws-lambda';
 import * as jwt from 'jsonwebtoken';
 
+const jwksBase = 'fakekeycloak.navex-dev.com';
 const mockGetSigningKey = jest.fn().mockImplementation((key) => {
   const signingkey = {
     publicKey: 'publicKey',
@@ -83,3 +82,6 @@ export function mockOnceJwtDecodeAndVerify(jwtValue: NavexJwt) {
   });
 
 }
+export const callDefaultOptions = {
+  jwksUri: `https://*.${jwksBase}/path/to/realm`
+};

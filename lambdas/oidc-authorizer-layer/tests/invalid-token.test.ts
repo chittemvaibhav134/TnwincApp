@@ -1,5 +1,5 @@
 // Order matters (tests-common has mocking side effects)
-import { generateAuthorizerTokenEvent, generateJwtToken, mockOnceJwtDecodeAndVerify } from "./tests-common";
+import { callDefaultOptions, generateAuthorizerTokenEvent, generateJwtToken, mockOnceJwtDecodeAndVerify } from "./tests-common";
 import { authenticateToken } from "..";
 
 // The TOKEN event type is used throughout this section, it is assumed that
@@ -12,7 +12,7 @@ describe('Authorizer Invalid Token Tests (TOKEN event)', function () {
         token.payload.scope = 'one-scope two-scope';
         mockOnceJwtDecodeAndVerify(token);
     
-        await expect(authenticateToken(event, ['my-audience'], ['two-scope']))
+        await expect(authenticateToken(event, ['my-audience'], ['two-scope'], callDefaultOptions))
             .rejects.toThrowError('token does not have clientkey')
     });
 
@@ -23,7 +23,7 @@ describe('Authorizer Invalid Token Tests (TOKEN event)', function () {
         token.payload.scope = 'one-scope two-scope';
         mockOnceJwtDecodeAndVerify(token);
 
-        await expect(authenticateToken(event, ['my-audience'], ['no-scope']))
+        await expect(authenticateToken(event, ['my-audience'], ['no-scope'], callDefaultOptions))
             .rejects.toThrowError('payload scope is not allowed')
     });
 
@@ -33,7 +33,7 @@ describe('Authorizer Invalid Token Tests (TOKEN event)', function () {
         delete token.header;
         mockOnceJwtDecodeAndVerify(token);
 
-        await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
+        await expect(authenticateToken(event, ['no-audience'], ['no-scope'], callDefaultOptions))
             .rejects.toThrowError('invalid token')
       })
     
@@ -43,7 +43,7 @@ describe('Authorizer Invalid Token Tests (TOKEN event)', function () {
         delete token.header.kid;
         mockOnceJwtDecodeAndVerify(token);
 
-        await expect(authenticateToken(event, ['no-audience'], ['no-scope']))
+        await expect(authenticateToken(event, ['no-audience'], ['no-scope'], callDefaultOptions))
             .rejects.toThrowError('invalid token')
       })
 });

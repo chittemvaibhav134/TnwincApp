@@ -1,5 +1,5 @@
 // Order matters (tests-common has mocking side effects)
-import { generateAuthorizerTokenEvent, generateJwtToken, mockOnceJwtDecodeAndVerify, generateAuthorizerRequestEvent } from "./tests-common";
+import { generateAuthorizerTokenEvent, generateJwtToken, mockOnceJwtDecodeAndVerify, generateAuthorizerRequestEvent, callDefaultOptions } from "./tests-common";
 import { authenticateToken } from "..";
 
 describe('Authorizer Valid State Tests', function () {
@@ -9,7 +9,7 @@ describe('Authorizer Valid State Tests', function () {
         token.payload.scope = 'fake scopes';
         mockOnceJwtDecodeAndVerify(token);
     
-        const response = await authenticateToken(event, ['my-audience'], ['fake']);
+        const response = await authenticateToken(event, ['my-audience'], ['fake'], callDefaultOptions);
         expect(response.policyDocument).toStrictEqual({
           Version: '2012-10-17',
           Statement: [{ Action: 'execute-api:Invoke', Effect: 'Allow', Resource: event.methodArn }]
@@ -24,7 +24,7 @@ describe('Authorizer Valid State Tests', function () {
         token.payload.scope = 'fake scopes';
         mockOnceJwtDecodeAndVerify(token);
     
-        const response = await authenticateToken(event, ['client-audience'], ['fake']);
+        const response = await authenticateToken(event, ['client-audience'], ['fake'], callDefaultOptions);
         expect(response.policyDocument).toStrictEqual({
           Version: '2012-10-17',
           Statement: [{ Action: 'execute-api:Invoke', Effect: 'Allow', Resource: event.methodArn }]
@@ -39,7 +39,7 @@ describe('Authorizer Valid State Tests', function () {
         token.payload.scope = 'user scopes';
         mockOnceJwtDecodeAndVerify(token);
     
-        var response = await authenticateToken(event, ['websocket-audience'], ['scopes', 'that', 'overlap']);
+        var response = await authenticateToken(event, ['websocket-audience'], ['scopes', 'that', 'overlap'], callDefaultOptions);
     
         expect(response.policyDocument).toStrictEqual({
           Version: '2012-10-17',
@@ -59,7 +59,7 @@ describe('Authorizer Valid State Tests', function () {
         token.payload.scope = 'user scopes';
         mockOnceJwtDecodeAndVerify(token);
     
-        var response = await authenticateToken(event, ['websocket-audience'], ['scopes', 'that', 'overlap']);
+        var response = await authenticateToken(event, ['websocket-audience'], ['scopes', 'that', 'overlap'], callDefaultOptions);
     
         expect(response.policyDocument).toStrictEqual({
           Version: '2012-10-17',
@@ -74,7 +74,7 @@ describe('Authorizer Valid State Tests', function () {
         token.payload.scope = 'user scopes';
         mockOnceJwtDecodeAndVerify(token);
     
-        var response = await authenticateToken(event, ['other-audience', 'websocket-audience'], ['scopes', 'that', 'overlap']);
+        var response = await authenticateToken(event, ['other-audience', 'websocket-audience'], ['scopes', 'that', 'overlap'], callDefaultOptions);
     
         expect(response.policyDocument).toStrictEqual({
           Version: '2012-10-17',
@@ -95,7 +95,7 @@ describe('Authorizer Valid State Tests', function () {
         token.payload.scope = 'web socket scopes';
         mockOnceJwtDecodeAndVerify(token);
     
-        var response = await authenticateToken(event, ['websocket-audience'], ['scopes']);
+        var response = await authenticateToken(event, ['websocket-audience'], ['scopes'], callDefaultOptions);
         expect(response.policyDocument).toStrictEqual({
           Version: '2012-10-17',
           Statement: [{ Action: 'execute-api:Invoke', Effect: 'Allow', Resource: event.methodArn }]
@@ -113,7 +113,7 @@ describe('Authorizer Valid State Tests', function () {
         token.payload.scope = 'web socket scopes';
         mockOnceJwtDecodeAndVerify(token);
     
-        var response = await authenticateToken(event, ['websocket-audience-cc'], ['scopes']);
+        var response = await authenticateToken(event, ['websocket-audience-cc'], ['scopes'], callDefaultOptions);
         expect(response.policyDocument).toStrictEqual({
           Version: '2012-10-17',
           Statement: [{ Action: 'execute-api:Invoke', Effect: 'Allow', Resource: event.methodArn }]
