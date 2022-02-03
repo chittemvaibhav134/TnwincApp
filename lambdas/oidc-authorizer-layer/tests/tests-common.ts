@@ -30,14 +30,14 @@ import { NavexJwt, NavexJwtPayload } from '../navexjwts';
 
 export function generateAuthorizerTokenEvent(): APIGatewayTokenAuthorizerEvent {
   return {
-    type: <'TOKEN'>"TOKEN",
+    type: "TOKEN" as const,
     authorizationToken: "Bearer token",
     methodArn: "arn:to:method"
   }
 }
 export function generateAuthorizerRequestEvent(): APIGatewayRequestAuthorizerEvent {
   return {
-    type: <'REQUEST'>'REQUEST',
+    type: 'REQUEST' as const,
     headers: {
       authorization: "Bearer faketoken"
     },
