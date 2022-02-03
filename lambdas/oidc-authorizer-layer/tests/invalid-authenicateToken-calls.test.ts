@@ -5,7 +5,7 @@ import { authenticateToken } from "..";
 describe('Authorizer Invalid calls to authenicateToken', function () {
     it('Missing Event throws error', async () => {
         await expect(authenticateToken(undefined, ['my-audience'], ['two-scope']))
-            .rejects.toThrowError('authorizerEvent is required and should match APIGatewayAuthorizerEvent')
+            .rejects.toThrowError('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent')
     });
     it('Missing Event Type throws error', async () => {
         const event = generateAuthorizerTokenEvent();
@@ -71,25 +71,25 @@ describe('Authorizer Invalid calls to authenicateToken', function () {
     it('Empty audience array throw error', async () => {
         const event = generateAuthorizerTokenEvent();
         await expect(authenticateToken(event, [], ['no-scope']))
-            .rejects.toThrowError('audiences cannot be an empty array')
+            .rejects.toThrowError('audiences (second param) cannot be an empty array')
     });
 
     it('Missing audience throws error', async () => {
         const event = generateAuthorizerTokenEvent();
         await expect(authenticateToken(event, null, ['no-scope']))
-            .rejects.toThrowError('audience is required and must be an array')
+            .rejects.toThrowError('audience (second param) must be an array of strings')
     });
 
     it('Empty scope array throw error', async () => {
         const event = generateAuthorizerTokenEvent();
         await expect(authenticateToken(event, ['no-audience'], []))
-            .rejects.toThrowError('scopes cannot be an empty array')
+            .rejects.toThrowError('scopes (third param) cannot be an empty array')
     });
 
     it('Missing scope throws error', async () => {
         const event = generateAuthorizerTokenEvent();
         await expect(authenticateToken(event, ['no-audience'], undefined))
-            .rejects.toThrowError('scopes is required and must be an array');
+            .rejects.toThrowError('scopes (third param) must be an array of strings');
     });
 
 })

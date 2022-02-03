@@ -74,7 +74,7 @@ const getWebSocketRequestToken = (request: APIGatewayRequestAuthorizerEvent): st
 }
 
 const getClientKey = (decodedToken: NavexJwt): string => {
-    if (!decodedToken.payload || !decodedToken.payload.clientkey) {
+    if (!decodedToken?.payload?.clientkey) {
         throw new Error('token does not have clientkey')
     }
     return decodedToken.payload.clientkey
@@ -133,16 +133,16 @@ export interface IAuthenicateTokenOptions {
  * @param {*} authorizerEvent 
  * @returns 
  */
-export async function authenticateToken(authorizerEvent: APIGatewayAuthorizerEvent, audiences: string[], scopes: string[], options?: IAuthenicateTokenOptions ) {
-    if (!authorizerEvent) { throw new Error('authorizerEvent is required and should match APIGatewayAuthorizerEvent') }
-    if (!Array.isArray(audiences)) { throw new Error('audience is required and must be an array') }
-    if (!Array.isArray(scopes)) { throw new Error('scopes is required and must be an array') }
+// TODO: 
+export async function authenticateToken(authorizerEvent: APIGatewayAuthorizerEvent|any, audiences: string[]|any, scopes: string[]|any, options?: IAuthenicateTokenOptions|any ) {
+    if (!authorizerEvent) { throw new Error('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent') }
     
-    if (audiences.length == 0) { throw new Error('audiences cannot be an empty array') }
-    if (scopes.length == 0) { throw new Error('scopes cannot be an empty array') }
+
+    if (!isStringArray(audiences)) { throw new Error('audience (second param) must be an array of strings') }
+    if (!isStringArray(scopes)) { throw new Error('scopes (third param) must be an array of strings') }
     
-    if (!isStringArray(audiences)) { throw new Error('all elements of audience must be of type string') }
-    if (!isStringArray(scopes)) { throw new Error('all elements of scopes must be of type string') }
+    if (audiences.length == 0) { throw new Error('audiences (second param) cannot be an empty array') }
+    if (scopes.length == 0) { throw new Error('scopes (third param) cannot be an empty array') }
 
     options = {
         scopeComplexityLimit: 500,
@@ -154,7 +154,7 @@ export async function authenticateToken(authorizerEvent: APIGatewayAuthorizerEve
     const token = getToken(authorizerEvent)
 
     const decoded = <NavexJwt>jwtdecode(token, { complete: true })
-    if (!decoded || !decoded.header || !decoded.header.kid) {
+    if (!decoded?.header?.kid) {
         throw new Error('invalid token')
     }
     const { payload } = decoded
