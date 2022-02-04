@@ -1,5 +1,16 @@
 # platform-auth-keycloak
 
+This repo contains many things!
+* The cfg to bld KC cntrs
+* The [ImplMWSPI](./build/app/moonwatch-spi/)
+* Legacy [ImplAWSAPIGWOIDCAuthNer](./lambdas/oidc-custom-authorizer/)
+* The [ImplAWSAPIGWOIDCAuthNerLib](./lambdas/oidc-authorizer-layer/)
+* The [ImplKCAPIPrx](./lambdas/kc-api-proxy/)
+* The [ImplImp4Cfg](./lambdas/kc-config-import)
+* The [Cfg4ImpProd](./import/variants/keycloak-app)
+* The [Cfg4ImpFake](./import/variants/dev-mock)
+
+
 This process allows a developer to install KeyCloak in a development environment.
 
 ## Dependencies
