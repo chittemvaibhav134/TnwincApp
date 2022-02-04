@@ -27,6 +27,9 @@ Parameters:
   StageAccountId:
     Type: String
     Default: "403172096194"
+  LayerName:
+    Type: String
+    Default: oidc-endpoint-authorizer-nodejs
 
 Resources:
   NavexKcContainerRepository:
@@ -541,6 +544,10 @@ Resources:
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_AutoValid::template-configuration.json"
                 OutputFileName: stack-outputs.json
+                ParameterOverrides: !Sub |
+                    {
+                      "LayerName": "${LayerName}-autovalidation"
+                    }
               InputArtifacts:
                 - Name: AuthPackageUsWest2
                 - Name: FinalizedCfnAuthConfig_AutoValid
@@ -808,6 +815,10 @@ Resources:
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_Wobbly::template-configuration.json"
                 OutputFileName: stack-outputs.json
+                ParameterOverrides: !Sub |
+                    {
+                      "LayerName": "${LayerName}-wobbly"
+                    }
               InputArtifacts:
                 - Name: AuthPackageUsWest2
                 - Name: FinalizedCfnAuthConfig_Wobbly
@@ -1072,6 +1083,10 @@ Resources:
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_Rickety::template-configuration.json"
                 OutputFileName: stack-outputs.json
+                ParameterOverrides: !Sub |
+                    {
+                      "LayerName": "${LayerName}-rickety"
+                    }
               InputArtifacts:
                 - Name: AuthPackageUsWest2
                 - Name: FinalizedCfnAuthConfig_Rickety
@@ -1336,6 +1351,10 @@ Resources:
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_Squirrelly::template-configuration.json"
                 OutputFileName: stack-outputs.json
+                ParameterOverrides: !Sub |
+                    {
+                      "LayerName": "${LayerName}-squirrelly"
+                    }
               InputArtifacts:
                 - Name: AuthPackageUsWest2
                 - Name: FinalizedCfnAuthConfig_Squirrelly
