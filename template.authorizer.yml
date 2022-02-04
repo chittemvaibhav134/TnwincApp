@@ -16,12 +16,6 @@ Parameters:
   LayerName:
     Type: String
     Default: oidc-endpoint-authorizer-nodejs
-  StackDeploymentPurpose:
-    Type: String
-    Default: pipeline
-    AllowedValues:
-      - pipeline # will publish its layer name to ssm, for pipeline stack deploys
-      - story # will not publish layer name to ssm, for one-off story stack deploys
 
 Outputs:
   CustomOidcAuthorizerLambdaName:
@@ -31,15 +25,7 @@ Outputs:
   LayerName:
     Value: !Ref LayerName
   LayerArn:
-    Value: !If
-      - IsPipelineStack
-      - !GetAtt LayerArnSetSsm.Value
-      - !Ref AuthorizerLayer
-
-Conditions:
-  IsPipelineStack: !Equals
-    - !Ref StackDeploymentPurpose
-    - "pipeline"
+    Value: !GetAtt LayerArnSetSsm.Value
 
 Resources:
   CustomOidcAuthorizerLambda:
@@ -56,10 +42,7 @@ Resources:
       Runtime: nodejs14.x
       Timeout: 30
       Layers:
-        - !If
-          - IsPipelineStack
-          - !GetAtt LayerArnSetSsm.Value
-          - !Ref AuthorizerLayer
+        - !GetAtt LayerArnSetSsm.Value
 
   CustomOidcAuthorizerLambdaPermission:
     Type: "AWS::Lambda::Permission"
@@ -103,6 +86,7 @@ Resources:
                   - lambda:InvokeAsync
                   - lambda:InvokeFunction
                 Resource: !GetAtt CustomOidcAuthorizerLambda.Arn
+  
   AuthorizerLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -115,9 +99,8 @@ Resources:
 
   LayerArnSetSsm:
     Type: AWS::SSM::Parameter
-    Condition: IsPipelineStack
     Properties:
-      Name: !Sub /mobile/lambda-code/layers/${LayerName}/arn
+      Name: !Sub /oidc-auth/layers/${LayerName}/arn
       Description: !Sub Amazon Resource Name of the ${LayerName} lambda layer.
       Type: String
       Value: !Ref AuthorizerLayer
