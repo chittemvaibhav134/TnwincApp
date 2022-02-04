@@ -362,14 +362,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_Dev::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_Dev::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-${AWS::StackName}"
                       }
                     },
                     "OutputFile": "template-configuration.json"
@@ -396,10 +397,6 @@ Resources:
                 StackName: !Sub ${ProjectName}-${AWS::StackName}-dev-authorizer
                 TemplatePath: "AuthPackage::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_Dev::template-configuration.json"
-                ParameterOverrides: !Sub |
-                    {
-                      "LayerName": "${LayerName}-${AWS::StackName}"
-                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackage

@@ -504,14 +504,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_AutoValid::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_AutoValid::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-autovalidation"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "autovalidation",
@@ -544,10 +545,6 @@ Resources:
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_AutoValid::template-configuration.json"
                 OutputFileName: stack-outputs.json
-                ParameterOverrides: !Sub |
-                    {
-                      "LayerName": "${LayerName}-autovalidation"
-                    }
               InputArtifacts:
                 - Name: AuthPackageUsWest2
                 - Name: FinalizedCfnAuthConfig_AutoValid
@@ -775,14 +772,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_Wobbly::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_Wobbly::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-wobbly"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "wobbly",
@@ -815,10 +813,6 @@ Resources:
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_Wobbly::template-configuration.json"
                 OutputFileName: stack-outputs.json
-                ParameterOverrides: !Sub |
-                    {
-                      "LayerName": "${LayerName}-wobbly"
-                    }
               InputArtifacts:
                 - Name: AuthPackageUsWest2
                 - Name: FinalizedCfnAuthConfig_Wobbly
@@ -1043,14 +1037,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_Rickety::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_Rickety::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-rickety"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "rickety",
@@ -1083,10 +1078,6 @@ Resources:
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_Rickety::template-configuration.json"
                 OutputFileName: stack-outputs.json
-                ParameterOverrides: !Sub |
-                    {
-                      "LayerName": "${LayerName}-rickety"
-                    }
               InputArtifacts:
                 - Name: AuthPackageUsWest2
                 - Name: FinalizedCfnAuthConfig_Rickety
@@ -1311,14 +1302,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_Squirrelly::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_Squirrelly::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-squirrelly"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "squirrelly",
@@ -1351,10 +1343,6 @@ Resources:
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_Squirrelly::template-configuration.json"
                 OutputFileName: stack-outputs.json
-                ParameterOverrides: !Sub |
-                    {
-                      "LayerName": "${LayerName}-squirrelly"
-                    }
               InputArtifacts:
                 - Name: AuthPackageUsWest2
                 - Name: FinalizedCfnAuthConfig_Squirrelly

@@ -417,14 +417,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_PerfLab::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_PerfLab::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-perflab"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "perflab",
@@ -456,10 +457,6 @@ Resources:
                 StackName: !Sub ${ProjectName}-auth-PerfLab
                 TemplatePath: "AuthPackageUsEast1::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_PerfLab::template-configuration.json"
-                ParameterOverrides: !Sub |
-                    {
-                      "LayerName": "${LayerName}-perflab"
-                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageUsEast1

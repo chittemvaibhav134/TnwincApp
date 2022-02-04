@@ -417,14 +417,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_PreviewUS::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_PreviewUS::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-previewUS"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "previewUS",
@@ -456,10 +457,6 @@ Resources:
                 StackName: !Sub ${ProjectName}-auth-previewUS
                 TemplatePath: "AuthPackageUsEast1::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_PreviewUS::template-configuration.json"
-                ParameterOverrides: !Sub |
-                    {
-                      "LayerName": "${LayerName}-previewUS"
-                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageUsEast1

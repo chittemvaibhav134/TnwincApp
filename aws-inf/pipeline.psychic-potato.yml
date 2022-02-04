@@ -457,14 +457,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_PsyPot::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_PsyPot::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-psychic-potato"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "psychic-potato",
@@ -496,10 +497,6 @@ Resources:
                 StackName: !Sub ${ProjectName}-auth-psychic-potato
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_PsyPot::template-configuration.json"
-                ParameterOverrides: !Sub |
-                    {
-                      "LayerName": "${LayerName}-psychic-potato"
-                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageUsWest2

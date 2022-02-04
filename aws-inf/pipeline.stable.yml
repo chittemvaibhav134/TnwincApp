@@ -550,14 +550,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_IntStable::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_IntStable::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-int-stable"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "int-stable",
@@ -589,10 +590,6 @@ Resources:
                 StackName: !Sub ${ProjectName}-stable-auth
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_IntStable::template-configuration.json"
-                ParameterOverrides: !Sub |
-                    {
-                      "LayerName": "${LayerName}-int-stable"
-                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageUsWest2
@@ -823,14 +820,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_StageEU::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_StageEU::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-stageEU"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "stageEU",
@@ -862,10 +860,6 @@ Resources:
                 StackName: !Sub ${ProjectName}-stable-auth
                 TemplatePath: "AuthPackageEuCentral1::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_StageEU::template-configuration.json"
-                ParameterOverrides: !Sub |
-                    {
-                      "LayerName": "${LayerName}-stageEU"
-                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageEuCentral1
@@ -1096,14 +1090,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_StageUS::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_StageUS::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-stageUS"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "stageUS",
@@ -1135,10 +1130,6 @@ Resources:
                 StackName: !Sub ${ProjectName}-stable-auth
                 TemplatePath: "AuthPackageUsEast1::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_StageUS::template-configuration.json"
-                ParameterOverrides: !Sub |
-                    {
-                      "LayerName": "${LayerName}-stageUS"
-                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageUsEast1
@@ -1378,14 +1369,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_ProdEU::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_ProdEU::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-prodEU"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "prodEU",
@@ -1417,10 +1409,6 @@ Resources:
                 StackName: !Sub ${ProjectName}-stable-auth
                 TemplatePath: "AuthPackageEuCentral1::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_ProdEU::template-configuration.json"
-                ParameterOverrides: !Sub |
-                    {
-                      "LayerName": "${LayerName}-prodEU"
-                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageEuCentral1
@@ -1660,14 +1648,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_ProdUS::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_ProdUS::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-prodUS"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "prodUS",
@@ -1699,10 +1688,6 @@ Resources:
                 StackName: !Sub ${ProjectName}-stable-auth
                 TemplatePath: "AuthPackageUsEast1::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_ProdUS::template-configuration.json"
-                ParameterOverrides: !Sub |
-                    {
-                      "LayerName": "${LayerName}-prodUS"
-                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageUsEast1
