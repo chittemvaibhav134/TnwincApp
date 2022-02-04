@@ -31,7 +31,7 @@ Resources:
         exports.handler = async (event, context) => {
             console.log(event);
             try {
-                const response = await authenticateToken(event, ['exampleapi'], ['exampleapiscope'])
+                const response = await authenticateToken(event, ['exampleapi'], ['exampleapiscope'], {jwksUri: process.env.JWKS_URI })
                 console.log(response)
                 return response 
             }
