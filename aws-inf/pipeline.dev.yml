@@ -79,6 +79,9 @@ Parameters:
     Type: "AWS::SSM::Parameter::Value<String>"
     Default: "/mobile/ssm-update-trigger"
     Description: Unique value to force lambda execution
+  LayerName:
+    Type: String
+    Default: oidc-endpoint-authorizer-nodejs
 
 Conditions:
   DevMock: !Equals [ !Ref ImportConfigVariant, "DevMock" ]
@@ -359,14 +362,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_Dev::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_Dev::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-${AWS::StackName}"
                       }
                     },
                     "OutputFile": "template-configuration.json"

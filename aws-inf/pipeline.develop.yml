@@ -27,6 +27,9 @@ Parameters:
   StageAccountId:
     Type: String
     Default: "403172096194"
+  LayerName:
+    Type: String
+    Default: oidc-endpoint-authorizer-nodejs
 
 Resources:
   NavexKcContainerRepository:
@@ -501,14 +504,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_AutoValid::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_AutoValid::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-autovalidation"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "autovalidation",
@@ -768,14 +772,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_Wobbly::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_Wobbly::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-wobbly"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "wobbly",
@@ -1032,14 +1037,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_Rickety::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_Rickety::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-rickety"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "rickety",
@@ -1296,14 +1302,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_Squirrelly::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_Squirrelly::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-squirrelly"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "squirrelly",
