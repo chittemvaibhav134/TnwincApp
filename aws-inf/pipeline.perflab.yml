@@ -21,6 +21,9 @@ Parameters:
   StageAccountId:
     Type: String
     Default: "403172096194"
+  LayerName:
+    Type: String
+    Default: oidc-endpoint-authorizer-nodejs
 
 Resources:
   NavexKcContainerRepository:
@@ -453,6 +456,10 @@ Resources:
                 StackName: !Sub ${ProjectName}-auth-PerfLab
                 TemplatePath: "AuthPackageUsEast1::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_PerfLab::template-configuration.json"
+                ParameterOverrides: !Sub |
+                    {
+                      "LayerName": "${LayerName}-perflab"
+                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageUsEast1

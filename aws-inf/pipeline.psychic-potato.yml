@@ -26,6 +26,9 @@ Parameters:
   IntegrationAccountId:
     Type: String
     Default: "455920928861"
+  LayerName:
+    Type: String
+    Default: oidc-endpoint-authorizer-nodejs
 
 Resources:
 
@@ -464,7 +467,7 @@ Resources:
                         "KCBaseUrl": "CfnDeploy_PsyPot::stack-outputs.json:Domain"
                       },
                       "Tags": {
-                        "Navex:Technical:DeploymentContext": "psychc-potato",
+                        "Navex:Technical:DeploymentContext": "psychic-potato",
                         "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
                       } 
                     },
@@ -493,6 +496,10 @@ Resources:
                 StackName: !Sub ${ProjectName}-auth-psychic-potato
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_PsyPot::template-configuration.json"
+                ParameterOverrides: !Sub |
+                    {
+                      "LayerName": "${LayerName}-psychic-potato"
+                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageUsWest2

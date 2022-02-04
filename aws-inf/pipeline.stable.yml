@@ -27,6 +27,9 @@ Parameters:
   ProductionAccountId:
     Type: String
     Default: "618036221923"
+  LayerName:
+    Type: String
+    Default: oidc-endpoint-authorizer-nodejs
 
 Resources:
   NavexKcContainerRepository:
@@ -586,6 +589,10 @@ Resources:
                 StackName: !Sub ${ProjectName}-stable-auth
                 TemplatePath: "AuthPackageUsWest2::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_IntStable::template-configuration.json"
+                ParameterOverrides: !Sub |
+                    {
+                      "LayerName": "${LayerName}-int-stable"
+                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageUsWest2
@@ -855,6 +862,10 @@ Resources:
                 StackName: !Sub ${ProjectName}-stable-auth
                 TemplatePath: "AuthPackageEuCentral1::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_StageEU::template-configuration.json"
+                ParameterOverrides: !Sub |
+                    {
+                      "LayerName": "${LayerName}-stageEU"
+                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageEuCentral1
@@ -1124,6 +1135,10 @@ Resources:
                 StackName: !Sub ${ProjectName}-stable-auth
                 TemplatePath: "AuthPackageUsEast1::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_StageUS::template-configuration.json"
+                ParameterOverrides: !Sub |
+                    {
+                      "LayerName": "${LayerName}-stageUS"
+                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageUsEast1
@@ -1402,6 +1417,10 @@ Resources:
                 StackName: !Sub ${ProjectName}-stable-auth
                 TemplatePath: "AuthPackageEuCentral1::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_ProdEU::template-configuration.json"
+                ParameterOverrides: !Sub |
+                    {
+                      "LayerName": "${LayerName}-prodEU"
+                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageEuCentral1
@@ -1680,6 +1699,10 @@ Resources:
                 StackName: !Sub ${ProjectName}-stable-auth
                 TemplatePath: "AuthPackageUsEast1::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_ProdUS::template-configuration.json"
+                ParameterOverrides: !Sub |
+                    {
+                      "LayerName": "${LayerName}-prodUS"
+                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackageUsEast1

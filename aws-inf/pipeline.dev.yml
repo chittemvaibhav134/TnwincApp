@@ -79,6 +79,9 @@ Parameters:
     Type: "AWS::SSM::Parameter::Value<String>"
     Default: "/mobile/ssm-update-trigger"
     Description: Unique value to force lambda execution
+  LayerName:
+    Type: String
+    Default: oidc-endpoint-authorizer-nodejs
 
 Conditions:
   DevMock: !Equals [ !Ref ImportConfigVariant, "DevMock" ]
@@ -393,6 +396,10 @@ Resources:
                 StackName: !Sub ${ProjectName}-${AWS::StackName}-dev-authorizer
                 TemplatePath: "AuthPackage::auth.packaged.yml"
                 TemplateConfiguration: "FinalizedCfnAuthConfig_Dev::template-configuration.json"
+                ParameterOverrides: !Sub |
+                    {
+                      "LayerName": "${LayerName}-${AWS::StackName}"
+                    }
                 OutputFileName: stack-outputs.json
               InputArtifacts:
                 - Name: AuthPackage
