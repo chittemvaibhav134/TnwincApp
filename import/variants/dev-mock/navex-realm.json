@@ -1432,7 +1432,9 @@
     "secret" : "86bd2274-be42-4c44-a996-93283601b9aa",
     "redirectUris": [
       "https://auth.coi.devlocal.navex-pe.com:6443/*",
-      "https://auth.devlocal.navex-pe.com:6443/*"
+      "https://auth.devlocal.navex-pe.com:6443/*",
+      "https://auth.devlocal.navex-pe.com:18443/*",
+      "https://auth.coi.devlocal.navex-pe.com:18443/*"
     ],
     "webOrigins" : [ "+" ],
     "notBefore" : 0,
