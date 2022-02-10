@@ -14,10 +14,10 @@ def find_task(ecs_client, cluster, startedby_id):
         logger.warn(f"Found {len(task_arns)} in {cluster} startedBy {startedby_id}.. there shouldn't be more than one and we are going to pretend there only was one")
     return ecs_client.describe_tasks(cluster=cluster, tasks=task_arns)['tasks'][0]
 
-def get_task_logs_location(ecs_client, task_definition_arn: str, task_arn: str) -> Tuple[str,str]:
+def get_task_logs_location(ecs_client, task_definition_arn: str, task_arn: str, container_name: str) -> Tuple[str,str]:
     task_definition = ecs_client.describe_task_definition(taskDefinition=task_definition_arn)
-    log_options = task_definition['taskDefinition']['containerDefinitions'][0]['logConfiguration']['options']
-    container_name = task_definition['taskDefinition']['containerDefinitions'][0]['name']
+    container_def = next(x for x in task_definition['taskDefinition']['containerDefinitions'] if x['name'] == container_name)
+    log_options = container_def['logConfiguration']['options']
     task_id = task_arn.split('/')[-1]
     return (log_options['awslogs-group'], f"{log_options['awslogs-stream-prefix']}/{container_name}/{task_id}")
 

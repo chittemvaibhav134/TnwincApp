@@ -833,6 +833,7 @@ Resources:
           TaskDefinition: !Ref ImportConfigTaskDefinition
           #TaskFamily: !Sub ${AWS::StackName}-KCCONFIG
           TaskSubnets: !Sub ${KeycloakSubnet1},${KeycloakSubnet2}
+          ImportConfigContainerName: 'Navex-Keycloak-Config'
 
   S3ConfigBucket:
     Type: AWS::S3::Bucket
