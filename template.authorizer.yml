@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
+Transform: 'AWS::Serverless-2016-10-31'
 Description: Lambda Authorizer for securing APIs.
 
 Metadata:
@@ -12,12 +13,19 @@ Parameters:
   KCBaseUrl:
     Type: String
     Default: "*.keycloak.devlocal.navex-pe.com:8443"
+  LayerName:
+    Type: String
+    Default: oidc-endpoint-authorizer-nodejs
 
 Outputs:
   CustomOidcAuthorizerLambdaName:
     Value: !Ref CustomOidcAuthorizerLambda
   ApiGatewayAuthorizerRole:
     Value: !Ref ApiGatewayAuthorizerRole
+  LayerName:
+    Value: !Ref LayerName
+  LayerArn:
+    Value: !GetAtt LayerArnSetSsm.Value
 
 Resources:
   CustomOidcAuthorizerLambda:
@@ -33,6 +41,8 @@ Resources:
       MemorySize: 256
       Runtime: nodejs14.x
       Timeout: 30
+      Layers:
+        - !GetAtt LayerArnSetSsm.Value
 
   CustomOidcAuthorizerLambdaPermission:
     Type: "AWS::Lambda::Permission"
@@ -77,3 +87,20 @@ Resources:
                   - lambda:InvokeFunction
                 Resource: !GetAtt CustomOidcAuthorizerLambda.Arn
   
+  AuthorizerLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - nodejs12.x
+        - nodejs14.x
+      ContentUri: ./lambdas/oidc-authorizer-layer/output/
+      LayerName: !Ref LayerName
+      RetentionPolicy: Retain
+
+  LayerArnSetSsm:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /oidc-auth/layers/${LayerName}/arn
+      Description: !Sub Amazon Resource Name of the ${LayerName} lambda layer.
+      Type: String
+      Value: !Ref AuthorizerLayer

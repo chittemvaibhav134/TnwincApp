@@ -77,6 +77,7 @@ def handler(event, context):
     cluster = os.environ['Cluster']
     task_definition = os.environ['TaskDefinition']
     task_subnets = os.environ['TaskSubnets'].split(',')
+    import_config_container_name = os.environ['ImportConfigContainerName']
     logger.info(f"KC Config import lamba called with event: {event}")
     import_id = get_startedby_id(event['ImportId'])
     # Check if there is a running task with this import id already
@@ -93,7 +94,7 @@ def handler(event, context):
     task_status = task['lastStatus']
     task_arn = task['taskArn']
     logger.info(f"Found task {task_arn} previously started with import id {import_id} in cluster {cluster}")
-    log_group, log_stream = get_task_logs_location(ecs_client, task['taskDefinitionArn'], task_arn)
+    log_group, log_stream = get_task_logs_location(ecs_client, task['taskDefinitionArn'], task_arn, import_config_container_name)
     
     if import_task_failed(task):
         message = f"{task_arn} was found in unexpected stop state. Check {log_group}/{log_stream} for logs"

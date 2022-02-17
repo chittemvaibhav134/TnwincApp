@@ -26,6 +26,9 @@ Parameters:
   IntegrationAccountId:
     Type: String
     Default: "455920928861"
+  LayerName:
+    Type: String
+    Default: oidc-endpoint-authorizer-nodejs
 
 Resources:
 
@@ -454,17 +457,18 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_PsyPot::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_PsyPot::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-psychic-potato"
                       },
                       "Tags": {
-                        "Navex:Technical:DeploymentContext": "psychc-potato",
+                        "Navex:Technical:DeploymentContext": "psychic-potato",
                         "Navex:Technical:Version": "ProjectVersion::build-record.json:Version"
                       } 
                     },

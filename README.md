@@ -1,5 +1,16 @@
 # platform-auth-keycloak
 
+This repo contains many things!
+* The cfg to bld KC cntrs
+* The implementation of [Moonwatch KeyCloak Integration Plugin](./build/app/moonwatch-spi/)
+* Legacy implementation of an [AWS API Gateway Authorizer for OIDC Authenication](./lambdas/oidc-custom-authorizer/)
+* The implementation of an [OIDC Authenication Library for use by AWS API Gateway Authorizers](./lambdas/oidc-authorizer-layer/)
+* The implementation of [KeyCloak API Proxy](./lambdas/kc-api-proxy/)
+* The implementation of [KeyCloak Configuration Import Lambda](./lambdas/kc-config-import)
+* The configuration dump that is used by KeyCloak in production like environments: [keycloak-app](./import/variants/keycloak-app)
+* The configuration dump that is used by KeyCloak in production like environments: [dev-mock](./import/variants/dev-mock)
+
+
 This process allows a developer to install KeyCloak in a development environment.
 
 ## Dependencies

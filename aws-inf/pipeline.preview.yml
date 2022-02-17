@@ -21,6 +21,9 @@ Parameters:
   StageAccountId:
     Type: String
     Default: "403172096194"
+  LayerName:
+    Type: String
+    Default: oidc-endpoint-authorizer-nodejs
 
 Resources:
   NavexKcContainerRepository:
@@ -414,14 +417,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_PreviewUS::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_PreviewUS::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-previewUS"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "previewUS",

@@ -27,6 +27,9 @@ Parameters:
   ProductionAccountId:
     Type: String
     Default: "618036221923"
+  LayerName:
+    Type: String
+    Default: oidc-endpoint-authorizer-nodejs
 
 Resources:
   NavexKcContainerRepository:
@@ -547,14 +550,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_IntStable::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_IntStable::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-int-stable"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "int-stable",
@@ -816,14 +820,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_StageEU::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_StageEU::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-stageEU"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "stageEU",
@@ -1085,14 +1090,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_StageUS::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_StageUS::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-stageUS"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "stageUS",
@@ -1363,14 +1369,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_ProdEU::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_ProdEU::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-prodEU"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "prodEU",
@@ -1641,14 +1648,15 @@ Resources:
                 Provider: Lambda
               Configuration:
                 FunctionName: CPUpdateJsonFile
-                UserParameters: |
+                UserParameters: !Sub |
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
-                        "KCBaseUrl": "CfnDeploy_ProdUS::stack-outputs.json:Domain"
+                        "KCBaseUrl": "CfnDeploy_ProdUS::stack-outputs.json:Domain",
+                        "LayerName": "${LayerName}-prodUS"
                       },
                       "Tags": {
                         "Navex:Technical:DeploymentContext": "prodUS",

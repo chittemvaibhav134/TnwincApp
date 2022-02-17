@@ -5,8 +5,10 @@ phases:
         nodejs: 14
     commands:
       - cd ./lambdas/oidc-custom-authorizer && npm install-ci-test && cd -
+      - cd ./lambdas/oidc-authorizer-layer && npm install-ci-test && cd -
   build:
     commands:
+      - cd ./lambdas/oidc-authorizer-layer && npm run bundle && cd -
       - aws cloudformation package --template template.authorizer.yml --s3-bucket $S3_BUCKET --s3-prefix $S3_PREFIX --output-template auth.packaged.yml
 artifacts:
   type: zip

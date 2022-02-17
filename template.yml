@@ -675,6 +675,11 @@ Resources:
               Value: !Ref MoonwatchApiRegion
             - Name: CACHE_OWNERS
               Value: !Ref InfiniSpanCacheOwners
+            - !If
+              - Development
+              - Name: X509_CA_BUNDLE
+                Value: "/CA_bundle/*.cer"
+              - !Ref AWS::NoValue
           Secrets:
             - Name: DB_PASSWORD
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${DbStrings.SsmPath}
@@ -828,6 +833,7 @@ Resources:
           TaskDefinition: !Ref ImportConfigTaskDefinition
           #TaskFamily: !Sub ${AWS::StackName}-KCCONFIG
           TaskSubnets: !Sub ${KeycloakSubnet1},${KeycloakSubnet2}
+          ImportConfigContainerName: 'Navex-Keycloak-Config'
 
   S3ConfigBucket:
     Type: AWS::S3::Bucket
@@ -1436,6 +1442,7 @@ Outputs:
     Value: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/appshell-bff"
   MoonwatchSecretSsmArn:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/moonwatch-api-proxy"
+  CustomerManagerClientSecretSsmArn:
+    Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/customermanager"
   RotateSecretTopicArn:
     Value: !Ref RotateSecretTopic
-       
