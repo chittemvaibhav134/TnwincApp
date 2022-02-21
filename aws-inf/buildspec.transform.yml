@@ -93,7 +93,7 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "https://auth.${SingleDomainUrl}/disclosures/*"
 
       # Set insights client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p redirectUris -v "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p redirectUris -v "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" -v "${DoormanBaseUrl}/*" -v "${InsightsApiBaseUrl}/public/v3/BrowserAuthorization.*"
 
       # Set riskrate client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id riskrate -p redirectUris -v "${RiskRateAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"

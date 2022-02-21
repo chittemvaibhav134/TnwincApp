@@ -1122,7 +1122,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "b902d50a-0725-4b33-a5c0-20554605c9a9",
-    "redirectUris" : [ "https://api.dev.insights.local/public/v2/BrowserAuthorization.FinishBrowserAuthorization", "https://doorman.dev.gw.local/*" ],
+    "redirectUris" : [ "https://api.dev.insights.local/public/v2/BrowserAuthorization.FinishBrowserAuthorization", "https://doorman.dev.gw.local/*", "https://api.dev.insights.local/public/v3/BrowserAuthorization.*" ],
     "webOrigins" : [ "*" ],
     "notBefore" : 0,
     "bearerOnly" : false,
