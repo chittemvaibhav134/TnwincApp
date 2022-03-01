@@ -85,8 +85,8 @@
       "Project": "esg",
       "Artifacts": [
         {
-          "Name": "esgAuthRedirectUrl",
-          "DefaultValue": "http://csrtenant.lab.csrware.com/sso/login"
+          "Name": "ApiBaseUrl",
+          "DefaultValue": "http://csrtenant.lab.csrware.com/"
         }
       ]
     },	
