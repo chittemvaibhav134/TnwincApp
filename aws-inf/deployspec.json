@@ -85,8 +85,8 @@
       "Project": "esg",
       "Artifacts": [
         {
-          "Name": "ApiBaseUrl",
-          "DefaultValue": "http://csrtenant.lab.csrware.com/"
+          "Name": "BaseRedirectUrl",
+          "DefaultValue": "http://csrtenant.lab.csrware.com"
         }
       ]
     },	

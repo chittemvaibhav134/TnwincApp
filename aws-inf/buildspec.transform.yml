@@ -34,7 +34,7 @@ phases:
       - LaunchDarklySdkKeySsmValue=$(jq -r '.LaunchDarklySdkKeySsmArn' "$DC_ART_DIR/global-configuration")
       - EpadminRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")      
       - CcAuthRedirectUrl=$(jq -r '.ApiBaseUrl' "$DC_ART_DIR/ng-learning-platform")
-      - EsgAuthRedirectUrl=$(jq -r '.ApiBaseUrl' "$DC_ART_DIR/esg")
+      - EsgAuthRedirectUrl=$(jq -r '.BaseRedirectUrl' "$DC_ART_DIR/esg")
       - SingleDomainUrl=$(jq -r '.SingleDomain' "$DC_ART_DIR/global-configuration")
       - mkdir transformed-import
       - |
