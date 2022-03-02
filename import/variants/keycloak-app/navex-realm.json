@@ -939,7 +939,7 @@
     "consentRequired": false,
     "standardFlowEnabled": true,
     "implicitFlowEnabled": false,
-    "directAccessGrantsEnabled": true,
+    "directAccessGrantsEnabled": false,
     "serviceAccountsEnabled": false,
     "publicClient": true,
     "frontchannelLogout": false,
