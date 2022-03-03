@@ -34,6 +34,7 @@ phases:
       - LaunchDarklySdkKeySsmValue=$(jq -r '.LaunchDarklySdkKeySsmArn' "$DC_ART_DIR/global-configuration")
       - EpadminRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")      
       - CcAuthRedirectUrl=$(jq -r '.ApiBaseUrl' "$DC_ART_DIR/ng-learning-platform")
+      - EsgAuthRedirectUrl=$(jq -r '.BaseRedirectUrl' "$DC_ART_DIR/esg")
       - SingleDomainUrl=$(jq -r '.SingleDomain' "$DC_ART_DIR/global-configuration")
       - mkdir transformed-import
       - |
@@ -88,6 +89,9 @@ phases:
 
       # Set course customizer client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p redirectUris -v "${CcAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
+      
+      # Set esg client related urls
+      - $TransformScript -r "$NavexRealmJson" -i --client-id navex-esg -p redirectUris -v "${EsgAuthRedirectUrl}/sso/login" -v "${DoormanBaseUrl}/*"
 
       # Set coi client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "https://auth.${SingleDomainUrl}/disclosures/*"

@@ -80,7 +80,16 @@
           "DefaultValue": "https://webapi-integration.lcms.navex-pe.com"
         }
       ]
-    },		
+    },
+    {
+      "Project": "esg",
+      "Artifacts": [
+        {
+          "Name": "BaseRedirectUrl",
+          "DefaultValue": "http://csrtenant.lab.csrware.com"
+        }
+      ]
+    },	
     {
       "Project": "coi-ui",
       "Artifacts": [
