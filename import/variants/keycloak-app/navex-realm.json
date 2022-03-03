@@ -927,9 +927,8 @@
     "alwaysDisplayInConsole": false,
     "clientAuthenticatorType": "client-secret",
     "redirectUris": [
-        "http://hnicorp.lab.csrware.com/sso/login",
-        "http://csrtenant.lab.csrware.com/sso/login",
-        "http://tapestry.lab.csrware.com/sso/login"
+        "http://csrtenant.lab.csrware.com/sso/login"
+       
     ],
     "webOrigins": [
         "+"
