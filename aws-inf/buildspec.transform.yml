@@ -89,6 +89,9 @@ phases:
 
       # Set course customizer client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p redirectUris -v "${CcAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
+      
+      # Set esg client related urls
+      - $TransformScript -r "$NavexRealmJson" -i --client-id navex-esg -p redirectUris -v "${EsgAuthRedirectUrl}/sso/login" -v "${DoormanBaseUrl}/*"
 
       # Set esg client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id navex-esg -p redirectUris -v "${EsgAuthRedirectUrl}/sso/login" -v "${DoormanBaseUrl}/*"
@@ -97,7 +100,7 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "https://auth.${SingleDomainUrl}/disclosures/*"
 
       # Set insights client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p redirectUris -v "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p redirectUris -v "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" -v "${InsightsApiBaseUrl}/public/v3/BrowserAuthorization.*" -v "${DoormanBaseUrl}/*" -v "https://apigw.${SingleDomainUrl}/analytics/api/public/v2/BrowserAuthorization.*" -v "https://apigw.${SingleDomainUrl}/analytics/api/public/v3/BrowserAuthorization.*"
 
       # Set riskrate client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id riskrate -p redirectUris -v "${RiskRateAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
