@@ -86,7 +86,7 @@
       "Artifacts": [
         {
           "Name": "BaseRedirectUrl",
-          "DefaultValue": "http://csrtenant.lab.csrware.com"
+          "DefaultValue": "http://csrtenant.stage.csrware.com"
         }
       ]
     },	

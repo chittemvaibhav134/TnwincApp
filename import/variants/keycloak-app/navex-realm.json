@@ -928,7 +928,6 @@
     "clientAuthenticatorType": "client-secret",
     "redirectUris": [
         "http://csrtenant.lab.csrware.com/sso/login"
-       
     ],
     "webOrigins": [
         "+"
@@ -988,7 +987,7 @@
         "configure": true,
         "manage": true
     }
-},  
+}, 
   {
     "id" : "961f57d5-7695-4a5c-a63e-8eeb82dbafb8",
     "clientId" : "customermanager",
