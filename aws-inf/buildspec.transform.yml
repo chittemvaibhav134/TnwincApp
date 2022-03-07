@@ -93,9 +93,6 @@ phases:
       # Set esg client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id navex-esg -p redirectUris -v "${EsgAuthRedirectUrl}/sso/login" -v "${DoormanBaseUrl}/*"
 
-      # Set esg client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id navex-esg -p redirectUris -v "${EsgAuthRedirectUrl}/sso/login" -v "${DoormanBaseUrl}/*"
-
       # Set coi client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "https://auth.${SingleDomainUrl}/disclosures/*"
 
