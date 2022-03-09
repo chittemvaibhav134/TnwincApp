@@ -927,7 +927,7 @@
     "alwaysDisplayInConsole": false,
     "clientAuthenticatorType": "client-secret",
     "redirectUris": [
-        "http://csrtenant.lab.csrware.com/sso/login"
+        "http://csrtenant.lab.csrware.com/*"
 
     ],
     "webOrigins": [
