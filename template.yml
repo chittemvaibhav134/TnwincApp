@@ -1290,6 +1290,29 @@ Resources:
       EnablePerformanceInsights: true
       PerformanceInsightsRetentionPeriod: 731
 
+  DatabaseSecondaryInstance:
+    Type: AWS::RDS::DBInstance
+    Condition: NotDevelopment
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - I3013
+    Properties:
+      Engine: aurora-postgresql
+      DBClusterIdentifier:  !Ref DatabaseCluster
+      DBInstanceClass: db.r4.large
+      DBSubnetGroupName: !Ref DatabaseSubnetGroup
+      DBParameterGroupName: !Ref DatabaseInstanceParameterGroup
+      MonitoringInterval: 1
+      MonitoringRoleArn: !GetAtt DatabaseMonitoringRole.Arn
+      AutoMinorVersionUpgrade: false
+      PubliclyAccessible: false
+      EnablePerformanceInsights: true
+      PerformanceInsightsRetentionPeriod: 731
+
   DatabaseInstance:
     Type: AWS::RDS::DBInstance
     Condition: Development
@@ -1361,6 +1384,57 @@ Resources:
       Dimensions:
         - Name: DBInstanceIdentifier
           Value: !If [Development, !Ref "DatabaseInstance", !Ref "DatabasePrimaryInstance" ]
+
+  DatabaseSecondaryCPUAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Condition: NotDevelopment
+    Properties:
+      AlarmDescription: Database CPU utilization is over 80%.
+      Namespace: AWS/RDS
+      MetricName: CPUUtilization
+      Unit: Percent
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 2
+      Threshold: 80
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: DBInstanceIdentifier
+          Value: !Ref "DatabaseSecondaryInstance"
+
+  DatabaseSecondaryMemoryAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Condition: NotDevelopment
+    Properties:
+      AlarmDescription: Database freeable memory is under 64MB.
+      Namespace: AWS/RDS
+      MetricName: FreeableMemory
+      Unit: Bytes
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 2
+      Threshold: 67108864
+      ComparisonOperator: LessThanOrEqualToThreshold
+      Dimensions:
+        - Name: DBInstanceIdentifier
+          Value: !Ref "DatabaseSecondaryInstance"
+
+  DatabaseSecondaryConnectionAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Condition: NotDevelopment
+    Properties:
+      AlarmDescription: Database has a concerning amount of connections
+      Namespace: AWS/RDS
+      MetricName: DatabaseConnections
+      Unit: Count
+      Statistic: Average
+      Period: 600
+      EvaluationPeriods: 2
+      Threshold: 150
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: DBInstanceIdentifier
+          Value: !Ref "DatabaseSecondaryInstance"
 
   KeyCloakDbSubnet1:
     Type: AWS::EC2::Subnet
