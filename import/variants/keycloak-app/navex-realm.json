@@ -2761,7 +2761,7 @@
       "protocol": "openid-connect",
       "publicClient": true,
       "redirectUris": [
-        "http://csrtenant.lab.csrware.com/*"
+        "http://lab.csrware.com/*"
       ],
       "serviceAccountsEnabled": false,
       "standardFlowEnabled": true,
