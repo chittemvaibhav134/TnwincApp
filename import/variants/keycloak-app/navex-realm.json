@@ -2023,7 +2023,8 @@
         "address",
         "microprofile-jwt",
         "offline_access",
-        "phone"
+        "phone",
+        "read:cm_api"
       ],
       "protocol": "openid-connect",
       "publicClient": false,
@@ -2032,7 +2033,7 @@
         "https://maint.pt.dev.local/oidc/coderedirector/*"
       ],
       "secret": "46a63bf4-99e1-40c5-a448-2d22b026efdd",
-      "serviceAccountsEnabled": false,
+      "serviceAccountsEnabled": true,
       "standardFlowEnabled": true,
       "surrogateAuthRequired": false,
       "webOrigins": []
