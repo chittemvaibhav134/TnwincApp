@@ -90,8 +90,17 @@ def update_csp_header(realm_dict: dict, domains: List[str], prepend_wildcard: bo
     domains = [d.strip() for d in domains]
     if prepend_wildcard:
         print("Prefixing each domain with '*.'...")
-        domains = [ f"*.{d}" for d in domains ]
-    domain_str = f"frame-src 'self'; frame-ancestors 'self' {' '.join(domains)}; object-src 'none';"
+        # domains = [ f"*.{d}" for d in domains ]
+        templist=[]
+        for x in domains:
+            if ( "csrware.com" in x ):
+                print("escaping * for csrware.com")
+                templist.append(x)
+            else:
+                templist.append( f"*.{x}" )
+
+    #domain_str = f"frame-src 'self'; frame-ancestors 'self' {' '.join(domains)}; object-src 'none';"
+    domain_str = f"frame-src 'self'; frame-ancestors 'self' {' '.join(templist)}; object-src 'none';"
     print(f"Setting contentSecurityPolicy to: {domain_str}")
     realm_dict['browserSecurityHeaders']['contentSecurityPolicy'] = domain_str
 
