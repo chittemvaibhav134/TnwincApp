@@ -1516,7 +1516,8 @@
         "address",
         "microprofile-jwt",
         "offline_access",
-        "phone"
+        "phone",
+        "read:cm_api"
       ],
       "protocol": "openid-connect",
       "publicClient": false,
@@ -1528,7 +1529,7 @@
         "https://doorman.dev.gw.local/*"
       ],
       "secret": "9b630071-25ec-4089-b31b-483d8860cefa",
-      "serviceAccountsEnabled": false,
+      "serviceAccountsEnabled": true,
       "standardFlowEnabled": true,
       "surrogateAuthRequired": false,
       "webOrigins": [
