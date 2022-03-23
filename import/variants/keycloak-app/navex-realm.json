@@ -575,7 +575,7 @@
   ],
   "browserFlow": "browser",
   "browserSecurityHeaders": {
-    "contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self' *.navex-pe.com:* https://doorman.dev.gw.local; object-src 'none';",
+    "contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self' *.navex-pe.com:* https://doorman.dev.gw.local *.pt.dev.local:*; object-src 'none';",
     "contentSecurityPolicyReportOnly": "",
     "strictTransportSecurity": "max-age=31536000; includeSubDomains",
     "xContentTypeOptions": "nosniff",
@@ -1516,7 +1516,8 @@
         "address",
         "microprofile-jwt",
         "offline_access",
-        "phone"
+        "phone",
+        "read:cm_api"
       ],
       "protocol": "openid-connect",
       "publicClient": false,
@@ -1528,7 +1529,7 @@
         "https://doorman.dev.gw.local/*"
       ],
       "secret": "9b630071-25ec-4089-b31b-483d8860cefa",
-      "serviceAccountsEnabled": false,
+      "serviceAccountsEnabled": true,
       "standardFlowEnabled": true,
       "surrogateAuthRequired": false,
       "webOrigins": [
@@ -2023,7 +2024,8 @@
         "address",
         "microprofile-jwt",
         "offline_access",
-        "phone"
+        "phone",
+        "read:cm_api"
       ],
       "protocol": "openid-connect",
       "publicClient": false,
@@ -2032,7 +2034,7 @@
         "https://maint.pt.dev.local/oidc/coderedirector/*"
       ],
       "secret": "46a63bf4-99e1-40c5-a448-2d22b026efdd",
-      "serviceAccountsEnabled": false,
+      "serviceAccountsEnabled": true,
       "standardFlowEnabled": true,
       "surrogateAuthRequired": false,
       "webOrigins": []
@@ -2761,7 +2763,11 @@
       "protocol": "openid-connect",
       "publicClient": true,
       "redirectUris": [
+<<<<<<< HEAD
         "http://lab.csrware.com/*"
+=======
+        "http://csrtenant.lab.csrware.com/*"
+>>>>>>> 87cc48547c4635adc780f594733114368e1b97b3
       ],
       "serviceAccountsEnabled": false,
       "standardFlowEnabled": true,
