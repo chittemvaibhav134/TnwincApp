@@ -1601,7 +1601,7 @@
       }
     } ],
     "defaultClientScopes" : [ "web-origins", "role_list", "roles", "profile", "email", "doorman-mappings" ],
-    "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
+    "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt", "read:cm_api" ]
   }, {
     "id" : "114d2412-1318-45f3-bf30-ce4687dd66bc",
     "clientId" : "just a test",
