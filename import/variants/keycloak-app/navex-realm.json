@@ -1802,7 +1802,8 @@
         "address",
         "microprofile-jwt",
         "offline_access",
-        "phone"
+        "phone",
+        "read:cm_api"
       ],
       "protocol": "openid-connect",
       "protocolMappers": [
