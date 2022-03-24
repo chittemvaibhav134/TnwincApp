@@ -35,7 +35,7 @@ phases:
       - EpadminRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")      
       - CcAuthRedirectUrl=$(jq -r '.ApiBaseUrl' "$DC_ART_DIR/ng-learning-platform")
       - EsgAuthRedirectUrl=$(jq -r '.BaseRedirectUrl' "$DC_ART_DIR/esg")
-      - SingleDomainUrl=$(jq -r '.SingleDomain' "$DC_ART_DIR/global-configuration")
+      - SingleDomain=$(jq -r '.SingleDomain' "$DC_ART_DIR/global-configuration")
       - mkdir transformed-import
       - |
         TransformScript="$APP_DIR/aws-inf/realm_transform.py"
@@ -59,11 +59,11 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --csp-header "$NavexRootDomains" --wildcard-prefix
 
       # Set appshell client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomainUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p baseUrl -v "$AppshellUserAppUrl"
 
       # Set appshell-bff client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomainUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellUserAppUrl"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p attributes:backchannel.logout.url -v "$AppshellAdminUrl/auth/backchannel-logout"
 
@@ -76,7 +76,7 @@ phases:
 
       # Set epim-iem client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p adminUrl -v "https://${EpimIemRootDomain}/"
-      - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p redirectUris -v "https://${EpimIemRootDomain}/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p redirectUris -v "https://${EpimIemRootDomain}/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/oidcredirect/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p webOrigins -v "https://${EpimIemRootDomain}"
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p rootUrl -v "https://${EpimIemRootDomain}/"
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p attributes:backchannel.logout.url -v "https://${EpimIemRootDomain}/authorization/authoidc/backchannellogout"
@@ -94,10 +94,10 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id navex-esg -p redirectUris -v "${EsgAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
 
       # Set coi client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "https://auth.${SingleDomainUrl}/disclosures/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "https://auth.${SingleDomain}/disclosures/*"
 
       # Set insights client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p redirectUris -v "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" -v "${InsightsApiBaseUrl}/public/v3/BrowserAuthorization.*" -v "${DoormanBaseUrl}/*" -v "https://apigw.${SingleDomainUrl}/analytics/api/public/v2/BrowserAuthorization.*" -v "https://apigw.${SingleDomainUrl}/analytics/api/public/v3/BrowserAuthorization.*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p redirectUris -v "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" -v "${InsightsApiBaseUrl}/public/v3/BrowserAuthorization.*" -v "${DoormanBaseUrl}/*" -v "https://apigw.${SingleDomain}/analytics/api/public/v2/BrowserAuthorization.*" -v "https://apigw.${SingleDomain}/analytics/api/public/v3/BrowserAuthorization.*"
 
       # Set riskrate client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id riskrate -p redirectUris -v "${RiskRateAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
