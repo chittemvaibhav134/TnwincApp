@@ -15,9 +15,6 @@ Parameters:
   GitHubBranch:
     Type: String
     Default: stable
-  GitHubToken:
-    Type: String
-    NoEcho: true
   StageAccountId:
     Type: String
     Default: "403172096194"
@@ -147,22 +144,6 @@ Resources:
           - !ImportValue CodeBuildSubnetAZ1
           - !ImportValue CodeBuildSubnetAZ2
         VpcId: !ImportValue CodeBuildVpcId 
-  PipelineWebhook:
-    Type: AWS::CodePipeline::Webhook
-    Properties:
-      Authentication: GITHUB_HMAC
-      AuthenticationConfiguration:
-        SecretToken: !Ref GitHubToken
-      Filters:
-        - 
-          JsonPath: "$.ref"
-          MatchEquals: !Sub "refs/heads/${GitHubBranch}"
-      TargetPipeline: !Ref Pipeline
-      TargetAction: App
-      Name: !Ref AWS::StackName
-      TargetPipelineVersion: !GetAtt Pipeline.Version
-      RegisterWithThirdParty: true
-
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:

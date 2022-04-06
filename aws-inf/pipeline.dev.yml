@@ -192,22 +192,6 @@ Resources:
           - Name: S3_Region
             Value: !Ref AWS::Region
 
-  PipelineWebhook:
-    Type: AWS::CodePipeline::Webhook
-    Properties:
-      Authentication: GITHUB_HMAC
-      AuthenticationConfiguration:
-        SecretToken: !GetAtt GitHubTokenSsm.Parameter.Value
-      Filters:
-        -
-          JsonPath: "$.ref"
-          MatchEquals: !Sub "refs/heads/${GitHubBranch}"
-      TargetPipeline: !Ref Pipeline
-      TargetAction: App
-      Name: !Ref AWS::StackName
-      TargetPipelineVersion: !GetAtt Pipeline.Version
-      RegisterWithThirdParty: true
-
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
@@ -219,18 +203,19 @@ Resources:
       Stages:
         - Name: Source
           Actions:
-            - Name: App
+            - 
+              Name: App
+              Namespace: SourceVariables
               ActionTypeId:
                 Category: Source
-                Owner: ThirdParty
+                Owner: AWS
                 Version: "1"
-                Provider: GitHub
+                Provider: CodeStarSourceConnection
               Configuration:
-                Owner: tnwinc
-                Repo: platform-auth-keycloak
-                Branch: !Ref GitHubBranch
-                OAuthToken: !GetAtt GitHubTokenSsm.Parameter.Value
-                PollForSourceChanges: false
+                ConnectionArn: "arn:aws:codestar-connections:us-west-2:518070709175:connection/c628c7f1-e78b-4ea7-a936-aaa704d6eed1"
+                FullRepositoryId: !Sub ${GitHubOwner}/${GitHubRepo}
+                BranchName: !Ref GitHubBranch
+                OutputArtifactFormat: "CODE_ZIP"
               OutputArtifacts:
                 - Name: App
               RunOrder: 1
