@@ -15,9 +15,6 @@ Parameters:
   GitHubBranch:
     Type: String
     Default: stable
-  GitHubToken:
-    Type: String
-    NoEcho: true
   StageAccountId:
     Type: String
     Default: "403172096194"
@@ -147,7 +144,6 @@ Resources:
           - !ImportValue CodeBuildSubnetAZ1
           - !ImportValue CodeBuildSubnetAZ2
         VpcId: !ImportValue CodeBuildVpcId 
-
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
@@ -171,18 +167,19 @@ Resources:
       Stages:
         - Name: Source
           Actions:
-            - Name: App
+            - 
+              Name: App
+              Namespace: SourceVariables
               ActionTypeId:
                 Category: Source
-                Owner: ThirdParty
+                Owner: AWS
                 Version: "1"
-                Provider: GitHub
+                Provider: CodeStarSourceConnection
               Configuration:
-                Owner: !Ref GitHubOwner
-                Repo: !Ref GitHubRepo
-                Branch: !Ref GitHubBranch
-                OAuthToken: !Ref GitHubToken
-                PollForSourceChanges: false
+                ConnectionArn: "arn:aws:codestar-connections:us-west-2:518070709175:connection/c628c7f1-e78b-4ea7-a936-aaa704d6eed1"
+                FullRepositoryId: !Sub ${GitHubOwner}/${GitHubRepo}
+                BranchName: !Ref GitHubBranch
+                OutputArtifactFormat: "CODE_ZIP"
               OutputArtifacts:
                 - Name: App
               RunOrder: 1
