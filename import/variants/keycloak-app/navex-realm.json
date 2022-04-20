@@ -2355,12 +2355,7 @@
         }
       ],
       "publicClient": false,
-      "redirectUris": [
-        "https://auth.coi.devlocal.navex-pe.com:18443/*",
-        "https://auth.coi.devlocal.navex-pe.com:6443/*",
-        "https://auth.devlocal.navex-pe.com:18443/*",
-        "https://auth.devlocal.navex-pe.com:6443/*"
-      ],
+      "redirectUris": [],
       "secret": "7db5584c-34f8-4c5f-9e2f-6a4db37de1f7",
       "serviceAccountsEnabled": true,
       "standardFlowEnabled": false,
