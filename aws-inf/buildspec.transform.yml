@@ -88,7 +88,7 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p webOrigins -v "https://${EpadminRootDomain}"
 
       # Set course customizer client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p redirectUris -v "${CcAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p redirectUris -v "${CcAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/* -v "https://auth.${SingleDomain}/course-customizer/*"
       
       # Set esg client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id navex-esg -p redirectUris -v "${EsgAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
