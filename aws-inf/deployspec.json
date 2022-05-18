@@ -78,10 +78,6 @@
         {
           "Name": "ApiBaseUrl",
           "DefaultValue": "https://webapi-integration.lcms.navex-pe.com"
-        },
-        {
-          "Name": "ApiProxiedDomain",
-          "DefaultValue": "https://user.wobbly.navex-int.com"
         }
       ]
     },

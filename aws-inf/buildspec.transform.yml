@@ -34,7 +34,6 @@ phases:
       - LaunchDarklySdkKeySsmValue=$(jq -r '.LaunchDarklySdkKeySsmArn' "$DC_ART_DIR/global-configuration")
       - EpadminRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")      
       - CcAuthRedirectUrl=$(jq -r '.ApiBaseUrl' "$DC_ART_DIR/ng-learning-platform")
-      - CcProxyAuthRedirectUrl=$(jq -r '.ApiProxiedDomain' "$DC_ART_DIR/ng-learning-platform")
       - EsgAuthRedirectUrl=$(jq -r '.BaseRedirectUrl' "$DC_ART_DIR/esg")
       - SingleDomain=$(jq -r '.SingleDomain' "$DC_ART_DIR/global-configuration")
       - mkdir transformed-import
@@ -89,7 +88,7 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p webOrigins -v "https://${EpadminRootDomain}"
 
       # Set course customizer client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p redirectUris -v "${CcAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/* -v "${CcProxyAuthRedirectUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p redirectUris -v "${CcAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/* -v "https://auth.${SingleDomain}/course-customizer/*"
       
       # Set esg client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id navex-esg -p redirectUris -v "${EsgAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
