@@ -2970,7 +2970,7 @@
         "phone"
       ],
       "protocol": "openid-connect",
-      "publicClient": true,
+      "publicClient": false,
       "redirectUris": [],
       "serviceAccountsEnabled": true,
       "standardFlowEnabled": false,
