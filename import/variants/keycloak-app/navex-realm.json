@@ -2858,7 +2858,7 @@
       "clientId": "coursecustomizer-backend",
       "consentRequired": false,
       "defaultClientScopes": [],
-      "directAccessGrantsEnabled": true,
+      "directAccessGrantsEnabled": false,
       "enabled": true,
       "frontchannelLogout": false,
       "fullScopeAllowed": true,
@@ -2917,10 +2917,10 @@
           "protocolMapper": "oidc-usersessionmodel-note-mapper"
         }
       ],
-      "publicClient": true,
+      "publicClient": false,
       "redirectUris": [],
-      "serviceAccountsEnabled": false,
-      "standardFlowEnabled": true,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
       "surrogateAuthRequired": false,
       "webOrigins": []
     },
