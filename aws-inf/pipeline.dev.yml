@@ -82,9 +82,16 @@ Parameters:
   LayerName:
     Type: String
     Default: oidc-endpoint-authorizer-nodejs
+  RotateClientSecret:
+    Type: String
+    Default: "No"
+    AllowedValues:
+      - "Yes"
+      - "No"
 
 Conditions:
   DevMock: !Equals [ !Ref ImportConfigVariant, "DevMock" ]
+  RotateClientSecret: !Equals [!Ref RotateClientSecret, "Yes"]
 
 Resources:
   GitHubTokenSsm:
@@ -424,27 +431,30 @@ Resources:
                   }
               InputArtifacts:
                 - Name: CfnDeploy_Dev
-            -
-              Name: PostDeployApiActions_Dev
-              RunOrder: 7
-              ActionTypeId:
-                Category: Invoke
-                Owner: AWS
-                Version: "1"
-                Provider: Lambda
-              Configuration:
-                FunctionName: CPInvokeLambda
-                UserParameters: !Sub |
-                  {
-                    "TargetFunctionName": "CfnDeploy_Dev::stack-outputs.json:CpPostDeployLambdaArn",
-                    "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
-                    "AccountId": "${AWS::AccountId}",
-                    "Region": "${AWS::Region}",
-                    "InvocationType": "RequestResponse",
-                    "ParseResponse": true
-                  }
-              InputArtifacts:
-                - Name: CfnDeploy_Dev
+            - !If
+              - RotateClientSecret
+              -
+                Name: PostDeployApiActions_Dev
+                RunOrder: 7
+                ActionTypeId:
+                  Category: Invoke
+                  Owner: AWS
+                  Version: "1"
+                  Provider: Lambda
+                Configuration:
+                  FunctionName: CPInvokeLambda
+                  UserParameters: !Sub |
+                    {
+                      "TargetFunctionName": "CfnDeploy_Dev::stack-outputs.json:CpPostDeployLambdaArn",
+                      "Payload": { "Actions": [ "rotate_client_secrets","clear_user_cache" ] },
+                      "AccountId": "${AWS::AccountId}",
+                      "Region": "${AWS::Region}",
+                      "InvocationType": "RequestResponse",
+                      "ParseResponse": true
+                    }
+                InputArtifacts:
+                  - Name: CfnDeploy_Dev
+              - !Ref AWS::NoValue
 
 
   CodePipelineServiceRole:
