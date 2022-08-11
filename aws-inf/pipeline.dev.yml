@@ -330,7 +330,8 @@ Resources:
                     "MoonwatchApiAccessPolicyArn": "${MoonwatchApiAccessPolicyArn}",
                     "MoonwatchApiBaseUrl": "${MoonwatchApiBaseUrl}",
                     "MoonwatchApiRegion": "${MoonwatchApiRegion}",
-                    "Stage" : "Development"
+                    "Stage" : "Development",
+                    "RotateClientSecret": "${RotateClientSecret}"
                   }
                 OutputFileName: stack-outputs.json
               InputArtifacts:

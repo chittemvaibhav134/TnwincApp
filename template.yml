@@ -70,6 +70,12 @@ Parameters:
     Default: 2
     MaxValue: 2
     Description: How many nodes in the Infinispan cluster will replicate a given session
+  RotateClientSecret:
+    Type: String
+    Default: "Yes"
+    AllowedValues:
+      - "Yes"
+      - "No"
 
 Conditions:
   CreateInstanceCert: !Equals [ !Ref InstanceCertificateArn, "None"]
@@ -79,6 +85,7 @@ Conditions:
   EnableNewRelicAgent: !Not [!Equals [ !Ref NewRelicLicenseKeySsmArn, "None" ] ]
   AutoApproveCert: !Not [!Equals [ !Ref DnsHostedZoneId, "None" ] ]
   MoonwatchApiAccessPolicy: !Not [ !Equals [ !Ref "MoonwatchApiAccessPolicyArn", "None" ] ]
+  RotateClientSecret: !Equals [!Ref RotateClientSecret, "Yes"]
 
 Mappings:
   StageToSubnets:
@@ -848,7 +855,7 @@ Resources:
       # clients who don't support the rotation scheme long before
       # stage/prod
       ScheduleExpression: !If [ Development, "rate(1 day)", "rate(7 days)" ]
-      State: ENABLED
+      State: !If [ RotateClientSecret, ENABLED, DISABLED ]
       Targets:
         - Arn: !GetAtt CweClientSecretRotateLambda.Arn
           Id: "CweClientSecretRotateLambda"
