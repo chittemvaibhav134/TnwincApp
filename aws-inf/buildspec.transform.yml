@@ -21,6 +21,7 @@ phases:
           AppshellAdminUrl=$(jq -r '.RootUiAdminUrl' "$DC_ART_DIR/appshell-infra")
           AppshellPlatforminatorUrl=$(jq -r '.RootUiNavexAdminUrl' "$DC_ART_DIR/appshell-infra")
           AppshellUserAppUrl=$(jq -r '.RootUiUserAppUrl' "$DC_ART_DIR/appshell-infra")
+      - PiralAppshellUrls=$(jq -r '.Urls' "$DC_ART_DIR/piral-shell-standard")
 
       - CmdUiRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/policytech")
       - EpimIemRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim")
@@ -66,6 +67,13 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellUserAppUrl"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p attributes:backchannel.logout.url -v "$AppshellAdminUrl/auth/backchannel-logout"
+
+      # Set appshell-bff additional redirectUri for piral-appshell
+      # Only need the first URL (Platforminator) since the others are handled through SingleDomain
+      - |
+        PiralAppshellUrlsArray=(${PiralAppshellUrls//,/ })
+        PiralAppshellUrl=${PiralAppshellUrlsArray[0]}
+        $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$PiralAppshellUrl/*"
 
       # Set cmd-backend client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "${DoormanBaseUrl}/*"
