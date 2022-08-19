@@ -33,7 +33,7 @@ phases:
       - MoonwatchApiAccessPolicyArn=$(jq -r '.ApiAccessPolicy' "$DC_ART_DIR/moonwatch")
       - MoonwatchApiRegion=$(jq -r '.AwsRegion' "$DC_ART_DIR/moonwatch")
       - LaunchDarklySdkKeySsmValue=$(jq -r '.LaunchDarklySdkKeySsmArn' "$DC_ART_DIR/global-configuration")
-      - EpadminRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")      
+      - EpadminRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")
       - CcAuthRedirectUrl=$(jq -r '.ApiBaseUrl' "$DC_ART_DIR/ng-learning-platform")
       - EsgAuthRedirectUrl=$(jq -r '.BaseRedirectUrl' "$DC_ART_DIR/esg")
       - SingleDomain=$(jq -r '.SingleDomain' "$DC_ART_DIR/global-configuration")
@@ -72,7 +72,7 @@ phases:
       # Only need the first URL (Platforminator) since the others are handled through SingleDomain
       - |
         PiralAppshellPlatforminatorUrl=${PiralAppshellUrls%%,*}
-        $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$PiralAppshellPlatforminatorUrl/*"
+        $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$PiralAppshellPlatforminatorUrl/*" --append
 
       # Set cmd-backend client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "${DoormanBaseUrl}/*"
@@ -90,8 +90,8 @@ phases:
       
       # Set epadmin client related urls 
       - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p adminUrl -v "https://${EpadminRootDomain}/" 
-      - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p redirectUris -v "https://${EpadminRootDomain}/*" -v "${DoormanBaseUrl}/*"      
-      - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p rootUrl -v "https://${EpadminRootDomain}/"       
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p redirectUris -v "https://${EpadminRootDomain}/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p rootUrl -v "https://${EpadminRootDomain}/"
       - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p webOrigins -v "https://${EpadminRootDomain}"
 
       # Set course customizer client related urls
