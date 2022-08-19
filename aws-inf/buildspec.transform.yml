@@ -71,9 +71,8 @@ phases:
       # Set appshell-bff additional redirectUri for piral-appshell
       # Only need the first URL (Platforminator) since the others are handled through SingleDomain
       - |
-        PiralAppshellUrlsArray=(${PiralAppshellUrls//,/ })
-        PiralAppshellUrl=${PiralAppshellUrlsArray[0]}
-        $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$PiralAppshellUrl/*"
+        PiralAppshellPlatforminatorUrl=${PiralAppshellUrls%%,*}
+        $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$PiralAppshellPlatforminatorUrl/*"
 
       # Set cmd-backend client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "${DoormanBaseUrl}/*"
