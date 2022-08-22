@@ -46,6 +46,15 @@
       ]
     },
     {
+      "Project": "piral-shell-standard",
+      "Artifacts": [
+        {
+          "Name": "Urls",
+          "DefaultValue": "http://piralnavexadmin.devlocal.navex-pe.com:1234,http://shell.portal.devlocal.navex-pe.com:1234/portal"
+        }
+      ]
+    },
+    {
       "Project": "policytech",
       "Artifacts": [
         {
@@ -89,7 +98,7 @@
           "DefaultValue": "http://csrtenant.stage.csrware.com"
         }
       ]
-    },	
+    },
     {
       "Project": "coi-ui",
       "Artifacts": [

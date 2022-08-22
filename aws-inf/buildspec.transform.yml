@@ -21,6 +21,7 @@ phases:
           AppshellAdminUrl=$(jq -r '.RootUiAdminUrl' "$DC_ART_DIR/appshell-infra")
           AppshellPlatforminatorUrl=$(jq -r '.RootUiNavexAdminUrl' "$DC_ART_DIR/appshell-infra")
           AppshellUserAppUrl=$(jq -r '.RootUiUserAppUrl' "$DC_ART_DIR/appshell-infra")
+      - PiralAppshellUrls=$(jq -r '.Urls' "$DC_ART_DIR/piral-shell-standard")
 
       - CmdUiRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/policytech")
       - EpimIemRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim")
@@ -32,7 +33,7 @@ phases:
       - MoonwatchApiAccessPolicyArn=$(jq -r '.ApiAccessPolicy' "$DC_ART_DIR/moonwatch")
       - MoonwatchApiRegion=$(jq -r '.AwsRegion' "$DC_ART_DIR/moonwatch")
       - LaunchDarklySdkKeySsmValue=$(jq -r '.LaunchDarklySdkKeySsmArn' "$DC_ART_DIR/global-configuration")
-      - EpadminRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")      
+      - EpadminRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")
       - CcAuthRedirectUrl=$(jq -r '.ApiBaseUrl' "$DC_ART_DIR/ng-learning-platform")
       - EsgAuthRedirectUrl=$(jq -r '.BaseRedirectUrl' "$DC_ART_DIR/esg")
       - SingleDomain=$(jq -r '.SingleDomain' "$DC_ART_DIR/global-configuration")
@@ -67,6 +68,12 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellUserAppUrl"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p attributes:backchannel.logout.url -v "$AppshellAdminUrl/auth/backchannel-logout"
 
+      # Set appshell-bff additional redirectUri for piral-appshell
+      # Only need the first URL (Platforminator) since the others are handled through SingleDomain
+      - |
+        PiralAppshellPlatforminatorUrl=${PiralAppshellUrls%%,*}
+        $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$PiralAppshellPlatforminatorUrl/*" --append
+
       # Set cmd-backend client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "${DoormanBaseUrl}/*"
 
@@ -83,8 +90,8 @@ phases:
       
       # Set epadmin client related urls 
       - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p adminUrl -v "https://${EpadminRootDomain}/" 
-      - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p redirectUris -v "https://${EpadminRootDomain}/*" -v "${DoormanBaseUrl}/*"      
-      - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p rootUrl -v "https://${EpadminRootDomain}/"       
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p redirectUris -v "https://${EpadminRootDomain}/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p rootUrl -v "https://${EpadminRootDomain}/"
       - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p webOrigins -v "https://${EpadminRootDomain}"
 
       # Set course customizer client related urls

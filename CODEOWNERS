@@ -1,0 +1,6 @@
+# Owner team
+* @tnwinc/cia-komodo
+/aws-inf/pipeline.dev.yaml @tnwinc/cia-komodo
+
+# Notify DevOps team when deployment pipeline updates are required
+/aws-inf/pipeline.*.yaml @tnwinc/devops-aoraki
