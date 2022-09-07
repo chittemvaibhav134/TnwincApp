@@ -1293,6 +1293,7 @@ Resources:
       MonitoringInterval: 1
       MonitoringRoleArn: !GetAtt DatabaseMonitoringRole.Arn
       AutoMinorVersionUpgrade: false
+      AllowMajorVersionUpgrade: true
       PubliclyAccessible: false
       EnablePerformanceInsights: true
       PerformanceInsightsRetentionPeriod: 731
@@ -1316,6 +1317,7 @@ Resources:
       MonitoringInterval: 1
       MonitoringRoleArn: !GetAtt DatabaseMonitoringRole.Arn
       AutoMinorVersionUpgrade: false
+      AllowMajorVersionUpgrade: true
       PubliclyAccessible: false
       EnablePerformanceInsights: true
       PerformanceInsightsRetentionPeriod: 731
@@ -1334,6 +1336,7 @@ Resources:
         # if specifying a version explicitly apparently you should nuke the auto-upgrade
         # cause otherwise cfn can try to downgrade the db and blow up stack deployments
         AutoMinorVersionUpgrade: false
+        AllowMajorVersionUpgrade: true
         AllocatedStorage: "5"
         DBInstanceClass: db.t3.micro
         DBSubnetGroupName: !Ref DatabaseSubnetGroup
