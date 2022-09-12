@@ -54,7 +54,7 @@ services:
       POSTGRES_USER: keycloak
     expose:
       - '5432'
-    image: postgres:11.5
+    image: postgres:11.16
     networks:
       navexdev:
     restart: 'no'

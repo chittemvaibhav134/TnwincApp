@@ -1199,22 +1199,22 @@ Resources:
         - !Ref KeyCloakDbSubnet1
         - !Ref KeyCloakDbSubnet2
 
-  DatabaseClusterParameterGroup:
+  DatabaseClusterParameterGroupPg11:
     Type: AWS::RDS::DBClusterParameterGroup
     Condition:  NotDevelopment
     Properties:
       Description: !Sub "Aurora PG Cluster Parameter Group for ${AWS::StackName}"
       # postgres 11 isn't in eu-central-1 yet apparently
-      Family: aurora-postgresql10
+      Family: aurora-postgresql11
       Parameters:
         rds.force_ssl: 0
 
-  DatabaseInstanceParameterGroup:
+  DatabaseInstanceParameterGroupPg11:
     Type: AWS::RDS::DBParameterGroup
     Condition:  NotDevelopment
     Properties:
       Description: !Sub "Aurora PG DB Instance Parameter Group for ${AWS::StackName}"
-      Family: aurora-postgresql10
+      Family: aurora-postgresql11
       Parameters:
         shared_preload_libraries: auto_explain,pg_stat_statements,pg_hint_plan,pgaudit
         log_statement: "ddl"
@@ -1258,14 +1258,14 @@ Resources:
     UpdateReplacePolicy: Snapshot
     Properties:
       Engine: aurora-postgresql
-      EngineVersion: "10.19"
+      EngineVersion: "11.16"
       BackupRetentionPeriod: 35
       PreferredBackupWindow: 05:00-06:00
       PreferredMaintenanceWindow: mon:03:00-mon:04:00
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
       VpcSecurityGroupIds:
         - !Ref DbClusterSecurityGroup
-      DBClusterParameterGroupName: !Ref DatabaseClusterParameterGroup
+      DBClusterParameterGroupName: !Ref DatabaseClusterParameterGroupPg11
       MasterUsername: !GetAtt DbUser.Name
       MasterUserPassword: !GetAtt DbPassword.Value
       StorageEncrypted: true
@@ -1287,12 +1287,13 @@ Resources:
     Properties:
       Engine: aurora-postgresql
       DBClusterIdentifier:  !Ref DatabaseCluster
-      DBInstanceClass: db.r4.large
+      DBInstanceClass: db.r6i.large
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
-      DBParameterGroupName: !Ref DatabaseInstanceParameterGroup
+      DBParameterGroupName: !Ref DatabaseInstanceParameterGroupPg11
       MonitoringInterval: 1
       MonitoringRoleArn: !GetAtt DatabaseMonitoringRole.Arn
       AutoMinorVersionUpgrade: false
+      AllowMajorVersionUpgrade: true
       PubliclyAccessible: false
       EnablePerformanceInsights: true
       PerformanceInsightsRetentionPeriod: 731
@@ -1310,12 +1311,13 @@ Resources:
     Properties:
       Engine: aurora-postgresql
       DBClusterIdentifier:  !Ref DatabaseCluster
-      DBInstanceClass: db.r4.large
+      DBInstanceClass: db.r6i.large
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
-      DBParameterGroupName: !Ref DatabaseInstanceParameterGroup
+      DBParameterGroupName: !Ref DatabaseInstanceParameterGroupPg11
       MonitoringInterval: 1
       MonitoringRoleArn: !GetAtt DatabaseMonitoringRole.Arn
       AutoMinorVersionUpgrade: false
+      AllowMajorVersionUpgrade: true
       PubliclyAccessible: false
       EnablePerformanceInsights: true
       PerformanceInsightsRetentionPeriod: 731
@@ -1330,12 +1332,13 @@ Resources:
         # Encryption at rest is supported on db.t2.small and larger i think
         # if we want to enable it for Dev stacks we need to up the instance class
         StorageEncrypted: false
-        EngineVersion: "10.19"
+        EngineVersion: "11.16"
         # if specifying a version explicitly apparently you should nuke the auto-upgrade
         # cause otherwise cfn can try to downgrade the db and blow up stack deployments
         AutoMinorVersionUpgrade: false
+        AllowMajorVersionUpgrade: true
         AllocatedStorage: "5"
-        DBInstanceClass: db.t2.micro
+        DBInstanceClass: db.t3.micro
         DBSubnetGroupName: !Ref DatabaseSubnetGroup
         MasterUsername: !GetAtt DbUser.Name
         MasterUserPassword: !GetAtt DbPassword.Value
