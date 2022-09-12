@@ -9,7 +9,7 @@ function Watch-Process {
         [int]$watchCountLimit = 1,
         [string]$description = "process",
         [bool]$showOutput,
-        [int]$timeoutSeconds = 60
+        [int]$timeoutSeconds = 180
     )
 
     $psi = New-Object System.Diagnostics.ProcessStartInfo -Property @{
