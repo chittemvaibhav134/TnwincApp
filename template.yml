@@ -1287,7 +1287,7 @@ Resources:
     Properties:
       Engine: aurora-postgresql
       DBClusterIdentifier:  !Ref DatabaseCluster
-      DBInstanceClass: db.r6i.large
+      DBInstanceClass: db.r5.large
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
       DBParameterGroupName: !Ref DatabaseInstanceParameterGroupPg11
       MonitoringInterval: 1
@@ -1311,7 +1311,7 @@ Resources:
     Properties:
       Engine: aurora-postgresql
       DBClusterIdentifier:  !Ref DatabaseCluster
-      DBInstanceClass: db.r6i.large
+      DBInstanceClass: db.r5.large
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
       DBParameterGroupName: !Ref DatabaseInstanceParameterGroupPg11
       MonitoringInterval: 1
