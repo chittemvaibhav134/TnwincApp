@@ -101,6 +101,11 @@ function getJwksClient(token: NavexJwt, options: IAuthenicateTokenOptions): Jwks
     }
 }
 
+function getMethodArn(authorizerEvent: IAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken): string {
+    if (isRequestV2(authorizerEvent)) { return authorizerEvent.routeArn; }
+    else { return authorizerEvent.methodArn; }
+}
+
 interface ITokenAuthEvent {
      type: "TOKEN";
      methodArn: string;
@@ -145,13 +150,13 @@ export interface IAuthenicateTokenOptions {
     /** The maximum number of search iterations to support when attempting to find a scope match. */
     scopeComplexityLimit?: number;
     jwksUri: string;
-    methodOrRouteArn: string|string[];
+    methodOrRouteArn?: string|string[];
 }
 function isAuthenicateTokenOptions(options: any): options is IAuthenicateTokenOptions {
     return typeof(options) === 'object' &&
         ['undefined', 'number'].includes(typeof(options.scopeComplexityLimit)) &&
         typeof(options.jwksUri) === 'string' &&
-        (typeof(options.methodOrRouteArn) === 'string' || 
+        (['undefined', 'string'].includes(typeof(options.methodOrRouteArn)) || 
             (Array.isArray(options.methodOrRouteArn) && options.methodOrRouteArn.length > 0 && typeof(options.methodOrRouteArn[0]) === 'string'));
 }
 
@@ -176,6 +181,7 @@ export async function authenticateToken(authorizerEvent: IAPIGatewayAuthorizerEv
     // Provide default for scopeComplexityLimit
     options = {
         scopeComplexityLimit: 500,
+        methodOrRouteArn: getMethodArn(authorizerEvent),
         ...options
     };
     
@@ -200,6 +206,6 @@ export async function authenticateToken(authorizerEvent: IAPIGatewayAuthorizerEv
     return ({
         principalId: verifiedPayload.sub,
         policyDocument: getPolicyDocument('Allow', options.methodOrRouteArn),
-        context: { scope: verifiedPayload.scope, session_state: verifiedPayload.session_state, clientkey: verifiedPayload.x }
+        context: { scope: verifiedPayload.scope, session_state: verifiedPayload.session_state, clientkey: verifiedPayload.clientkey }
     });
 }
