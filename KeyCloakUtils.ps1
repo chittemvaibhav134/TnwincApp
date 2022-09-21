@@ -65,5 +65,5 @@ function Wait-KeyCloakStartup {
         [bool]$showOutput
     )
 
-    Watch-Process -showOutput $showOutput -fileName "docker" -argumentList $argumentList -watchForRegex "Admin console listening on" -watchCountLimit 1 -description "KeyCloak start"
+    Watch-Process -showOutput $showOutput -fileName "docker" -argumentList $argumentList -watchForRegex "Admin console listening on" -watchCountLimit 1 -description "KeyCloak start" -timeoutSeconds 180
 }
