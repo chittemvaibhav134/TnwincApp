@@ -53,7 +53,7 @@
       ],
       "builtIn": true,
       "description": "Handle what to do if there is existing account with same email/username like authenticated identity provider",
-      "id": "dd82ed66-3c19-4aee-9a60-9d895a698cc5",
+      "id": "1fd50216-09e8-440c-96e1-2f2ca0837145",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -79,7 +79,7 @@
       ],
       "builtIn": true,
       "description": "Reauthentication of existing account",
-      "id": "bb09f57b-ac71-46ca-bce3-5e4fa878e3a6",
+      "id": "30fe97f7-8f0e-4d9d-a507-b57d73c6312b",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -105,7 +105,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the auth-otp-form authenticator should be used or not.",
-      "id": "b2e1b2f0-8e20-4033-8f8b-33c4f0041c1c",
+      "id": "a00f46ab-38ba-4596-8aa1-558f6ca66bf6",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -148,7 +148,7 @@
       ],
       "builtIn": true,
       "description": "browser based authentication",
-      "id": "82e218ce-55c3-4bfa-af2f-0fa1fbed1676",
+      "id": "f6866f4b-fb68-4c66-8ebc-e00d52fb1751",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -190,7 +190,7 @@
       ],
       "builtIn": true,
       "description": "Base authentication for clients",
-      "id": "670c314f-6769-4966-b3d5-6c96ad535a4a",
+      "id": "f0de6f2b-c80f-48b1-ba7f-0cfe24fb6793",
       "providerId": "client-flow",
       "topLevel": true
     },
@@ -224,7 +224,7 @@
       ],
       "builtIn": true,
       "description": "OpenID Connect Resource Owner Grant",
-      "id": "f56e7b28-edb1-4ac1-bc41-a37297fbb1aa",
+      "id": "c71eea80-e8d6-4178-addc-863a8383fc3e",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -250,7 +250,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the direct-grant-validate-otp authenticator should be used or not.",
-      "id": "34bb9363-a7fd-4291-bd96-55ee306c4c16",
+      "id": "f4579492-0907-4797-b3dc-0e5f9f6b3996",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -268,7 +268,7 @@
       ],
       "builtIn": true,
       "description": "Used by Docker clients to authenticate against the IDP",
-      "id": "1bd69525-4166-465b-8080-1537c710006a",
+      "id": "5be55697-4a79-4257-8948-a5cadd80ac3f",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -304,7 +304,7 @@
       ],
       "builtIn": true,
       "description": "Actions taken after first broker login with identity provider account, which is not yet linked to any Keycloak account",
-      "id": "d741457d-82fa-4933-a9e0-e8a999b3ca8e",
+      "id": "aa994276-37df-4386-8225-40f1e877e35a",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -330,7 +330,7 @@
       ],
       "builtIn": true,
       "description": "Username, password, otp and other auth forms.",
-      "id": "dfecde76-06f7-4c52-9721-7e4fa617b041",
+      "id": "3bfa14a1-f60d-400f-a0e7-5d1686b5dcce",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -356,7 +356,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the auth-otp-form authenticator should be used or not.",
-      "id": "87fc69ee-f1ee-4a9f-b230-ecca6869a4fe",
+      "id": "7d558a2c-bbf6-4f81-9533-6fba45082542",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -398,7 +398,7 @@
       ],
       "builtIn": true,
       "description": "An authentication flow based on challenge-response HTTP Authentication Schemes",
-      "id": "280b1e3b-1371-431a-8d13-5f9021159415",
+      "id": "fdcdbc71-7aa9-4644-9bb7-c4d59caca94b",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -417,7 +417,7 @@
       ],
       "builtIn": true,
       "description": "registration flow",
-      "id": "44b73a6a-7283-4666-85fe-47c5e3ab4de5",
+      "id": "e803987a-3776-46ad-bef8-0cbf59d7f7a9",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -459,7 +459,7 @@
       ],
       "builtIn": true,
       "description": "registration form",
-      "id": "0cdce1fb-a2f9-4c76-9840-cfde934678d7",
+      "id": "01867b8a-90b5-4a8a-a5da-526a4e45b2dc",
       "providerId": "form-flow",
       "topLevel": false
     },
@@ -501,7 +501,7 @@
       ],
       "builtIn": true,
       "description": "Reset credentials for a user if they forgot their password or something",
-      "id": "af8d1b51-f884-401a-898f-251519de3ebb",
+      "id": "e088fe4b-f938-4a93-bd46-92cba1b3f8a0",
       "providerId": "basic-flow",
       "topLevel": true
     },
@@ -527,7 +527,7 @@
       ],
       "builtIn": true,
       "description": "Flow to determine if the reset-otp authenticator should be used or not.",
-      "id": "15450e7b-ba81-4197-852e-78d8ce8f3ee8",
+      "id": "7b33c61e-c7a0-45f5-8714-87dc7d18acf7",
       "providerId": "basic-flow",
       "topLevel": false
     },
@@ -545,7 +545,7 @@
       ],
       "builtIn": true,
       "description": "SAML ECP Profile Authentication Flow",
-      "id": "f7f285bd-25b1-4fec-a43a-a1fbdbbf34db",
+      "id": "0c4b8fbd-f003-461b-b8bb-0a085be17641",
       "providerId": "basic-flow",
       "topLevel": true
     }
@@ -556,21 +556,21 @@
       "config": {
         "require.password.update.after.registration": "false"
       },
-      "id": "3d9a273b-a9a4-49d4-ab44-2500f31fa1f0"
+      "id": "5087c31c-2fb2-402d-97b9-cf779c5eeb08"
     },
     {
       "alias": "doorman-default",
       "config": {
         "defaultProvider": "doorman"
       },
-      "id": "57d319fd-c875-4f0c-93fb-2d53bda48b9e"
+      "id": "1954afb6-d59c-48aa-87f9-2a035bd81882"
     },
     {
       "alias": "review profile config",
       "config": {
         "update.profile.on.first.login": "missing"
       },
-      "id": "3e25b98f-a333-40f9-9c81-7625443df759"
+      "id": "a64603ba-0bf0-45f5-bace-a9c93de9ff44"
     }
   ],
   "browserFlow": "browser",
@@ -2383,6 +2383,102 @@
       "alwaysDisplayInConsole": false,
       "attributes": {
         "backchannel.logout.revoke.offline.tokens": "false",
+        "backchannel.logout.session.required": "false",
+        "client_credentials.use_refresh_token": "false",
+        "display.on.consent.screen": "false",
+        "exclude.session.state.from.auth.response": "false",
+        "id.token.as.detached.signature": "false",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "oidc.ciba.grant.enabled": "false",
+        "require.pushed.authorization.requests": "false",
+        "saml.artifact.binding": "false",
+        "saml.assertion.signature": "false",
+        "saml.authnstatement": "false",
+        "saml.client.signature": "false",
+        "saml.encrypt": "false",
+        "saml.force.post.binding": "false",
+        "saml.multivalued.roles": "false",
+        "saml.onetimeuse.condition": "false",
+        "saml.server.signature": "false",
+        "saml.server.signature.keyinfo.ext": "false",
+        "saml_force_name_id_format": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "use.refresh.tokens": "true"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "bearerOnly": false,
+      "clientAuthenticatorType": "client-secret",
+      "clientId": "my-tasks-list-api",
+      "consentRequired": false,
+      "defaultClientScopes": [
+        "pt_api"
+      ],
+      "directAccessGrantsEnabled": false,
+      "enabled": true,
+      "frontchannelLogout": false,
+      "fullScopeAllowed": true,
+      "id": "1802cd94-cd8b-4c02-be7c-a2703ca00b8e",
+      "implicitFlowEnabled": false,
+      "nodeReRegistrationTimeout": -1,
+      "notBefore": 0,
+      "optionalClientScopes": [],
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "clientAddress",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.session.note": "clientAddress"
+          },
+          "consentRequired": false,
+          "id": "0d1777d9-65f9-411f-9d38-b1592f9584c3",
+          "name": "Client IP Address",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "clientHost",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.session.note": "clientHost"
+          },
+          "consentRequired": false,
+          "id": "cdb5212e-d549-48da-abb7-3b09a7cf13e6",
+          "name": "Client Host",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "clientId",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.session.note": "clientId"
+          },
+          "consentRequired": false,
+          "id": "ba9067ec-fe34-4374-9595-6fa77860adb0",
+          "name": "Client ID",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper"
+        }
+      ],
+      "publicClient": false,
+      "redirectUris": [],
+      "secret": "39581921-2283-4f8e-a9c6-e031e87b7535",
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "surrogateAuthRequired": false,
+      "webOrigins": []
+    },
+    {
+      "alwaysDisplayInConsole": false,
+      "attributes": {
+        "backchannel.logout.revoke.offline.tokens": "false",
         "backchannel.logout.session.required": "true",
         "client_credentials.use_refresh_token": "false",
         "display.on.consent.screen": "false",
@@ -3346,7 +3442,7 @@
         "syncMode": "INHERIT",
         "user.attribute": "tenantid"
       },
-      "id": "ef277127-916a-463f-9746-b42ed2b33830",
+      "id": "ee6009d4-f4da-4af4-839a-023ecd844a2f",
       "identityProviderAlias": "doorman",
       "identityProviderMapper": "saml-user-attribute-idp-mapper",
       "name": "TenantId"
@@ -3356,7 +3452,7 @@
         "attribute.name": "http://schemas.navexglobal.com/identity/claims/DoormanClientKey",
         "user.attribute": "clientkey"
       },
-      "id": "648b77f2-ae48-4454-aa97-1805ee8cf483",
+      "id": "e572d9ca-ce20-470b-970d-73415f37b1da",
       "identityProviderAlias": "doorman",
       "identityProviderMapper": "saml-user-attribute-idp-mapper",
       "name": "ClientKey"
@@ -3366,7 +3462,7 @@
         "attribute.name": "http://schemas.navexglobal.com/identity/claims/EmailAddress",
         "user.attribute": "email"
       },
-      "id": "7667e681-2bad-443e-b235-403a188e77f1",
+      "id": "8efd1acf-7644-45b6-a7f5-ec3477f96b6d",
       "identityProviderAlias": "doorman",
       "identityProviderMapper": "saml-user-attribute-idp-mapper",
       "name": "EmailAddress"
@@ -3376,7 +3472,7 @@
         "attribute.name": "http://schemas.navexglobal.com/identity/claims/FirstName",
         "user.attribute": "firstName"
       },
-      "id": "0cb0d37f-faa7-4adf-9ed2-869bf7049b65",
+      "id": "08124bc3-1e42-4dec-8236-1a27753b9200",
       "identityProviderAlias": "doorman",
       "identityProviderMapper": "saml-user-attribute-idp-mapper",
       "name": "FirstName"
@@ -3386,7 +3482,7 @@
         "attribute.name": "http://schemas.navexglobal.com/identity/claims/LastName",
         "user.attribute": "lastName"
       },
-      "id": "46e15ed0-aadb-4169-8113-57ba2e3523c5",
+      "id": "0e005bd5-af40-4c80-8f68-80a4755dafbc",
       "identityProviderAlias": "doorman",
       "identityProviderMapper": "saml-user-attribute-idp-mapper",
       "name": "LastName"
@@ -3396,7 +3492,7 @@
         "attribute.name": "http://schemas.navexglobal.com/identity/claims/MiddleName",
         "user.attribute": "middle_name"
       },
-      "id": "6d4c988d-36ae-4635-9e22-04959db563d2",
+      "id": "681f6309-149c-4c2d-8aa3-3329e3964ff5",
       "identityProviderAlias": "doorman",
       "identityProviderMapper": "saml-user-attribute-idp-mapper",
       "name": "MiddleName"
@@ -3406,7 +3502,7 @@
         "attribute.name": "http://schemas.navexglobal.com/identity/claims/PreferredLanguageRegion",
         "user.attribute": "locale"
       },
-      "id": "b4a6933f-4280-4b20-84b6-3c59c6015700",
+      "id": "4bc74d1e-571a-4f1d-aa69-7bf2aedac7fd",
       "identityProviderAlias": "doorman",
       "identityProviderMapper": "saml-user-attribute-idp-mapper",
       "name": "PreferredLanguageRegion"
@@ -3416,7 +3512,7 @@
         "attribute.name": "http://schemas.navexglobal.com/identity/claims/UserName",
         "user.attribute": "preferred_username"
       },
-      "id": "b93436a5-698f-4d59-8af6-aac3a4627dfa",
+      "id": "cfb0f281-e933-42fa-8dd1-1251d774ae2e",
       "identityProviderAlias": "doorman",
       "identityProviderMapper": "saml-user-attribute-idp-mapper",
       "name": "Preferred Username"
@@ -3426,7 +3522,7 @@
         "attribute.name": "http://schemas.navexglobal.com/identity/claims/UserStoreRole",
         "user.attribute": "user_store_role"
       },
-      "id": "5a41f8ff-449c-4bc4-906f-c587b2c0db73",
+      "id": "1ad0070b-4c6a-41e5-9724-9be54c43bedd",
       "identityProviderAlias": "doorman",
       "identityProviderMapper": "saml-user-attribute-idp-mapper",
       "name": "UserStoreRole"
@@ -3436,7 +3532,7 @@
         "attribute.name": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name",
         "user.attribute": "puid"
       },
-      "id": "19fa3709-c85c-4df8-ab38-1963f77a70ee",
+      "id": "241fb247-78ae-47b1-b1f7-340c71ec3213",
       "identityProviderAlias": "doorman",
       "identityProviderMapper": "saml-user-attribute-idp-mapper",
       "name": "Puid"
@@ -3445,7 +3541,7 @@
       "config": {
         "template": "${ATTRIBUTE.http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name}"
       },
-      "id": "240aee07-1d4f-4ddb-ad39-b54297b1fbf9",
+      "id": "75064be1-9f34-4414-9ef4-22a11afa4854",
       "identityProviderAlias": "doorman",
       "identityProviderMapper": "saml-username-idp-mapper",
       "name": "UserName"
@@ -3686,6 +3782,7 @@
       "epim-s2s": [],
       "insights": [],
       "moonwatch-api-proxy": [],
+      "my-tasks-list-api": [],
       "navex-esg": [],
       "ncis-api": [],
       "realm-management": [
@@ -4220,6 +4317,23 @@
       "serviceAccountClientId": "epim-s2s",
       "totp": false,
       "username": "service-account-epim-s2s"
+    },
+    {
+      "createdTimestamp": 1663868759365,
+      "credentials": [],
+      "disableableCredentialTypes": [],
+      "emailVerified": false,
+      "enabled": true,
+      "groups": [],
+      "id": "0f32a1f1-e784-4e37-80ac-a307c72ae2a6",
+      "notBefore": 0,
+      "realmRoles": [
+        "default-roles-navex"
+      ],
+      "requiredActions": [],
+      "serviceAccountClientId": "my-tasks-list-api",
+      "totp": false,
+      "username": "service-account-my-tasks-list-api"
     }
   ],
   "verifyEmail": false,
