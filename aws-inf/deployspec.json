@@ -181,6 +181,7 @@
     "AppShellBffClientSecretSsmArn",
     "CustomOidcAuthorizerLambdaName",
     "ApiGatewayAuthorizerRole",
-    "RotateSecretTopicArn"
+    "RotateSecretTopicArn",
+    "MyTaskListApiClientSecretSSmArn"
   ]
 }
