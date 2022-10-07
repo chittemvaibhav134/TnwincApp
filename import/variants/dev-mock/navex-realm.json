@@ -1797,7 +1797,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "31f15a15-7873-440d-863b-43b2c519670e",
-    "redirectUris" : [ "https://auth.dev.rr.local/*", "https://doorman.dev.gw.local/*", "https://auth.n3dev.rr.navex-pe.com/*" ],
+    "redirectUris" : [ "https://auth.dev.rr.local/*", "https://doorman.dev.gw.local/*", "https://auth.n3dev.rr.navex-pe.com/*", "https://auth.n4dev.rr.navex-pe.com/*", "https://auth.n5dev.rr.navex-pe.com/*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
     "bearerOnly" : false,
