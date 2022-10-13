@@ -6,7 +6,7 @@ import { verifyScope } from './scope';
 import { NavexJwt, NavexJwtPayload } from './navexjwts';
 
 /** Creates an IAM PolicyDocument from the given parameters. */
-const getPolicyDocument = (effect: string, resource: string): PolicyDocument => {
+const getPolicyDocument = (effect: string, resource: string|string[]): PolicyDocument => {
     const policyDocument = {
         Version: '2012-10-17', // default version
         Statement: [{
@@ -150,11 +150,14 @@ export interface IAuthenicateTokenOptions {
     /** The maximum number of search iterations to support when attempting to find a scope match. */
     scopeComplexityLimit?: number;
     jwksUri: string;
+    methodOrRouteArn?: string|string[];
 }
 function isAuthenicateTokenOptions(options: any): options is IAuthenicateTokenOptions {
     return typeof(options) === 'object' &&
         ['undefined', 'number'].includes(typeof(options.scopeComplexityLimit)) &&
-        typeof(options.jwksUri) === 'string';
+        typeof(options.jwksUri) === 'string' &&
+        (['undefined', 'string'].includes(typeof(options.methodOrRouteArn)) || 
+            (Array.isArray(options.methodOrRouteArn) && options.methodOrRouteArn.length > 0 && typeof(options.methodOrRouteArn[0]) === 'string'));
 }
 
 /**
@@ -178,11 +181,10 @@ export async function authenticateToken(authorizerEvent: IAPIGatewayAuthorizerEv
     // Provide default for scopeComplexityLimit
     options = {
         scopeComplexityLimit: 500,
+        methodOrRouteArn: getMethodArn(authorizerEvent),
         ...options
     };
     
-    const methodArn = getMethodArn(authorizerEvent);
-
     const token = getToken(authorizerEvent)
 
     const decoded = <NavexJwt>jwtdecode(token, { complete: true })
@@ -203,7 +205,7 @@ export async function authenticateToken(authorizerEvent: IAPIGatewayAuthorizerEv
     const verifiedPayload = <NavexJwtPayload>jwtverify(token, signingKey, { audience: audiences });
     return ({
         principalId: verifiedPayload.sub,
-        policyDocument: getPolicyDocument('Allow', methodArn),
+        policyDocument: getPolicyDocument('Allow', options.methodOrRouteArn),
         context: { scope: verifiedPayload.scope, session_state: verifiedPayload.session_state, clientkey: verifiedPayload.clientkey }
     });
 }
