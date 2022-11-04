@@ -162,6 +162,15 @@
           "DefaultValue": "None"
         }
       ]
+    },
+    {
+      "Project": "pita",
+      "Artifacts": [
+        {
+          "Name": "ApiURL",
+          "DefaultValue": "None"
+        }
+      ]
     }
   ],
   "Exposes": [

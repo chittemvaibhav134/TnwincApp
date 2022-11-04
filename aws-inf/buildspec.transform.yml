@@ -37,6 +37,7 @@ phases:
       - CcAuthRedirectUrl=$(jq -r '.ApiBaseUrl' "$DC_ART_DIR/ng-learning-platform")
       - EsgAuthRedirectUrl=$(jq -r '.BaseRedirectUrl' "$DC_ART_DIR/esg")
       - SingleDomain=$(jq -r '.SingleDomain' "$DC_ART_DIR/global-configuration")
+      - PitaUrl=$(jq -r '.ApiURL' "$DC_ART_DIR/pita")
       - mkdir transformed-import
       - |
         TransformScript="$APP_DIR/aws-inf/realm_transform.py"
@@ -116,6 +117,10 @@ phases:
       # riskrate wants to use the preview KC instance for an additional environment and the easiest way to accomplish this hacky goal is to
       # add the redirectUri for that env in all environments. Not ideal, but an easy way to make it happen...
       - $TransformScript -r "$NavexRealmJson" -i --client-id riskrate -p redirectUris -v "https://auth.rr.navexglobalpreview.com/auth/*" --append
+
+      # Set pita client related urls
+      - $TransformScript -r "$NavexRealmJson" -i --client-id pita -p redirectUris -v "https://$PitaUrl/*" 
+      - $TransformScript -r "$NavexRealmJson" -i --client-id pita -p attributes:backchannel.logout.url -v "https://$PitaUrl/api/oidc/logout"
 
       # copy updated realm file to captured artifact dir
       - cp "$NavexRealmJson" transformed-import/navex-realm.json

@@ -3507,7 +3507,8 @@
         "email",
         "profile",
         "roles",
-        "web-origins"
+        "web-origins",
+        "doorman-mappings"
       ],
       "directAccessGrantsEnabled": false,
       "enabled": true,
