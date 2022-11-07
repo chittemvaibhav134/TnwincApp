@@ -1510,6 +1510,8 @@ Outputs:
     Value: !Ref AWS::Region
   ClientSecretSsmKmsArn:
     Value: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/ssm"
+  RotateSecretTopicArn:
+    Value: !Ref RotateSecretTopic
   NcisApiClientSecretSsmArn:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/ncis-api"
   CmdBackendClientSecretSsmArn:
@@ -1542,5 +1544,5 @@ Outputs:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/navexadmin"
   PitaClientSecretSsmArn:
     Value: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/pita"
-  RotateSecretTopicArn:
-    Value: !Ref RotateSecretTopic
+  FoundationServiceClientSecretSsmArn:
+    Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/foundation-service-client"
