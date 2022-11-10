@@ -162,6 +162,15 @@
           "DefaultValue": "None"
         }
       ]
+    },
+    {
+      "Project": "pita",
+      "Artifacts": [
+        {
+          "Name": "ApiURL",
+          "DefaultValue": "None"
+        }
+      ]
     }
   ],
   "Exposes": [
@@ -182,6 +191,8 @@
     "CustomOidcAuthorizerLambdaName",
     "ApiGatewayAuthorizerRole",
     "RotateSecretTopicArn",
-    "MyTaskListApiClientSecretSSmArn"
+    "MyTaskListApiClientSecretSSmArn",
+    "NavexOneClientSecretSsmArn",
+    "NavexAdminClientSecretSsmArn"
   ]
 }
