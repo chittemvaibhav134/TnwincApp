@@ -72,12 +72,12 @@ phases:
       # Set navexone client related urls
       # This part will have to change if we ever add more apps to AppShell/NavexOne
       - PiralAppshellNavexOneUrl=${PiralAppshellUrls##*,}
-      - $TransformScript -r "$NavexRealmJson" -i --client-id navexone -p redirectUris -v "$PiralAppshellNavexOneUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id navexone -p redirectUris -v "$PiralAppshellNavexOneUrl/*" -v "https://auth.${SingleDomain}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id navexone -p baseUrl -v "$PiralAppshellNavexOneUrl"
 
       # Set navexadmin client related urls
       - PiralAppshellPlatforminatorUrl=${PiralAppshellUrls%%,*}
-      - $TransformScript -r "$NavexRealmJson" -i --client-id navexadmin -p redirectUris -v "$PiralAppshellPlatforminatorUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id navexadmin -p redirectUris -v "$PiralAppshellPlatforminatorUrl/*" -v "https://auth.${SingleDomain}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id navexadmin -p baseUrl -v "$PiralAppshellPlatforminatorUrl"
 
       # Set cmd-backend client related urls
