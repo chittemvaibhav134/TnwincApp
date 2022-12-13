@@ -262,7 +262,6 @@
         "containerId" : "ce1cac52-1298-4064-9a98-dd2a9fee63c7",
         "attributes" : { }
       } ],
-      "cmd-frontend" : [ ],
       "pita" : [ ],
       "cmd-backend" : [ ],
       "admin-cli" : [ ],
