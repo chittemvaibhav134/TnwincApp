@@ -2829,7 +2829,8 @@
       "notBefore": 0,
       "optionalClientScopes": [
         "pt_api",
-        "read:cm_api"
+        "read:cm_api",
+        "read:compliance-type-list-service"
       ],
       "protocol": "openid-connect",
       "protocolMappers": [
@@ -3040,7 +3041,9 @@
       "implicitFlowEnabled": false,
       "nodeReRegistrationTimeout": -1,
       "notBefore": 0,
-      "optionalClientScopes": [],
+      "optionalClientScopes": [
+        "read:compliance-type-list-service"
+      ],
       "protocol": "openid-connect",
       "protocolMappers": [
         {
