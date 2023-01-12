@@ -823,6 +823,26 @@ Resources:
                 Action:
                   - iam:PassRole
 
+  ConfigImporterSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: !Sub ${AWS::StackName}-configimporter
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
+          Description: "Everything to anywhere"
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${InfrastructureStackName}-VpcId"
+
+  ConfigImporterSecurityGroupIngress:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      Description: "Allow traffic from self"
+      GroupId: !GetAtt ConfigImporterSecurityGroup.GroupId
+      IpProtocol: -1
+      SourceSecurityGroupId: !GetAtt ConfigImporterSecurityGroup.GroupId
+
   CpRunImportConfigTaskLambda:
     Type: AWS::Lambda::Function
     Properties:
@@ -840,6 +860,7 @@ Resources:
           TaskDefinition: !Ref ImportConfigTaskDefinition
           #TaskFamily: !Sub ${AWS::StackName}-KCCONFIG
           TaskSubnets: !Sub ${KeycloakSubnet1},${KeycloakSubnet2}
+          SecurityGroupId: !GetAtt ConfigImporterSecurityGroup.GroupId
           ImportConfigContainerName: 'Navex-Keycloak-Config'
 
   S3ConfigBucket:

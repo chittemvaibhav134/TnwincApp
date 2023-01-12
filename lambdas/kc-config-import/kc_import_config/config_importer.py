@@ -21,7 +21,7 @@ def get_task_logs_location(ecs_client, task_definition_arn: str, task_arn: str, 
     task_id = task_arn.split('/')[-1]
     return (log_options['awslogs-group'], f"{log_options['awslogs-stream-prefix']}/{container_name}/{task_id}")
 
-def run_task(ecs_client, cluster: str, task_subnets: List[str], task_definition: str, startedby_id: str = "config-importer") -> dict:
+def run_task(ecs_client, cluster: str, task_subnets: List[str], task_definition: str, security_group_id: str, startedby_id: str = "config-importer") -> dict:
     # public ip is needed for fargate so that it can pull the container image.
     # if we set up a nat gateway/instance this can just be set to disabled either way.
     logger.info(f'Starting task {task_definition} in cluster {cluster}...')
@@ -34,7 +34,8 @@ def run_task(ecs_client, cluster: str, task_subnets: List[str], task_definition:
         networkConfiguration = {
             'awsvpcConfiguration' : {
                 'subnets'       :  task_subnets,
-                'assignPublicIp': 'ENABLED'
+                'assignPublicIp': 'ENABLED',
+                'securityGroups': [security_group_id]
             }
         }
     )
