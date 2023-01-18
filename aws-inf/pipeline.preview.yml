@@ -474,7 +474,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_PreviewUS::stack-outputs.json:CpConfigImportLambdaArn",
-                    "Payload": {"ImportId":"{{ codepipeline_job_id }}"},
+                    "Payload": {"ImportId":"{{ codepipeline_action_execution_id }}"},
                     "AccountId": "${StageAccountId}",
                     "Region": "us-east-1",
                     "ParseResponse": true
