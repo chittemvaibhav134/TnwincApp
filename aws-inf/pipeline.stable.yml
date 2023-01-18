@@ -592,7 +592,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_IntStable::stack-outputs.json:CpConfigImportLambdaArn",
-                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "Payload": {"ImportId":"{{ codepipeline_job_id }}"},
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
                     "ParseResponse": true
@@ -862,7 +862,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_StageEU::stack-outputs.json:CpConfigImportLambdaArn",
-                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "Payload": {"ImportId":"{{ codepipeline_job_id }}"},
                     "AccountId": "${StageAccountId}",
                     "Region": "eu-central-1",
                     "ParseResponse": true
@@ -1132,7 +1132,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_StageUS::stack-outputs.json:CpConfigImportLambdaArn",
-                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "Payload": {"ImportId":"{{ codepipeline_job_id }}"},
                     "AccountId": "${StageAccountId}",
                     "Region": "us-east-1",
                     "ParseResponse": true
@@ -1411,7 +1411,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_ProdEU::stack-outputs.json:CpConfigImportLambdaArn",
-                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "Payload": {"ImportId":"{{ codepipeline_job_id }}"},
                     "AccountId": "${ProductionAccountId}",
                     "Region": "eu-central-1",
                     "ParseResponse": true
@@ -1691,7 +1691,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_ProdUS::stack-outputs.json:CpConfigImportLambdaArn",
-                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "Payload": {"ImportId":"{{ codepipeline_job_id }}"},
                     "AccountId": "${ProductionAccountId}",
                     "Region": "us-east-1",
                     "ParseResponse": true

@@ -475,7 +475,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_PerfLab::stack-outputs.json:CpConfigImportLambdaArn",
-                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "Payload": {"ImportId":"{{ codepipeline_job_id }}"},
                     "AccountId": "${StageAccountId}",
                     "Region": "us-east-1",
                     "ParseResponse": true
