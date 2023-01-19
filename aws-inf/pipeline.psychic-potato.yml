@@ -499,7 +499,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_PsyPot::stack-outputs.json:CpConfigImportLambdaArn",
-                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "Payload": {"ImportId":"{{ codepipeline_action_execution_id }}"},
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
                     "ParseResponse": true

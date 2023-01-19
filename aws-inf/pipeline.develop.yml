@@ -546,7 +546,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_AutoValid::stack-outputs.json:CpConfigImportLambdaArn",
-                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "Payload": {"ImportId":"{{ codepipeline_action_execution_id }}"},
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
                     "ParseResponse": true
@@ -814,7 +814,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_Wobbly::stack-outputs.json:CpConfigImportLambdaArn",
-                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "Payload": {"ImportId":"{{ codepipeline_action_execution_id }}"},
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
                     "ParseResponse": true
@@ -1079,7 +1079,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_Rickety::stack-outputs.json:CpConfigImportLambdaArn",
-                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "Payload": {"ImportId":"{{ codepipeline_action_execution_id }}"},
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
                     "ParseResponse": true
@@ -1344,7 +1344,7 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "TargetFunctionName": "CfnDeploy_Squirrelly::stack-outputs.json:CpConfigImportLambdaArn",
-                    "Payload": {"ImportId":"#{codepipeline.PipelineExecutionId}"},
+                    "Payload": {"ImportId":"{{ codepipeline_action_execution_id }}"},
                     "AccountId": "${IntegrationAccountId}",
                     "Region": "us-west-2",
                     "ParseResponse": true
