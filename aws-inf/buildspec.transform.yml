@@ -83,10 +83,6 @@ phases:
       # Set cmd-backend client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "${DoormanBaseUrl}/*"
 
-      # Set cmd-frontend client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "https://maint.$CmdUiRootDomain/oidc/silentchecksso/*" -v "${DoormanBaseUrl}/*"
-      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-frontend -p webOrigins -v "https://maint.$CmdUiRootDomain"
-
       # Set epim-iem client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p adminUrl -v "https://${EpimIemRootDomain}/"
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p redirectUris -v "https://${EpimIemRootDomain}/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/oidcredirect/*"

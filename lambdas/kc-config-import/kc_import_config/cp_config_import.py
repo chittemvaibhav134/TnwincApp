@@ -77,6 +77,7 @@ def handler(event, context):
     cluster = os.environ['Cluster']
     task_definition = os.environ['TaskDefinition']
     task_subnets = os.environ['TaskSubnets'].split(',')
+    sg_id = os.environ['SecurityGroupId']
     import_config_container_name = os.environ['ImportConfigContainerName']
     logger.info(f"KC Config import lamba called with event: {event}")
     import_id = get_startedby_id(event['ImportId'])
@@ -85,7 +86,7 @@ def handler(event, context):
     if not task:
         # kickoff import task if not
         logger.info(f"Unable to find previously started task with import id: {import_id} in cluster: {cluster}... starting one now")
-        task = run_task(ecs_client, cluster, task_subnets, task_definition, import_id)
+        task = run_task(ecs_client, cluster, task_subnets, task_definition, sg_id, import_id)
         message = f"Started {task['taskArn']} in cluster {cluster}"
         logger.info(message)
         return CodePipelineHelperResponse.in_progress(message)
