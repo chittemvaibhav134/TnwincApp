@@ -1,0 +1,10 @@
+# Disable client cert auth request
+
+embed-server --server-config=standalone-ha.xml --std-out=echo
+
+batch
+
+/subsystem=elytron/server-ssl-context=kcSSLContext:write-attribute(name=want-client-auth, value=false)
+run-batch
+
+stop-embedded-server
