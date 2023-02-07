@@ -36,6 +36,8 @@ phases:
       - EpadminRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")
       - CcAuthRedirectUrl=$(jq -r '.ApiBaseUrl' "$DC_ART_DIR/ng-learning-platform")
       - EsgAuthRedirectUrl=$(jq -r '.BaseRedirectUrl' "$DC_ART_DIR/esg")
+      - EsgFrontendAuthRedirectUrl=$(jq -r '.FrontendBaseUrl' "$DC_ART_DIR/navex-esg-backend-api")
+      - EsgBackendAuthRedirectUrl=$(jq -r '.BackendBaseUrl' "$DC_ART_DIR/navex-esg-backend-api")
       - SingleDomain=$(jq -r '.SingleDomain' "$DC_ART_DIR/global-configuration")
       - PitaUrl=$(jq -r '.ApiURL' "$DC_ART_DIR/pita")
       - mkdir transformed-import
@@ -100,7 +102,7 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p redirectUris -v "${CcAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/course-customizer/*"
       
       # Set esg client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id navex-esg -p redirectUris -v "${EsgAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id navex-esg -p redirectUris -v "${EsgAuthRedirectUrl}/*" -v "${EsgFrontendAuthRedirectUrl}/*" -v "${EsgBackendAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
 
       # Set coi client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "https://auth.${SingleDomain}/disclosures/*"
