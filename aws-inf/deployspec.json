@@ -105,10 +105,6 @@
         {
           "Name": "FrontendBaseUrl",
           "DefaultValue": "https://lab.navex-int.com"
-        },
-        {
-          "Name": "BackendBaseUrl",
-          "DefaultValue": "https://backend.navex-int.com"
         }
       ]
     },
