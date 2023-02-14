@@ -65,11 +65,6 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p baseUrl -v "$AppshellUserAppUrl"
 
-      # Set appshell-bff client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*"
-      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellUserAppUrl"
-      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p attributes:backchannel.logout.url -v "$AppshellAdminUrl/auth/backchannel-logout"
-
       # Set navexone client related urls
       # This part will have to change if we ever add more apps to AppShell/NavexOne
       - PiralAppshellNavexOneUrl=${PiralAppshellUrls##*,}
@@ -81,6 +76,11 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id navexadmin -p redirectUris -v "$PiralAppshellPlatforminatorUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id navexadmin -p baseUrl -v "$PiralAppshellPlatforminatorUrl"
 
+      # Set appshell-bff client related urls
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*" -v "$PiralAppshellPlatforminatorUrl"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellUserAppUrl"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p attributes:backchannel.logout.url -v "$AppshellAdminUrl/auth/backchannel-logout"
+      
       # Set cmd-backend client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "${DoormanBaseUrl}/*"
 
