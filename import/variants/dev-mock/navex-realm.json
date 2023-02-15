@@ -1332,7 +1332,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "24e45b53-42d3-4a87-aa25-e75478be4b89",
-    "redirectUris" : [ "https://user.app.navex-dev.com/*", "https://navexadmin.ea-sandbox.navex-dev.com/*", "https://admin.ea-research.navex-dev.com/*", "https://navexadmin.navex-dev.com/*", "https://admin.ea-sandbox.navex-dev.com/*", "https://user.app.ea-sandbox.navex-dev.com/*", "https://auth.ea-research.navex-dev.com/*", "https://navexadmin.ea-research.navex-dev.com/*", "https://user.app.ea-research.navex-dev.com/*", "https://auth.navex-dev.com/*", "https://admin.navex-dev.com/*", "https://auth.ea-sandbox.navex-dev.com/*", "https://piralnavexadmin.wobbly.navex-int.com/*" ],
+    "redirectUris" : [ "https://user.app.navex-dev.com/*", "https://navexadmin.ea-sandbox.navex-dev.com/*", "https://admin.ea-research.navex-dev.com/*", "https://navexadmin.navex-dev.com/*", "https://admin.ea-sandbox.navex-dev.com/*", "https://user.app.ea-sandbox.navex-dev.com/*", "https://auth.ea-research.navex-dev.com/*", "https://navexadmin.ea-research.navex-dev.com/*", "https://user.app.ea-research.navex-dev.com/*", "https://auth.navex-dev.com/*", "https://admin.navex-dev.com/*", "https://auth.ea-sandbox.navex-dev.com/*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
     "bearerOnly" : false,
