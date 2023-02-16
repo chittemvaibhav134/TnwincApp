@@ -77,7 +77,7 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id navexadmin -p baseUrl -v "$PiralAppshellPlatforminatorUrl"
 
       # Set appshell-bff client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*" -v "$PiralAppshellPlatforminatorUrl"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*" -v "$PiralAppshellPlatforminatorUrl/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellUserAppUrl"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p attributes:backchannel.logout.url -v "$AppshellAdminUrl/auth/backchannel-logout"
       
