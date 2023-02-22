@@ -36,6 +36,7 @@ phases:
       - EpadminRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim-standard-epadmin")
       - CcAuthRedirectUrl=$(jq -r '.ApiBaseUrl' "$DC_ART_DIR/ng-learning-platform")
       - EsgAuthRedirectUrl=$(jq -r '.BaseRedirectUrl' "$DC_ART_DIR/esg")
+      - EsgFrontendAuthRedirectUrl=$(jq -r '.FrontendBaseUrl' "$DC_ART_DIR/navex-esg-backend-api")
       - SingleDomain=$(jq -r '.SingleDomain' "$DC_ART_DIR/global-configuration")
       - PitaUrl=$(jq -r '.ApiURL' "$DC_ART_DIR/pita")
       - mkdir transformed-import
@@ -64,11 +65,6 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id appshell -p baseUrl -v "$AppshellUserAppUrl"
 
-      # Set appshell-bff client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*"
-      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellUserAppUrl"
-      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p attributes:backchannel.logout.url -v "$AppshellAdminUrl/auth/backchannel-logout"
-
       # Set navexone client related urls
       # This part will have to change if we ever add more apps to AppShell/NavexOne
       - PiralAppshellNavexOneUrl=${PiralAppshellUrls##*,}
@@ -80,6 +76,11 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id navexadmin -p redirectUris -v "$PiralAppshellPlatforminatorUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id navexadmin -p baseUrl -v "$PiralAppshellPlatforminatorUrl"
 
+      # Set appshell-bff client related urls
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p redirectUris -v "$AppshellAdminUrl/*" -v "$AppshellPlatforminatorUrl/*" -v "$AppshellUserAppUrl/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/*" -v "$PiralAppshellPlatforminatorUrl/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p baseUrl -v "$AppshellUserAppUrl"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id appshell-bff -p attributes:backchannel.logout.url -v "$AppshellAdminUrl/auth/backchannel-logout"
+      
       # Set cmd-backend client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "${DoormanBaseUrl}/*"
 
@@ -100,7 +101,7 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p redirectUris -v "${CcAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/course-customizer/*"
       
       # Set esg client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id navex-esg -p redirectUris -v "${EsgAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id navex-esg -p redirectUris -v "${EsgAuthRedirectUrl}/*" -v "${EsgFrontendAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
 
       # Set coi client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "https://auth.${SingleDomain}/disclosures/*"
