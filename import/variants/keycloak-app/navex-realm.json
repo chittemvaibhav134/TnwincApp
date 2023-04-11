@@ -3804,7 +3804,7 @@
             "userinfo.token.claim": "true"
           },
           "consentRequired": false,
-          "id": "a4b2e017-b59e-4a9e-bc8e-06d5ad0b3e44",
+          "id": "b4d55de0-3cc6-4907-9389-67a9570dd549",
           "name": "Client IP Address",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usersessionmodel-note-mapper"
@@ -3820,7 +3820,7 @@
             "userinfo.token.claim": "true"
           },
           "consentRequired": false,
-          "id": "3d060141-15eb-4694-aa61-e154a0e2c69c",
+          "id": "3e9432be-df77-4f28-bee4-de0019fda8c3",
           "name": "Client Host",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usersessionmodel-note-mapper"
@@ -3836,7 +3836,7 @@
             "userinfo.token.claim": "true"
           },
           "consentRequired": false,
-          "id": "c1fbef57-eb46-4f3c-9137-363bc8eabd17",
+          "id": "85654468-be9f-4d32-84ad-9a138c6fb04d",
           "name": "Client ID",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usersessionmodel-note-mapper"
