@@ -3767,6 +3767,87 @@
       "webOrigins": [
         "+"
       ]
+    },
+    {
+      "alwaysDisplayInConsole": false,
+      "attributes": {
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "backchannel.logout.session.required": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "bearerOnly": false,
+      "clientAuthenticatorType": "client-secret",
+      "clientId": "tenant-sync",
+      "consentRequired": false,
+      "defaultClientScopes": [],
+      "directAccessGrantsEnabled": false,
+      "enabled": true,
+      "frontchannelLogout": false,
+      "fullScopeAllowed": true,
+      "id": "5da4f14b-f5c3-4759-8ac8-7ea3fabe21ba",
+      "implicitFlowEnabled": false,
+      "nodeReRegistrationTimeout": -1,
+      "notBefore": 0,
+      "optionalClientScopes": [
+        "read:cm_api"
+      ],
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "config": {
+            "access.token.claim": "true",
+            "access.tokenResponse.claim": "false",
+            "claim.name": "clientAddress",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.session.note": "clientAddress",
+            "userinfo.token.claim": "true"
+          },
+          "consentRequired": false,
+          "id": "b4d55de0-3cc6-4907-9389-67a9570dd549",
+          "name": "Client IP Address",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "access.tokenResponse.claim": "false",
+            "claim.name": "clientHost",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.session.note": "clientHost",
+            "userinfo.token.claim": "true"
+          },
+          "consentRequired": false,
+          "id": "3e9432be-df77-4f28-bee4-de0019fda8c3",
+          "name": "Client Host",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "access.tokenResponse.claim": "false",
+            "claim.name": "clientId",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.session.note": "clientId",
+            "userinfo.token.claim": "true"
+          },
+          "consentRequired": false,
+          "id": "85654468-be9f-4d32-84ad-9a138c6fb04d",
+          "name": "Client ID",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper"
+        }
+      ],
+      "publicClient": false,
+      "redirectUris": [],
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "surrogateAuthRequired": false,
+      "webOrigins": []
     }
   ],
   "components": {
@@ -4255,6 +4336,7 @@
       "coi-backend": [],
       "coursecustomizer": [],
       "coursecustomizer-backend": [],
+      "tenant-sync": [],
       "customermanager": [],
       "doorman": [],
       "epadmin": [],
@@ -4784,6 +4866,23 @@
       "serviceAccountClientId": "coursecustomizer-backend",
       "totp": false,
       "username": "service-account-coursecustomizer-backend"
+    },
+    {
+      "createdTimestamp": 1662657659218,
+      "credentials": [],
+      "disableableCredentialTypes": [],
+      "emailVerified": false,
+      "enabled": true,
+      "groups": [],
+      "id": "99ffcb56-e161-4a3d-bc54-6f0be1b9ec2e",
+      "notBefore": 0,
+      "realmRoles": [
+        "default-roles-navex"
+      ],
+      "requiredActions": [],
+      "serviceAccountClientId": "tenant-sync",
+      "totp": false,
+      "username": "service-account-tenant-sync"
     },
     {
       "createdTimestamp": 1663785575899,

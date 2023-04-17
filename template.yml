@@ -1569,3 +1569,5 @@ Outputs:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/foundation-service-client"
   DoormanClientSecretSsmArn:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/doorman"
+  TenantSyncClientSecretArn:
+    Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/tenant-sync"

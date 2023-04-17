@@ -9,15 +9,15 @@
     "bundle": "rm -f custom-authorizer.zip ; zip custom-authorizer.zip -r *.js *.json node_modules/"
   },
   "dependencies": {
-    "auth0": "^2.36.1",
+    "auth0": "^2.44.1",
     "bluebird": "^3.7.2",
     "dotenv": "^10.0.0",
-    "jsonwebtoken": "^8.5.1",
-    "jwks-rsa": "^2.0.4"
+    "jsonwebtoken": "^9.0.0",
+    "jwks-rsa": "^2.1.5"
   },
   "devDependencies": {
     "aws-sdk": "^2.963.0",
-    "jest": "^27.4.5",
-    "lambda-local": "^2.0.0"
+    "jest": "^28.1.3",
+    "lambda-local": "^2.0.3"
   }
 }
