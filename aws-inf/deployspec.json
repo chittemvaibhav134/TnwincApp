@@ -118,6 +118,15 @@
       ]
     },
     {
+      "Project": "coi-api",
+      "Artifacts": [
+        {
+          "Name": "Url",
+          "DefaultValue": "https://api.coi.devlocal.navex-pe.com"
+        }
+      ]
+    },
+    {
       "Project": "insights",
       "Artifacts": [
         {
