@@ -26,6 +26,7 @@ phases:
       - CmdUiRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/policytech")
       - EpimIemRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim")
       - CoiAuthRedirectUrl=$(jq -r '.CoiAuthRedirectUrl' "$DC_ART_DIR/coi-ui")
+      - CoiApiUrl=$(jq -r '.Url' "$DC_ART_DIR/coi-api")
       - InsightsApiBaseUrl=$(jq -r '.ApiFriendlyBaseUrl' "$DC_ART_DIR/insights")
       - RiskRateAuthRedirectUrl=$(jq -r '.AuthRedirectUrl' "$DC_ART_DIR/riskrate")
       - NewRelicLicenseKeySsmArn=$(jq -r '.NewRelicenseKeySsmArn' "$DC_ART_DIR/global-configuration")
@@ -105,6 +106,7 @@ phases:
 
       # Set coi client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "https://auth.${SingleDomain}/disclosures/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p attributes:backchannel.logout.url -v "$CoiApiUrl/public/v6/sessions.backChannelLogout"
 
       # Set insights client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p redirectUris -v "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" -v "${InsightsApiBaseUrl}/public/v3/BrowserAuthorization.*" -v "${DoormanBaseUrl}/*" -v "https://apigw.${SingleDomain}/analytics/api/public/v2/BrowserAuthorization.*" -v "https://apigw.${SingleDomain}/analytics/api/public/v3/BrowserAuthorization.*"
