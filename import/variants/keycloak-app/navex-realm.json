@@ -1499,10 +1499,11 @@
       ],
       "protocol": "openid-connect",
       "publicClient": false,
-      "redirectUris": [
-        "https://doorman.dev.gw.local/*",
-        "https://secure.dev.ep.local/*"
-      ],
+        "redirectUris": [
+            "https://local.navex-pe.com/*",
+            "https://doorman.dev.gw.local/*",
+            "https://secure.dev.ep.local/*"
+        ],
       "rootUrl": "https://secure.dev.ep.local",
       "secret": "442cea9a-5177-47e1-a6d4-a70418620019",
       "serviceAccountsEnabled": false,
