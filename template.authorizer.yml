@@ -38,8 +38,8 @@ Resources:
       Environment:
         Variables:
           JWKS_URI: !Sub https://${KCBaseUrl}/auth/realms/navex/protocol/openid-connect/certs
-      MemorySize: 256
-      Runtime: nodejs14.x
+      MemorySize: 512
+      Runtime: nodejs18.x
       Timeout: 30
       Layers:
         - !GetAtt LayerArnSetSsm.Value
@@ -91,8 +91,8 @@ Resources:
     Type: AWS::Serverless::LayerVersion
     Properties:
       CompatibleRuntimes:
-        - nodejs12.x
-        - nodejs14.x
+        - nodejs18.x
+        - nodejs16.x
       ContentUri: ./lambdas/oidc-authorizer-layer/output/
       LayerName: !Ref LayerName
       RetentionPolicy: Retain
