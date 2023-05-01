@@ -1485,8 +1485,11 @@
       "tls.client.certificate.bound.access.tokens" : "false",
       "saml.authnstatement" : "false",
       "display.on.consent.screen" : "false",
-      "saml.onetimeuse.condition" : "false"
-    },
+      "saml.onetimeuse.condition" : "false",
+      "backchannel.logout.revoke.offline.tokens": "false",
+      "backchannel.logout.session.required": "true",
+      "backchannel.logout.url": "https://maint.pt.dev.local/oidc/backchannellogout"
+  },
     "authenticationFlowBindingOverrides" : { },
     "fullScopeAllowed" : true,
     "nodeReRegistrationTimeout" : -1,
