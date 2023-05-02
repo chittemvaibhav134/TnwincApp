@@ -1591,7 +1591,8 @@
       "optionalClientScopes": [
         "pt_api",
         "read:cm_api",
-        "read:compliance-type-list-service"
+        "read:compliance-type-list-service",
+        "read:machine-translation-service"
       ],
       "protocol": "openid-connect",
       "protocolMappers": [
@@ -3205,6 +3206,29 @@
         "jsonType.label" : "boolean"
       }
     } ]
+  }, {
+    "id": "ba4171b4-c958-4007-b850-9bc116d8589c",
+      "name": "read:machine-translation-service",
+      "description": "Allow access to machine translations service",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true"
+      },
+      "protocolMappers": [
+        {
+          "id": "e6f7e27a-3cff-40b5-a48e-03f6659c9065",
+          "name": "machine-translation-service-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "included.custom.audience": "machine-translation-service"
+          }
+        }
+      ]
   } ],
   "defaultDefaultClientScopes" : [ "email", "profile", "role_list", "roles", "web-origins" ],
   "defaultOptionalClientScopes" : [ "address", "microprofile-jwt", "offline_access", "phone" ],

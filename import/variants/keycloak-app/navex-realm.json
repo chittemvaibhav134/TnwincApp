@@ -2967,7 +2967,8 @@
       "optionalClientScopes": [
         "pt_api",
         "read:cm_api",
-        "read:compliance-type-list-service"
+        "read:compliance-type-list-service",
+        "read:machine-translation-service"
       ],
       "protocol": "openid-connect",
       "protocolMappers": [
