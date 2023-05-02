@@ -418,7 +418,8 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json"
+                      "App::aws-inf/template-configuration.json",
+                      "Transform_PerfLab::template-auth-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
@@ -436,6 +437,7 @@ Resources:
                 - Name: App
                 - Name: ProjectVersion
                 - Name: CfnDeploy_PerfLab
+                - Name: Transform_PerfLab
               OutputArtifacts:
                 - Name: FinalizedCfnAuthConfig_PerfLab
               RunOrder: 6

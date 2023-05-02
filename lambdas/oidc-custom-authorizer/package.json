@@ -4,9 +4,14 @@
   "description": "An AWS Lambda function to provide a Custom Authenticator for AWS API Gateway that verifies RS* signed tokens",
   "main": "index.js",
   "scripts": {
-    "start": "lambda-local --timeout 300 --lambda-path index.js --event-path event.json",
-    "test": "jest",
-    "bundle": "rm -f custom-authorizer.zip ; zip custom-authorizer.zip -r *.js *.json node_modules/"
+    "clean": "rm -rf output/",
+    "build-local-deps": "cd ../oidc-authorizer-layer && npm run bundle && cd ..",
+    "bundle-copy-local-deps": "rm ./node_modules/oidc-authorizer && cp -r ../../oidc-authorizer-layer/output/nodejs/node_modules/oidc-authorizer ./node_modules/oidc-authorizer",
+    "bundle-stage-output": "mkdir -p output/ && cp package.json package-lock.json output/",
+    "bundle-install-deps": "npm run build-local-deps && npm run bundle-stage-output && cd output/ && npm ci --omit=dev && npm run bundle-copy-local-deps && cd ..",
+    "bundle": "npm run clean && npm run bundle-install-deps && cp *.js *.json output/",
+    "start": "npm run build-local-deps && lambda-local --timeout 300 --lambda-path index.js --event-path event.json",
+    "test": "jest"
   },
   "dependencies": {
     "auth0": "^3.3.0",
@@ -14,7 +19,7 @@
     "dotenv": "^10.0.0",
     "jsonwebtoken": "^9.0.0",
     "jwks-rsa": "^2.1.5",
-    "oidc-authorizer": "file:../oidc-authorizer-layer"
+    "oidc-authorizer": "file:../oidc-authorizer-layer/output/nodejs/node_modules/oidc-authorizer/"
   },
   "devDependencies": {
     "aws-sdk": "^2.963.0",

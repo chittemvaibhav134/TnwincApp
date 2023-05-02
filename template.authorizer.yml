@@ -13,6 +13,9 @@ Parameters:
   KCBaseUrl:
     Type: String
     Default: "*.keycloak.devlocal.navex-pe.com:8443"
+  Auth0Domain:
+    Type: String
+    Default: "auth0.test.navex-dev.com"
   LayerName:
     Type: String
     Default: oidc-endpoint-authorizer-nodejs
@@ -32,12 +35,13 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Role: !GetAtt LambdaExecutionRole.Arn
-      Code: ./lambdas/oidc-custom-authorizer/
+      Code: ./lambdas/oidc-custom-authorizer/output/
       Handler: index.handler
       Description: Authorize Endpoints for KeyCloak
       Environment:
         Variables:
           JWKS_URI: !Sub https://${KCBaseUrl}/auth/realms/navex/protocol/openid-connect/certs
+          AUTH0_JWKS: !Sub https://${Auth0Domain}/.well-known/jwks.json
       MemorySize: 512
       Runtime: nodejs18.x
       Timeout: 30

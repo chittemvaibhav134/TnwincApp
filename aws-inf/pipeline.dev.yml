@@ -16,6 +16,7 @@ Metadata:
         Parameters:
           - GitHubBranch
           - ImportConfigVariant
+          - Auth0Domain
       - Label:
           default: "Moonwatch"
         Parameters:
@@ -88,6 +89,8 @@ Parameters:
     AllowedValues:
       - "Yes"
       - "No"
+  Auth0Domain:
+    Type: String
 
 Conditions:
   DevMock: !Equals [ !Ref ImportConfigVariant, "DevMock" ]
@@ -378,6 +381,7 @@ Resources:
                     "Json": {
                       "Parameters": {
                         "KCBaseUrl": "CfnDeploy_Dev::stack-outputs.json:Domain",
+                        "Auth0Domain": "${Auth0Domain}",
                         "LayerName": "${LayerName}-${AWS::StackName}"
                       }
                     },

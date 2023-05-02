@@ -535,7 +535,8 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json"
+                      "App::aws-inf/template-configuration.json",
+                      "Transform_IntStable::template-auth-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
@@ -553,6 +554,7 @@ Resources:
                 - Name: App
                 - Name: ProjectVersion
                 - Name: CfnDeploy_IntStable
+                - Name: Transform_IntStable
               OutputArtifacts:
                 - Name: FinalizedCfnAuthConfig_IntStable
               RunOrder: 6
@@ -805,7 +807,8 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json"
+                      "App::aws-inf/template-configuration.json",
+                      "Transform_StageEU::template-auth-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
@@ -823,6 +826,7 @@ Resources:
                 - Name: App
                 - Name: ProjectVersion
                 - Name: CfnDeploy_StageEU
+                - Name: Transform_StageEU
               OutputArtifacts:
                 - Name: FinalizedCfnAuthConfig_StageEU
               RunOrder: 6
@@ -1075,7 +1079,8 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json"
+                      "App::aws-inf/template-configuration.json",
+                      "Transform_StageUS::template-auth-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
@@ -1093,6 +1098,7 @@ Resources:
                 - Name: App
                 - Name: ProjectVersion
                 - Name: CfnDeploy_StageUS
+                - Name: Transform_StageUS
               OutputArtifacts:
                 - Name: FinalizedCfnAuthConfig_StageUS
               RunOrder: 6
@@ -1354,7 +1360,8 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json"
+                      "App::aws-inf/template-configuration.json",
+                      "Transform_ProdEU::template-auth-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
@@ -1372,6 +1379,7 @@ Resources:
                 - Name: App
                 - Name: ProjectVersion
                 - Name: CfnDeploy_ProdEU
+                - Name: Transform_ProdEU
               OutputArtifacts:
                 - Name: FinalizedCfnAuthConfig_ProdEU
               RunOrder: 6
@@ -1633,7 +1641,8 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json"
+                      "App::aws-inf/template-configuration.json",
+                      "Transform_ProdUS::template-auth-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
@@ -1651,6 +1660,7 @@ Resources:
                 - Name: App
                 - Name: ProjectVersion
                 - Name: CfnDeploy_ProdUS
+                - Name: Transform_ProdUS
               OutputArtifacts:
                 - Name: FinalizedCfnAuthConfig_ProdUS
               RunOrder: 6
