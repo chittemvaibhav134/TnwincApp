@@ -442,7 +442,8 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json"
+                      "App::aws-inf/template-configuration.json",
+                      "Transform_PsyPot::template-auth-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
@@ -460,6 +461,7 @@ Resources:
                 - Name: App
                 - Name: ProjectVersion
                 - Name: CfnDeploy_PsyPot
+                - Name: Transform_PsyPot
               OutputArtifacts:
                 - Name: FinalizedCfnAuthConfig_PsyPot
               RunOrder: 6

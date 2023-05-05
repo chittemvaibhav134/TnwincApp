@@ -87,6 +87,7 @@ function buildJwksUriFromIssuer(token: NavexJwt, options: IAuthenicateTokenOptio
             }
         }
     }
+    throw new Error(`Could not find matching JWKS base for issuer host ${issuerHostname}`);
 }
 
 const jwksClients = new Map<string, JwksClient>();
@@ -162,7 +163,7 @@ function isAuthenicateTokenOptions(options: any): options is IAuthenicateTokenOp
     return typeof(options) === 'object' &&
         ['undefined', 'number'].includes(typeof(options.scopeComplexityLimit)) &&
         (typeof(options.jwksUri) === 'string' ||
-        (Array.isArray(options.jwksUri) && options.jwksUri.length > 0 && typeof(options.jwksUri[0]) === 'string')) &&
+        isStringArray(options.jwksUri)) &&
         (['undefined', 'string'].includes(typeof(options.methodOrRouteArn)) || 
             (Array.isArray(options.methodOrRouteArn) && options.methodOrRouteArn.length > 0 && typeof(options.methodOrRouteArn[0]) === 'string'));
 }
