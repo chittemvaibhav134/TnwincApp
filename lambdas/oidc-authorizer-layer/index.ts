@@ -181,7 +181,8 @@ export async function authenticateToken(authorizerEvent: IAPIGatewayAuthorizerEv
     if (audiences !== undefined && !isStringArray(audiences)) { throw new Error('audience (second param) must be an array of strings or omitted') }
     if (!isStringArray(scopes)) { throw new Error('scopes (third param) must be an array of strings') }
     
-    if (audiences !== undefined && audiences.length == 0) { throw new Error('audiences (second param) cannot be an empty array') }
+    if (audiences !== undefined && audiences.length == 0) { throw new Error('audiences (second param) cannot be an empty array unless omitted') }
+
     if (scopes.length == 0) { throw new Error('scopes (third param) cannot be an empty array') }
 
     if (!isAuthenicateTokenOptions(options)) { throw new Error('options (fourth param) is required and must match IAuthenicateTokenOptions') }
