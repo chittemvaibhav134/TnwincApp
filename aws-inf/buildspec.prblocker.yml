@@ -15,7 +15,6 @@ phases:
   pre_build:
     commands:
       - echo $DockerhubPassword | docker login --username $DockerhubUsername --password-stdin
-      - cd ./lambdas/oidc-custom-authorizer && npm install-ci-test && cd -
       - cd ./lambdas/oidc-authorizer-layer && npm install-ci-test && cd -
   build:
     commands:
