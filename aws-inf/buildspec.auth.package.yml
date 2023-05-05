@@ -2,7 +2,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-        nodejs: 14
+        nodejs: 18
     commands:
       - cd ./lambdas/oidc-custom-authorizer && npm install-ci-test && cd -
       - cd ./lambdas/oidc-authorizer-layer && npm install-ci-test && cd -
