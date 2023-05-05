@@ -13,7 +13,6 @@
     "start": "npm run build-local-deps && lambda-local --timeout 300 --lambda-path index.js --event-path event.json"
   },
   "dependencies": {
-    "auth0": "^3.3.0",
     "bluebird": "^3.7.2",
     "dotenv": "^10.0.0",
     "jsonwebtoken": "^9.0.0",

@@ -79,11 +79,11 @@ function buildJwksUriFromIssuer(token: NavexJwt, options: IAuthenicateTokenOptio
         const jwksIsTemplate = jwksHostname.startsWith('*.');
         const jwksHostnamePlain = jwksIsTemplate ? jwksHostname.substring('*.'.length) : jwksHostname;
         if(issuerHostname.endsWith(jwksHostnamePlain)) {
-            if( jwksIsTemplate ) {
+            if( jwksHostnamePlain == issuerHostname ) {
+                return jwksTemplate.replace('*.', '');
+            } else {
                 const clientKey = getClientKey(token);
                 return jwksTemplate.replace('*', clientKey)
-            } else {
-                return jwksTemplate.replace('*.', '');
             }
         }
     }
@@ -170,7 +170,9 @@ function isAuthenicateTokenOptions(options: any): options is IAuthenicateTokenOp
 
 /**
  * 
- * @param {*} authorizerEvent 
+ * @param {*} authorizerEvent This is lambda authorizer event
+ * @param {string[]|undefined} audiences A list of audiences that should be verified on the authorizerEvent's token. 
+ *   Set this to undefined when there is not a predictable list of audiences.
  * @returns 
  */
 // TODO: 
