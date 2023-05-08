@@ -73,7 +73,7 @@ Resources:
         BuildSpec: aws-inf/buildspec.package.yml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:5.0
+        Image: aws/codebuild/standard:7.0
         Type: LINUX_CONTAINER
         EnvironmentVariables:
           - Name: S3_BUCKET
@@ -93,7 +93,7 @@ Resources:
         BuildSpec: aws-inf/buildspec.auth.package.yml    
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:5.0
+        Image: aws/codebuild/standard:7.0
         Type: LINUX_CONTAINER
         EnvironmentVariables:
           - Name: S3_BUCKET
@@ -113,7 +113,7 @@ Resources:
         BuildSpec: aws-inf/buildspec.yml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:5.0
+        Image: aws/codebuild/standard:7.0
         Type: LINUX_CONTAINER
         PrivilegedMode: True
         EnvironmentVariables:
@@ -135,7 +135,7 @@ Resources:
         BuildSpec: app/aws-inf/buildspec.transform.yml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:5.0
+        Image: aws/codebuild/standard:7.0
         Type: LINUX_CONTAINER
       VpcConfig:
         SecurityGroupIds:
@@ -417,7 +417,8 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json"
+                      "App::aws-inf/template-configuration.json",
+                      "Transform_PreviewUS::template-auth-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
@@ -435,6 +436,7 @@ Resources:
                 - Name: App
                 - Name: ProjectVersion
                 - Name: CfnDeploy_PreviewUS
+                - Name: Transform_PreviewUS
               OutputArtifacts:
                 - Name: FinalizedCfnAuthConfig_PreviewUS
               RunOrder: 6
