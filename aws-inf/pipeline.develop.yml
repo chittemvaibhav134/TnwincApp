@@ -1294,7 +1294,7 @@ Resources:
                   {
                     "JsonFiles": [
                       "App::aws-inf/template-configuration.json",
-                      "Transform_Squierrelly::template-auth-configuration.json"
+                      "Transform_Squirrelly::template-auth-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
