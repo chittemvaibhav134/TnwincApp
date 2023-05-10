@@ -508,7 +508,7 @@ Resources:
                 - Name: App
                 - Name: ProjectVersion
                 - Name: CfnDeploy_AutoValid
-                - Name: Transform_Autovalid
+                - Name: Transform_AutoValid
               OutputArtifacts:
                 - Name: FinalizedCfnAuthConfig_AutoValid
               RunOrder: 6
