@@ -72,15 +72,22 @@ const getClientKey = (decodedToken: NavexJwt): string => {
 
 function buildJwksUriFromIssuer(token: NavexJwt, options: IAuthenicateTokenOptions): string {
     if (!token.payload.iss) { throw new Error('invalid issuer') }
-    const jwksTemplate = options.jwksUri;
-    const jwksHostname = new URL(jwksTemplate).hostname
+    const jwksUriSet = Array.isArray(options.jwksUri) ? options.jwksUri : [options.jwksUri];
     const issuerHostname = new URL(token.payload.iss).hostname
-    if(jwksHostname.replace('*.', '') == issuerHostname) {
-        return jwksTemplate.replace('*.', '');
-    } else {
-        const clientKey = getClientKey(token);
-        return jwksTemplate.replace('*', clientKey)
+    for(const jwksTemplate of jwksUriSet) {
+        const jwksHostname = new URL(jwksTemplate).hostname
+        const jwksIsTemplate = jwksHostname.startsWith('*.');
+        const jwksHostnamePlain = jwksIsTemplate ? jwksHostname.substring('*.'.length) : jwksHostname;
+        if(issuerHostname.endsWith(jwksHostnamePlain)) {
+            if( jwksHostnamePlain == issuerHostname ) {
+                return jwksTemplate.replace('*.', '');
+            } else {
+                const clientKey = getClientKey(token);
+                return jwksTemplate.replace('*', clientKey)
+            }
+        }
     }
+    throw new Error(`Could not find matching JWKS base for issuer host ${issuerHostname}`);
 }
 
 const jwksClients = new Map<string, JwksClient>();
@@ -149,31 +156,35 @@ export type IAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken = ITokenAu
 export interface IAuthenicateTokenOptions {
     /** The maximum number of search iterations to support when attempting to find a scope match. */
     scopeComplexityLimit?: number;
-    jwksUri: string;
+    jwksUri: string|string[];
     methodOrRouteArn?: string|string[];
 }
 function isAuthenicateTokenOptions(options: any): options is IAuthenicateTokenOptions {
     return typeof(options) === 'object' &&
         ['undefined', 'number'].includes(typeof(options.scopeComplexityLimit)) &&
-        typeof(options.jwksUri) === 'string' &&
+        (typeof(options.jwksUri) === 'string' ||
+        isStringArray(options.jwksUri)) &&
         (['undefined', 'string'].includes(typeof(options.methodOrRouteArn)) || 
             (Array.isArray(options.methodOrRouteArn) && options.methodOrRouteArn.length > 0 && typeof(options.methodOrRouteArn[0]) === 'string'));
 }
 
 /**
  * 
- * @param {*} authorizerEvent 
+ * @param {*} authorizerEvent This is lambda authorizer event
+ * @param {string[]|undefined} audiences A list of audiences that should be verified on the authorizerEvent's token. 
+ *   Set this to undefined when there is not a predictable list of audiences.
  * @returns 
  */
 // TODO: 
-export async function authenticateToken(authorizerEvent: IAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken, audiences: string[], scopes: string[], options: IAuthenicateTokenOptions ) {
+export async function authenticateToken(authorizerEvent: IAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken, audiences: string[]|undefined , scopes: string[], options: IAuthenicateTokenOptions ) {
     if (!isAPIGatewayAuthorizerEventSubsetNeededForAuthenicateToken(authorizerEvent)) { throw new Error('authorizerEvent (first param) is required and should match APIGatewayAuthorizerEvent') }
     
 
-    if (!isStringArray(audiences)) { throw new Error('audience (second param) must be an array of strings') }
+    if (audiences !== undefined && !isStringArray(audiences)) { throw new Error('audience (second param) must be an array of strings or omitted') }
     if (!isStringArray(scopes)) { throw new Error('scopes (third param) must be an array of strings') }
     
-    if (audiences.length == 0) { throw new Error('audiences (second param) cannot be an empty array') }
+    if (audiences !== undefined && audiences.length == 0) { throw new Error('audiences (second param) cannot be an empty array unless omitted') }
+
     if (scopes.length == 0) { throw new Error('scopes (third param) cannot be an empty array') }
 
     if (!isAuthenicateTokenOptions(options)) { throw new Error('options (fourth param) is required and must match IAuthenicateTokenOptions') }

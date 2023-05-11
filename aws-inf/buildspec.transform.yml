@@ -16,6 +16,7 @@ phases:
       - InfStackName=$(jq -r '.StackName' "$DC_ART_DIR/aws-inf")
       - DoormanMetadataUrl=$(jq -r '.MetadataUrl' "$DC_ART_DIR/doorman")
       - DoormanBaseUrl=$(jq -r '.BaseUrl' "$DC_ART_DIR/doorman")
+      - Auth0Domain=$(jq -r '.authDomain_value' "$DC_ART_DIR/auth0-global-configuration")
       - NavexRootDomains=$(jq -r '.NavexRootDomains' "$DC_ART_DIR/global-configuration")
       - |
           AppshellAdminUrl=$(jq -r '.RootUiAdminUrl' "$DC_ART_DIR/appshell-infra")
@@ -26,6 +27,7 @@ phases:
       - CmdUiRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/policytech")
       - EpimIemRootDomain=$(jq -r '.UiRootDomain' "$DC_ART_DIR/epim")
       - CoiAuthRedirectUrl=$(jq -r '.CoiAuthRedirectUrl' "$DC_ART_DIR/coi-ui")
+      - CoiApiUrl=$(jq -r '.Url' "$DC_ART_DIR/coi-api")
       - InsightsApiBaseUrl=$(jq -r '.ApiFriendlyBaseUrl' "$DC_ART_DIR/insights")
       - RiskRateAuthRedirectUrl=$(jq -r '.AuthRedirectUrl' "$DC_ART_DIR/riskrate")
       - NewRelicLicenseKeySsmArn=$(jq -r '.NewRelicenseKeySsmArn' "$DC_ART_DIR/global-configuration")
@@ -83,6 +85,7 @@ phases:
       
       # Set cmd-backend client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p attributes:backchannel.logout.url -v "https://maint.$SingleDomain/content/oidc/backchannellogout"
 
       # Set epim-iem client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p adminUrl -v "https://${EpimIemRootDomain}/"
@@ -105,6 +108,7 @@ phases:
 
       # Set coi client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p redirectUris -v "${CoiAuthRedirectUrl}/*" -v "https://auth.${SingleDomain}/disclosures/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id coi -p attributes:backchannel.logout.url -v "$CoiApiUrl/public/v6/sessions.backChannelLogout"
 
       # Set insights client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p redirectUris -v "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" -v "${InsightsApiBaseUrl}/public/v3/BrowserAuthorization.*" -v "${DoormanBaseUrl}/*" -v "https://apigw.${SingleDomain}/analytics/api/public/v2/BrowserAuthorization.*" -v "https://apigw.${SingleDomain}/analytics/api/public/v3/BrowserAuthorization.*"
@@ -141,7 +145,19 @@ phases:
             }
           }' > \
           ./template-configuration.json
+      # Create artifact for the Auth0Domain
+      - |
+        jq --null-input \
+          --arg Auth0Domain "$Auth0Domain" \
+          '{
+            "Parameters": {
+              "Auth0Domain": $Auth0Domain
+            }
+          }' > \
+          ./template-auth-configuration.json
+      
 artifacts:
   files:
     - "template-configuration.json"
+    - "template-auth-configuration.json"
     - "transformed-import/*.json"

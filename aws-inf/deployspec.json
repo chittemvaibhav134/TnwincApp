@@ -118,6 +118,15 @@
       ]
     },
     {
+      "Project": "coi-api",
+      "Artifacts": [
+        {
+          "Name": "Url",
+          "DefaultValue": "https://api.coi.devlocal.navex-pe.com"
+        }
+      ]
+    },
+    {
       "Project": "insights",
       "Artifacts": [
         {
@@ -177,6 +186,15 @@
       "Artifacts": [
         {
           "Name": "ApiURL",
+          "DefaultValue": "None"
+        }
+      ]
+    },
+    {
+      "Project": "auth0-global-configuration",
+      "Artifacts": [
+        {
+          "Name": "authDomain_value",
           "DefaultValue": "None"
         }
       ]

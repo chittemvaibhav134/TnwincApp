@@ -270,6 +270,7 @@
       "admin-cli" : [ ],
       "appshell-localhost" : [ ],
       "coi" : [ ],
+      "coi-backend": [],
       "foundation-service-client" : [ ],
       "account" : [ {
         "id" : "1f713088-3fce-427c-8999-16555d56cf9c",
@@ -1484,8 +1485,11 @@
       "tls.client.certificate.bound.access.tokens" : "false",
       "saml.authnstatement" : "false",
       "display.on.consent.screen" : "false",
-      "saml.onetimeuse.condition" : "false"
-    },
+      "saml.onetimeuse.condition" : "false",
+      "backchannel.logout.revoke.offline.tokens": "false",
+      "backchannel.logout.session.required": "true",
+      "backchannel.logout.url": "https://maint.pt.dev.local/oidc/backchannellogout"
+  },
     "authenticationFlowBindingOverrides" : { },
     "fullScopeAllowed" : true,
     "nodeReRegistrationTimeout" : -1,
@@ -1545,6 +1549,122 @@
     "defaultClientScopes" : [ "email", "doorman-mappings" ],
     "optionalClientScopes" : [ ]
   }, {
+      "alwaysDisplayInConsole": false,
+      "attributes": {
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "backchannel.logout.session.required": "true",
+        "client_credentials.use_refresh_token": "false",
+        "display.on.consent.screen": "false",
+        "exclude.session.state.from.auth.response": "false",
+        "id.token.as.detached.signature": "false",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "oidc.ciba.grant.enabled": "false",
+        "require.pushed.authorization.requests": "false",
+        "saml.artifact.binding": "false",
+        "saml.assertion.signature": "false",
+        "saml.authnstatement": "false",
+        "saml.client.signature": "false",
+        "saml.encrypt": "false",
+        "saml.force.post.binding": "false",
+        "saml.multivalued.roles": "false",
+        "saml.onetimeuse.condition": "false",
+        "saml.server.signature": "false",
+        "saml.server.signature.keyinfo.ext": "false",
+        "saml_force_name_id_format": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "use.refresh.tokens": "true"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "bearerOnly": false,
+      "clientAuthenticatorType": "client-secret",
+      "clientId": "coi-backend",
+      "consentRequired": false,
+      "defaultClientScopes": [],
+      "directAccessGrantsEnabled": false,
+      "enabled": true,
+      "frontchannelLogout": false,
+      "fullScopeAllowed": true,
+      "id": "c5e9403c-86af-46db-8d00-a33eb0f90eff",
+      "implicitFlowEnabled": false,
+      "nodeReRegistrationTimeout": -1,
+      "notBefore": 0,
+      "optionalClientScopes": [
+        "pt_api",
+        "read:cm_api",
+        "read:compliance-type-list-service",
+        "read:machine-translation-service"
+      ],
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "clientAddress",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.session.note": "clientAddress",
+            "userinfo.token.claim": "true"
+          },
+          "consentRequired": false,
+          "id": "fd3f412c-e204-4e2b-8fb8-ae2a9d7f49b3",
+          "name": "Client IP Address",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "clientHost",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.session.note": "clientHost",
+            "userinfo.token.claim": "true"
+          },
+          "consentRequired": false,
+          "id": "8f77463c-2301-4fcc-a3bf-bd9e1c7faf19",
+          "name": "Client Host",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "clientId",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.session.note": "clientId",
+            "userinfo.token.claim": "true"
+          },
+          "consentRequired": false,
+          "id": "e8bf1470-82be-4cce-8efe-d4a80cbd2cff",
+          "name": "Client ID",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "included.client.audience": "coi",
+            "userinfo.token.claim": "false"
+          },
+          "consentRequired": false,
+          "id": "242152b1-5252-4221-b841-f3b723b79d06",
+          "name": "coi_audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper"
+        }
+      ],
+      "publicClient": false,
+      "redirectUris": [],
+      "secret": "c13cb96b-59d2-4a19-aa98-94819a66c20d",
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "surrogateAuthRequired": false,
+      "webOrigins": [
+        "+"
+      ]
+    }, {
     "id" : "4d33c658-0d15-42dc-8a94-6faccfac3fb8",
     "clientId" : "customermanager",
     "surrogateAuthRequired" : false,
@@ -3086,6 +3206,29 @@
         "jsonType.label" : "boolean"
       }
     } ]
+  }, {
+    "id": "ba4171b4-c958-4007-b850-9bc116d8589c",
+      "name": "read:machine-translation-service",
+      "description": "Allow access to machine translations service",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true"
+      },
+      "protocolMappers": [
+        {
+          "id": "e6f7e27a-3cff-40b5-a48e-03f6659c9065",
+          "name": "machine-translation-service-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "included.custom.audience": "machine-translation-service"
+          }
+        }
+      ]
   } ],
   "defaultDefaultClientScopes" : [ "email", "profile", "role_list", "roles", "web-origins" ],
   "defaultOptionalClientScopes" : [ "address", "microprofile-jwt", "offline_access", "phone" ],
