@@ -589,6 +589,7 @@ Resources:
       - LoadBalancerListenerHttps
     Properties:
       Cluster: !GetAtt Cluster.Arn
+      PropagateTags: SERVICE
       DesiredCount: !Ref DesiredTaskCount
       TaskDefinition: !Ref TaskDefinition
       LaunchType: FARGATE
