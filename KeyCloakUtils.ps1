@@ -44,8 +44,8 @@ function Restart-KeyCloak {
     )
 
     Write-Host "Restarting KeyCloak."
-    docker-compose -f $composeFilePath down
-    docker-compose -f $composeFilePath up -d
+    docker compose -f $composeFilePath down
+    docker compose -f $composeFilePath up -d
 
     $argumentList = @(
         'logs',
