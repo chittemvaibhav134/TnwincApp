@@ -1431,7 +1431,7 @@
       "attributes": {
         "backchannel.logout.revoke.offline.tokens": "false",
         "backchannel.logout.session.required": "true",
-        "backchannel.logout.url": "https://dev.ep.local/authorization/authoidc/backchannellogout",
+        "backchannel.logout.url": "https://local.navex-pe.com/authorization/authoidc/backchannellogout",
         "client_credentials.use_refresh_token": "false",
         "display.on.consent.screen": "false",
         "exclude.session.state.from.auth.response": "false",
