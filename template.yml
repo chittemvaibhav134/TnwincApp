@@ -850,7 +850,7 @@ Resources:
       # Explicit name to get around circular dep with role privs
       FunctionName: !Sub ${AWS::StackName}-CpRunImportTask
       Code: ./lambdas/kc-config-import/
-      Runtime: python3.7
+      Runtime: python3.9
       Role: !GetAtt CpRunImportConfigTaskRole.Arn
       MemorySize: 256
       Timeout: 20
@@ -949,7 +949,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code: ./lambdas/kc-api-proxy/
-      Runtime: python3.8
+      Runtime: python3.9
       Role: !GetAtt ClientSecretRotateLambdaRole.Arn
       MemorySize: 256
       Timeout: 60
@@ -1002,7 +1002,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code: ./lambdas/kc-api-proxy/
-      Runtime: python3.8
+      Runtime: python3.9
       Role: !GetAtt LambdaKCApiProxyRole.Arn
       MemorySize: 256
       Timeout: 60
@@ -1044,7 +1044,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code: ./lambdas/kc-api-proxy/
-      Runtime: python3.8
+      Runtime: python3.9
       Role: !GetAtt LambdaKCApiProxyRole.Arn
       MemorySize: 256
       Timeout: 60
@@ -1098,7 +1098,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code: ./lambdas/kc-api-proxy/
-      Runtime: python3.8
+      Runtime: python3.9
       Role: !GetAtt ClientSecretRotateLambdaRole.Arn
       MemorySize: 256
       Timeout: 60
