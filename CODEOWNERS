@@ -3,4 +3,4 @@
 /aws-inf/pipeline.dev.yaml @tnwinc/cia-komodo
 
 # Notify DevOps team when deployment pipeline updates are required
-/aws-inf/pipeline.*.yaml @tnwinc/devops-aoraki
+/aws-inf/pipeline.*.yml @tnwinc/devops-aoraki

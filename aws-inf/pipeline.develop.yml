@@ -82,7 +82,7 @@ Resources:
         BuildSpec: aws-inf/buildspec.yml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:5.0
+        Image: aws/codebuild/standard:7.0
         Type: LINUX_CONTAINER
         PrivilegedMode: True
         EnvironmentVariables:
@@ -100,7 +100,7 @@ Resources:
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:5.0
+        Image: aws/codebuild/standard:7.0
         PrivilegedMode: True
       Source:
         Type: GITHUB
@@ -131,7 +131,7 @@ Resources:
         BuildSpec: app/aws-inf/buildspec.transform.yml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:5.0
+        Image: aws/codebuild/standard:7.0
         Type: LINUX_CONTAINER
       VpcConfig:
         SecurityGroupIds:
@@ -153,7 +153,7 @@ Resources:
         BuildSpec: aws-inf/buildspec.package.yml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:5.0
+        Image: aws/codebuild/standard:7.0
         Type: LINUX_CONTAINER
         EnvironmentVariables:
           - Name: S3_BUCKET
@@ -173,7 +173,7 @@ Resources:
         BuildSpec: aws-inf/buildspec.auth.package.yml    
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:5.0
+        Image: aws/codebuild/standard:7.0
         Type: LINUX_CONTAINER
         EnvironmentVariables:
           - Name: S3_BUCKET
@@ -489,7 +489,8 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json"
+                      "App::aws-inf/template-configuration.json",
+                      "Transform_AutoValid::template-auth-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
@@ -507,6 +508,7 @@ Resources:
                 - Name: App
                 - Name: ProjectVersion
                 - Name: CfnDeploy_AutoValid
+                - Name: Transform_AutoValid
               OutputArtifacts:
                 - Name: FinalizedCfnAuthConfig_AutoValid
               RunOrder: 6
@@ -757,7 +759,8 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json"
+                      "App::aws-inf/template-configuration.json",
+                      "Transform_Wobbly::template-auth-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
@@ -775,6 +778,7 @@ Resources:
                 - Name: App
                 - Name: ProjectVersion
                 - Name: CfnDeploy_Wobbly
+                - Name: Transform_Wobbly
               OutputArtifacts:
                 - Name: FinalizedCfnAuthConfig_Wobbly
               RunOrder: 6
@@ -1022,7 +1026,8 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json"
+                      "App::aws-inf/template-configuration.json",
+                      "Transform_Rickety::template-auth-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
@@ -1040,6 +1045,7 @@ Resources:
                 - Name: App
                 - Name: ProjectVersion
                 - Name: CfnDeploy_Rickety
+                - Name: Transform_Rickety
               OutputArtifacts:
                 - Name: FinalizedCfnAuthConfig_Rickety
               RunOrder: 6
@@ -1287,7 +1293,8 @@ Resources:
                 UserParameters: !Sub |
                   {
                     "JsonFiles": [
-                      "App::aws-inf/template-configuration.json"
+                      "App::aws-inf/template-configuration.json",
+                      "Transform_Squirrelly::template-auth-configuration.json"
                     ],
                     "Json": {
                       "Parameters": {
@@ -1305,6 +1312,7 @@ Resources:
                 - Name: App
                 - Name: ProjectVersion
                 - Name: CfnDeploy_Squirrelly
+                - Name: Transform_Squirrelly
               OutputArtifacts:
                 - Name: FinalizedCfnAuthConfig_Squirrelly
               RunOrder: 6

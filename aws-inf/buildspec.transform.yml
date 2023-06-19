@@ -16,6 +16,7 @@ phases:
       - InfStackName=$(jq -r '.StackName' "$DC_ART_DIR/aws-inf")
       - DoormanMetadataUrl=$(jq -r '.MetadataUrl' "$DC_ART_DIR/doorman")
       - DoormanBaseUrl=$(jq -r '.BaseUrl' "$DC_ART_DIR/doorman")
+      - Auth0Domain=$(jq -r '.authDomain_value' "$DC_ART_DIR/auth0-global-configuration")
       - NavexRootDomains=$(jq -r '.NavexRootDomains' "$DC_ART_DIR/global-configuration")
       - |
           AppshellAdminUrl=$(jq -r '.RootUiAdminUrl' "$DC_ART_DIR/appshell-infra")
@@ -144,7 +145,19 @@ phases:
             }
           }' > \
           ./template-configuration.json
+      # Create artifact for the Auth0Domain
+      - |
+        jq --null-input \
+          --arg Auth0Domain "$Auth0Domain" \
+          '{
+            "Parameters": {
+              "Auth0Domain": $Auth0Domain
+            }
+          }' > \
+          ./template-auth-configuration.json
+      
 artifacts:
   files:
     - "template-configuration.json"
+    - "template-auth-configuration.json"
     - "transformed-import/*.json"

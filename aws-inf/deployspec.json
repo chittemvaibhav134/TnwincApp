@@ -189,6 +189,15 @@
           "DefaultValue": "None"
         }
       ]
+    },
+    {
+      "Project": "auth0-global-configuration",
+      "Artifacts": [
+        {
+          "Name": "authDomain_value",
+          "DefaultValue": "None"
+        }
+      ]
     }
   ],
   "Exposes": [
