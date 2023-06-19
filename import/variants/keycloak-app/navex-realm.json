@@ -3825,6 +3825,7 @@
       ],
       "publicClient": false,
       "redirectUris": [],
+      "secret": "3cfcda2d-181e-4414-877b-af6fb49b066c",
       "serviceAccountsEnabled": true,
       "standardFlowEnabled": false,
       "surrogateAuthRequired": false,
