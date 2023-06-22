@@ -1482,9 +1482,9 @@
       "protocol": "openid-connect",
       "publicClient": false,
       "redirectUris": [
-          "https://dev.ep.local/*",
-          "https://doorman.dev.gw.local/*",
-          "https://local.navex-pe.com/*"
+        "https://dev.ep.local/*",
+        "https://doorman.dev.gw.local/*",
+        "https://local.navex-pe.com/*"
       ],
       "rootUrl": "https://dev.ep.local/",
       "secret": "9923b91d-4706-4ca0-8e97-1493e3956f5a",
@@ -1550,8 +1550,8 @@
       "protocol": "openid-connect",
       "publicClient": false,
       "redirectUris": [
-          "https://doorman.dev.gw.local/*",
-          "https://secure.dev.ep.local/*"
+        "https://doorman.dev.gw.local/*",
+        "https://secure.dev.ep.local/*"
       ],
       "rootUrl": "https://secure.dev.ep.local",
       "secret": "442cea9a-5177-47e1-a6d4-a70418620019",
@@ -2256,6 +2256,8 @@
     {
       "alwaysDisplayInConsole": false,
       "attributes": {
+		"backchannel.logout.url": "https://api.navexone-dev.local/public/v1/Session.BackoutChannelLogout",
+        "backchannel.logout.session.required": "true",
         "display.on.consent.screen": "false",
         "exclude.session.state.from.auth.response": "false",
         "saml.assertion.signature": "false",

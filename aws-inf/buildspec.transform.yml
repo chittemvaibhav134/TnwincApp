@@ -112,7 +112,8 @@ phases:
 
       # Set insights client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p redirectUris -v "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" -v "${InsightsApiBaseUrl}/public/v3/BrowserAuthorization.*" -v "${DoormanBaseUrl}/*" -v "https://apigw.${SingleDomain}/analytics/api/public/v2/BrowserAuthorization.*" -v "https://apigw.${SingleDomain}/analytics/api/public/v3/BrowserAuthorization.*"
-
+      - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p attributes:backchannel.logout.url -v "${InsightsApiBaseUrl}/public/v1/Session.BackChannelLogout"
+      
       # Set riskrate client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id riskrate -p redirectUris -v "${RiskRateAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
       # riskrate wants to use the preview KC instance for an additional environment and the easiest way to accomplish this hacky goal is to
