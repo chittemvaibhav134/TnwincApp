@@ -102,7 +102,7 @@ phases:
 
       # Set course customizer client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p redirectUris -v "${CcAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/course-customizer/*"
-      
+      - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p attributes:backchannel.logout.url -v "https://auth.${SingleDomain}/course-customizer/api/login/BackChannelLogout"
       # Set esg client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id navex-esg -p redirectUris -v "${EsgAuthRedirectUrl}/*" -v "${EsgFrontendAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
 
