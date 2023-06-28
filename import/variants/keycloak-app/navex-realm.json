@@ -2256,7 +2256,7 @@
     {
       "alwaysDisplayInConsole": false,
       "attributes": {
-		"backchannel.logout.url": "https://api.navexone-dev.local/public/v1/Session.BackoutChannelLogout",
+        "backchannel.logout.url": "https://api.navexone-dev.local/public/v1/Session.BackoutChannelLogout",
         "backchannel.logout.session.required": "true",
         "display.on.consent.screen": "false",
         "exclude.session.state.from.auth.response": "false",
@@ -3919,6 +3919,7 @@
       "attributes": {
         "backchannel.logout.revoke.offline.tokens": "false",
         "backchannel.logout.session.required": "true",
+        "backchannel.logout.url": "https://auth.devlocal.navex-pe.com/course-customizer/api/login/BackChannelLogout",
         "client_credentials.use_refresh_token": "false",
         "display.on.consent.screen": "false",
         "exclude.session.state.from.auth.response": "false",
@@ -5287,7 +5288,6 @@
       "totp": false,
       "username": "service-account-userstore"
     }
-
   ],
   "verifyEmail": false,
   "waitIncrementSeconds": 60,
