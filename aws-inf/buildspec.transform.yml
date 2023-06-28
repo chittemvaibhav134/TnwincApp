@@ -16,6 +16,7 @@ phases:
       - InfStackName=$(jq -r '.StackName' "$DC_ART_DIR/aws-inf")
       - DoormanMetadataUrl=$(jq -r '.MetadataUrl' "$DC_ART_DIR/doorman")
       - DoormanBaseUrl=$(jq -r '.BaseUrl' "$DC_ART_DIR/doorman")
+      - Auth0Domain=$(jq -r '.authDomain_value' "$DC_ART_DIR/auth0-global-configuration")
       - NavexRootDomains=$(jq -r '.NavexRootDomains' "$DC_ART_DIR/global-configuration")
       - |
           AppshellAdminUrl=$(jq -r '.RootUiAdminUrl' "$DC_ART_DIR/appshell-infra")
@@ -84,13 +85,14 @@ phases:
       
       # Set cmd-backend client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "${DoormanBaseUrl}/*"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p attributes:backchannel.logout.url -v "https://maint.$SingleDomain/content/oidc/backchannellogout"
 
       # Set epim-iem client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p adminUrl -v "https://${EpimIemRootDomain}/"
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p redirectUris -v "https://${EpimIemRootDomain}/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/oidcredirect/*"
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p webOrigins -v "https://${EpimIemRootDomain}"
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p rootUrl -v "https://${EpimIemRootDomain}/"
-      - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p attributes:backchannel.logout.url -v "https://${EpimIemRootDomain}/authorization/authoidc/backchannellogout"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p attributes:backchannel.logout.url -v "https://auth.${SingleDomain}/incidents/authorization/authoidc/backchannellogout"
       
       # Set epadmin client related urls 
       - $TransformScript -r "$NavexRealmJson" -i --client-id epadmin -p adminUrl -v "https://${EpadminRootDomain}/" 
@@ -100,7 +102,8 @@ phases:
 
       # Set course customizer client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p redirectUris -v "${CcAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*" -v "https://auth.${SingleDomain}/course-customizer/*"
-      
+      - $TransformScript -r "$NavexRealmJson" -i --client-id coursecustomizer -p attributes:backchannel.logout.url -v "https://auth.${SingleDomain}/course-customizer/api/login/BackChannelLogout"
+            
       # Set esg client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id navex-esg -p redirectUris -v "${EsgAuthRedirectUrl}/*" -v "${EsgFrontendAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
 
@@ -110,7 +113,8 @@ phases:
 
       # Set insights client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p redirectUris -v "${InsightsApiBaseUrl}/public/v2/BrowserAuthorization.*" -v "${InsightsApiBaseUrl}/public/v3/BrowserAuthorization.*" -v "${DoormanBaseUrl}/*" -v "https://apigw.${SingleDomain}/analytics/api/public/v2/BrowserAuthorization.*" -v "https://apigw.${SingleDomain}/analytics/api/public/v3/BrowserAuthorization.*"
-
+      - $TransformScript -r "$NavexRealmJson" -i --client-id insights -p attributes:backchannel.logout.url -v "${InsightsApiBaseUrl}/public/v1/Session.BackChannelLogout"
+      
       # Set riskrate client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id riskrate -p redirectUris -v "${RiskRateAuthRedirectUrl}/*" -v "${DoormanBaseUrl}/*"
       # riskrate wants to use the preview KC instance for an additional environment and the easiest way to accomplish this hacky goal is to
@@ -143,7 +147,19 @@ phases:
             }
           }' > \
           ./template-configuration.json
+      # Create artifact for the Auth0Domain
+      - |
+        jq --null-input \
+          --arg Auth0Domain "$Auth0Domain" \
+          '{
+            "Parameters": {
+              "Auth0Domain": $Auth0Domain
+            }
+          }' > \
+          ./template-auth-configuration.json
+      
 artifacts:
   files:
     - "template-configuration.json"
+    - "template-auth-configuration.json"
     - "transformed-import/*.json"
