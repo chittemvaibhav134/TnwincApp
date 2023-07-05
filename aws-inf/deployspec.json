@@ -214,6 +214,7 @@
     "EpimIemClientSecretSsmArn",
     "InsightsClientSecretSsmArn",
     "RiskRateClientSecretSsmArn",
+    "RiskRateBackendClientSecretSsmArn",
     "AppShellBffClientSecretSsmArn",
     "CustomOidcAuthorizerLambdaName",
     "ApiGatewayAuthorizerRole",
