@@ -4926,6 +4926,7 @@
         }
       ],
       "riskrate": [],
+      "riskrate-backend": [],
       "security-admin-console": [],
       "tenant-sync": [],
       "userstore": [],
@@ -5385,16 +5386,18 @@
       "username": "service-account-userstore"
     },   
     {
-      "id": "4df44785-6d28-4004-a446-10fe79f2d008",
       "createdTimestamp": 1687987040026,
-      "username": "service-account-riskrate-backend",
-      "enabled": true,
-      "totp": false,
-      "emailVerified": false,
-      "serviceAccountClientId": "riskrate-backend",
+      "credentials": [],
       "disableableCredentialTypes": [],
+      "emailVerified": false,
+      "enabled": true,
+      "groups": [],
+      "id": "4df44785-6d28-4004-a446-10fe79f2d008",
+      "notBefore": 0,
       "requiredActions": [],
-      "notBefore": 0
+      "serviceAccountClientId": "riskrate-backend",
+      "totp": false,
+      "username": "service-account-riskrate-backend",
     }
   ],
   "verifyEmail": false,
