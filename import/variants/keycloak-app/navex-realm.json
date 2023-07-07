@@ -1402,6 +1402,52 @@
         "display.on.consent.screen": "true",
         "include.in.token.scope": "true"
       },
+      "id": "6828390b-02f8-4fef-b75d-15c72b8d583d",
+      "name": "read:authz_api",
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "config": {
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "included.client.audience": "authz"
+          },
+          "consentRequired": false,
+          "id": "2ee44e36-4459-42b9-b0c7-dd7a8bd8b753",
+          "name": "authzmapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper"
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "display.on.consent.screen": "true",
+        "include.in.token.scope": "true"
+      },
+      "id": "c5f1279b-c2c5-409d-af86-8740955d1ec3",
+      "name": "write:authz_api",
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "config": {
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "included.client.audience": "authz"
+          },
+          "consentRequired": false,
+          "id": "46dc874c-f968-44f9-83cd-1da656f9114a",
+          "name": "authzmapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper"
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "display.on.consent.screen": "true",
+        "include.in.token.scope": "true"
+      },
       "id": "e6bc4e66-cf67-441a-ae41-97d32d6274ca",
       "name": "read:machine-translation-service",
       "protocol": "openid-connect",
@@ -4176,6 +4222,68 @@
       "authenticationFlowBindingOverrides": {},
       "bearerOnly": false,
       "clientAuthenticatorType": "client-secret",
+      "clientId": "authz",
+      "consentRequired": false,
+      "defaultClientScopes": [
+        "email",
+        "profile",
+        "roles",
+        "web-origins"
+      ],
+      "directAccessGrantsEnabled": false,
+      "enabled": true,
+      "frontchannelLogout": false,
+      "fullScopeAllowed": true,
+      "id": "3ece644a-eedd-43ed-a2be-6919e105b58b",
+      "implicitFlowEnabled": false,
+      "nodeReRegistrationTimeout": -1,
+      "notBefore": 0,
+      "optionalClientScopes": [
+        "address",
+        "microprofile-jwt",
+        "offline_access",
+        "phone",
+        "read:authz_api",
+        "write:authz_api"
+      ],
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "redirectUris": [],
+      "secret": "2fb23a98-3570-4189-9bd6-bcf17b616579",
+      "serviceAccountsEnabled": false,
+      "standardFlowEnabled": false,
+      "surrogateAuthRequired": false,
+      "webOrigins": []
+    },
+    {
+      "alwaysDisplayInConsole": false,
+      "attributes": {
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "backchannel.logout.session.required": "true",
+        "client_credentials.use_refresh_token": "false",
+        "display.on.consent.screen": "false",
+        "exclude.session.state.from.auth.response": "false",
+        "id.token.as.detached.signature": "false",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "oidc.ciba.grant.enabled": "false",
+        "require.pushed.authorization.requests": "false",
+        "saml.artifact.binding": "false",
+        "saml.assertion.signature": "false",
+        "saml.authnstatement": "false",
+        "saml.client.signature": "false",
+        "saml.encrypt": "false",
+        "saml.force.post.binding": "false",
+        "saml.multivalued.roles": "false",
+        "saml.onetimeuse.condition": "false",
+        "saml.server.signature": "false",
+        "saml.server.signature.keyinfo.ext": "false",
+        "saml_force_name_id_format": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "use.refresh.tokens": "true"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "bearerOnly": false,
+      "clientAuthenticatorType": "client-secret",
       "clientId": "navex-esg",
       "consentRequired": false,
       "defaultClientScopes": [
@@ -4682,6 +4790,7 @@
       "admin-cli": [],
       "appshell": [],
       "appshell-bff": [],
+      "authz": [],
       "broker": [
         {
           "attributes": {},
@@ -5384,7 +5493,7 @@
       "serviceAccountClientId": "userstore",
       "totp": false,
       "username": "service-account-userstore"
-    },   
+    },
     {
       "createdTimestamp": 1687987040026,
       "credentials": [],
