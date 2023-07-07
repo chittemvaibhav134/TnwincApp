@@ -5397,7 +5397,7 @@
       "requiredActions": [],
       "serviceAccountClientId": "riskrate-backend",
       "totp": false,
-      "username": "service-account-riskrate-backend",
+      "username": "service-account-riskrate-backend"
     }
   ],
   "verifyEmail": false,
