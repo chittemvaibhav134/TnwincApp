@@ -1399,6 +1399,52 @@
     },
     {
       "attributes": {
+        "display.on.consent.screen": "false",
+        "include.in.token.scope": "true"
+      },
+      "id": "6828390b-02f8-4fef-b75d-15c72b8d583d",
+      "name": "read:authz_api",
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "config": {
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "included.custom.audience": "authz"
+          },
+          "consentRequired": false,
+          "id": "2ee44e36-4459-42b9-b0c7-dd7a8bd8b753",
+          "name": "read_authz_audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper"
+        }
+      ]
+    },
+    {
+      "attributes": {
+        "display.on.consent.screen": "false",
+        "include.in.token.scope": "true"
+      },
+      "id": "c5f1279b-c2c5-409d-af86-8740955d1ec3",
+      "name": "write:authz_api",
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "config": {
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "included.custom.audience": "authz"
+          },
+          "consentRequired": false,
+          "id": "46dc874c-f968-44f9-83cd-1da656f9114a",
+          "name": "write_authz_audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper"
+        }
+      ]
+    },
+    {
+      "attributes": {
         "display.on.consent.screen": "true",
         "include.in.token.scope": "true"
       },
@@ -2420,7 +2466,9 @@
         "phone",
         "pt_api",
         "read:cm_api",
-        "read:compliance-type-list-service"
+        "read:compliance-type-list-service",
+        "read:authz_api", 
+        "write:authz_api"
       ],
       "protocol": "openid-connect",
       "protocolMappers": [
@@ -5384,7 +5432,7 @@
       "serviceAccountClientId": "userstore",
       "totp": false,
       "username": "service-account-userstore"
-    },   
+    },
     {
       "createdTimestamp": 1687987040026,
       "credentials": [],
