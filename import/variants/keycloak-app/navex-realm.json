@@ -1399,7 +1399,7 @@
     },
     {
       "attributes": {
-        "display.on.consent.screen": "true",
+        "display.on.consent.screen": "false",
         "include.in.token.scope": "true"
       },
       "id": "6828390b-02f8-4fef-b75d-15c72b8d583d",
@@ -1410,7 +1410,7 @@
           "config": {
             "access.token.claim": "true",
             "id.token.claim": "false",
-            "included.client.audience": "authz"
+            "included.custom.audience": "authz"
           },
           "consentRequired": false,
           "id": "2ee44e36-4459-42b9-b0c7-dd7a8bd8b753",
@@ -1422,7 +1422,7 @@
     },
     {
       "attributes": {
-        "display.on.consent.screen": "true",
+        "display.on.consent.screen": "false",
         "include.in.token.scope": "true"
       },
       "id": "c5f1279b-c2c5-409d-af86-8740955d1ec3",
@@ -1433,7 +1433,7 @@
           "config": {
             "access.token.claim": "true",
             "id.token.claim": "false",
-            "included.client.audience": "authz"
+            "included.custom.audience": "authz"
           },
           "consentRequired": false,
           "id": "46dc874c-f968-44f9-83cd-1da656f9114a",
