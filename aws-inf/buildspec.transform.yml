@@ -85,7 +85,7 @@ phases:
       
       # Set cmd-backend client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "${DoormanBaseUrl}/*"
-      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p attributes:backchannel.logout.url -v "https://maint.$SingleDomain/content/oidc/backchannellogout"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p attributes:backchannel.logout.url -v "https://maint.$CmdUiRootDomain/oidc/backchannellogout"
 
       # Set epim-iem client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p adminUrl -v "https://${EpimIemRootDomain}/"
