@@ -2120,7 +2120,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "9e5fa1d8-8a93-432e-966c-20cf4561912e",
-    "redirectUris" : [ "https://api.dev.insights.local/public/v3/BrowserAuthorization.*", "https://api.dev.insights.local/public/v2/BrowserAuthorization.*", "https://doorman.dev.gw.local/*", "https://api.navexone-dev.local/analytics/public/v2/BrowserAuthorization.*", "https://api.navexone-dev.local/analytics/public/v3/BrowserAuthorization.*" ],
+    "redirectUris" : [ "https://api.dev.insights.local/public/v3/BrowserAuthorization.*", "https://api.dev.insights.local/public/v2/BrowserAuthorization.*", "https://doorman.dev.gw.local/*", "https://api.navexone-dev.local/public/v2/BrowserAuthorization.*", "https://api.navexone-dev.local/public/v3/BrowserAuthorization.*" ],
     "webOrigins" : [ "*" ],
     "notBefore" : 0,
     "bearerOnly" : false,
