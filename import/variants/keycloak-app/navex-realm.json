@@ -2751,6 +2751,7 @@
       "attributes": {
         "backchannel.logout.url": "https://auth.dev.rr.local/auth/PerformBackChannelLogout",
         "backchannel.logout.session.required": "true",
+        "backchannel.logout.revoke.offline.tokens": "false",
         "display.on.consent.screen": "false",
         "exclude.session.state.from.auth.response": "false",
         "saml.assertion.signature": "false",
