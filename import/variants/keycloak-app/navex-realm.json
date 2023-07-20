@@ -2749,7 +2749,7 @@
     {
       "alwaysDisplayInConsole": false,
       "attributes": {
-		"backchannel.logout.revoke.offline.tokens": "false",
+        "backchannel.logout.revoke.offline.tokens": "false",
         "backchannel.logout.session.required": "true",
         "display.on.consent.screen": "false",
         "exclude.session.state.from.auth.response": "false",
