@@ -2749,7 +2749,7 @@
     {
       "alwaysDisplayInConsole": false,
       "attributes": {
-        "backchannel.logout.revoke.offline.tokens": "false",
+        "backchannel.logout.url": "https://auth.dev.rr.local/auth/PerformBackChannelLogout",
         "backchannel.logout.session.required": "true",
         "display.on.consent.screen": "false",
         "exclude.session.state.from.auth.response": "false",
