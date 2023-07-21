@@ -182,15 +182,6 @@
       ]
     },
     {
-      "Project": "pita",
-      "Artifacts": [
-        {
-          "Name": "ApiURL",
-          "DefaultValue": "None"
-        }
-      ]
-    },
-    {
       "Project": "auth0-global-configuration",
       "Artifacts": [
         {

@@ -4139,7 +4139,7 @@
       "attributes": {
         "backchannel.logout.revoke.offline.tokens": "false",
         "backchannel.logout.session.required": "true",
-        "backchannel.logout.url": "https://jjensen.pita.navex-dev.com/api/Oidc/logout",
+        "backchannel.logout.url": "https://auth.envoy.navex-dev.com/api/Oidc/logout",
         "client_credentials.use_refresh_token": "false",
         "display.on.consent.screen": "false",
         "exclude.session.state.from.auth.response": "false",
