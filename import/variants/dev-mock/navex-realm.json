@@ -2348,7 +2348,7 @@
       "oidc.ciba.grant.enabled" : "false",
       "saml.artifact.binding" : "false",
       "backchannel.logout.session.required" : "true",
-      "backchannel.logout.url" : "https://auth.envoy.navex-dev.com/api/oidc/logout",
+      "backchannel.logout.url" : "https://auth.envoy.navex-dev.com/api/Oidc/logout",
       "client_credentials.use_refresh_token" : "false",
       "saml_force_name_id_format" : "false",
       "saml.client.signature" : "false",
