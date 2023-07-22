@@ -40,6 +40,7 @@ phases:
       - EsgAuthRedirectUrl=$(jq -r '.BaseRedirectUrl' "$DC_ART_DIR/esg")
       - EsgFrontendAuthRedirectUrl=$(jq -r '.FrontendBaseUrl' "$DC_ART_DIR/navex-esg-backend-api")
       - SingleDomain=$(jq -r '.SingleDomain' "$DC_ART_DIR/global-configuration")
+      - PitaUrl=$(jq -r '.ApiURL' "$DC_ART_DIR/pita")
       - mkdir transformed-import
       - |
         TransformScript="$APP_DIR/aws-inf/realm_transform.py"
@@ -123,7 +124,7 @@ phases:
 
       # Set pita client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id pita -p redirectUris -v "https://auth.${SingleDomain}/oidcredirect"
-      - $TransformScript -r "$NavexRealmJson" -i --client-id pita -p attributes:backchannel.logout.url -v "https://auth.{SingleDomain}/api/oidc/logout"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id pita -p attributes:backchannel.logout.url -v "https://$PitaUrl/api/oidc/logout"
 
       # copy updated realm file to captured artifact dir
       - cp "$NavexRealmJson" transformed-import/navex-realm.json
