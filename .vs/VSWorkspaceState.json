@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\aws-inf",
+    "\\lambdas",
+    "\\lambdas\\kc-api-proxy",
+    "\\lambdas\\kc-api-proxy\\kc_api_proxy",
+    "\\lambdas\\kc-config-import",
+    "\\lambdas\\kc-config-import\\kc_import_config"
+  ],
+  "SelectedNode": "\\aws-inf\\pipeline.develop.yml",
+  "PreviewInSolutionExplorer": false
+}
