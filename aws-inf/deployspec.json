@@ -181,7 +181,7 @@
         }
       ]
     },
-    {
+		{
       "Project": "pita",
       "Artifacts": [
         {

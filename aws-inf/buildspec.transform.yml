@@ -123,7 +123,7 @@ phases:
       - $TransformScript -r "$NavexRealmJson" -i --client-id riskrate -p attributes:backchannel.logout.url -v "${RiskRateAuthRedirectUrl}/PerformBackChannelLogout"
 
       # Set pita client related urls
-      - $TransformScript -r "$NavexRealmJson" -i --client-id pita -p redirectUris -v "https://$PitaUrl/*" 
+      - $TransformScript -r "$NavexRealmJson" -i --client-id pita -p redirectUris -v "https://auth.${SingleDomain}/oidcredirect"
       - $TransformScript -r "$NavexRealmJson" -i --client-id pita -p attributes:backchannel.logout.url -v "https://$PitaUrl/api/oidc/logout"
 
       # copy updated realm file to captured artifact dir
