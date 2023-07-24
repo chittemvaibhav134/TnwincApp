@@ -1499,7 +1499,7 @@
     "standardFlowEnabled" : true,
     "implicitFlowEnabled" : false,
     "directAccessGrantsEnabled" : true,
-    "serviceAccountsEnabled" : false,
+    "serviceAccountsEnabled" : true,
     "publicClient" : false,
     "frontchannelLogout" : false,
     "protocol" : "openid-connect",
@@ -1520,12 +1520,12 @@
       "backchannel.logout.revoke.offline.tokens": "false",
       "backchannel.logout.session.required": "true",
       "backchannel.logout.url": "https://maint.pt.dev.local/oidc/backchannellogout"
-  },
+    },
     "authenticationFlowBindingOverrides" : { },
     "fullScopeAllowed" : true,
     "nodeReRegistrationTimeout" : -1,
     "defaultClientScopes" : [ "web-origins", "roles", "profile", "email", "doorman-mappings" ],
-    "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
+    "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt", "read:authz_api" , "write:authz_api" ]
   }, {
     "id" : "05b253d3-0781-41d3-93a3-2444da72b4ac",
     "clientId" : "coi",
@@ -2120,7 +2120,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "9e5fa1d8-8a93-432e-966c-20cf4561912e",
-    "redirectUris" : [ "https://api.dev.insights.local/public/v3/BrowserAuthorization.*", "https://api.dev.insights.local/public/v2/BrowserAuthorization.*", "https://doorman.dev.gw.local/*", "https://api.navexone-dev.local/analytics/public/v2/BrowserAuthorization.*", "https://api.navexone-dev.local/analytics/public/v3/BrowserAuthorization.*" ],
+    "redirectUris" : [ "https://api.dev.insights.local/public/v3/BrowserAuthorization.*", "https://api.dev.insights.local/public/v2/BrowserAuthorization.*", "https://doorman.dev.gw.local/*", "https://api.navexone-dev.local/public/v2/BrowserAuthorization.*", "https://api.navexone-dev.local/public/v3/BrowserAuthorization.*" ],
     "webOrigins" : [ "*" ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -2935,6 +2935,46 @@
         "access.token.claim" : "true",
         "userinfo.token.claim" : "false"
       }
+    } ]
+  }, {
+    "attributes" : {
+      "display.on.consent.screen" : "false",
+      "include.in.token.scope" : "true"
+    },
+    "id" : "6828390b-02f8-4fef-b75d-15c72b8d583d",
+    "name" : "read:authz_api",
+    "protocol" : "openid-connect",
+    "protocolMappers" : [ {
+      "config" : {
+        "access.token.claim" : "true",
+        "id.token.claim" : "false",
+        "included.custom.audience" : "authz"
+      },
+      "consentRequired" : false,
+      "id" : "2ee44e36-4459-42b9-b0c7-dd7a8bd8b753",
+      "name" : "read_authz_audience",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-audience-mapper"
+    } ]
+  }, {
+    "attributes" : {
+      "display.on.consent.screen" : "false",
+      "include.in.token.scope" : "true"
+    },
+    "id" : "c5f1279b-c2c5-409d-af86-8740955d1ec3",
+    "name" : "write:authz_api",
+    "protocol" : "openid-connect",
+    "protocolMappers" : [ {
+      "config" : {
+        "access.token.claim" : "true",
+        "id.token.claim" : "false",
+        "included.custom.audience" : "authz"
+      },
+      "consentRequired" : false,
+      "id" : "46dc874c-f968-44f9-83cd-1da656f9114a",
+      "name" : "write_authz_audience",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-audience-mapper"
     } ]
   }, {
     "id" : "a159f3c7-8e4e-429c-a7e7-1615b33d2851",

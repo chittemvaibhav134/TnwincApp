@@ -85,7 +85,7 @@ phases:
       
       # Set cmd-backend client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p redirectUris -v "https://maint.$CmdUiRootDomain/oidc/coderedirector/*" -v "${DoormanBaseUrl}/*"
-      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p attributes:backchannel.logout.url -v "https://maint.$SingleDomain/content/oidc/backchannellogout"
+      - $TransformScript -r "$NavexRealmJson" -i --client-id cmd-backend -p attributes:backchannel.logout.url -v "https://maint.$CmdUiRootDomain/oidc/backchannellogout"
 
       # Set epim-iem client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id epim-iem -p adminUrl -v "https://${EpimIemRootDomain}/"
@@ -120,6 +120,7 @@ phases:
       # riskrate wants to use the preview KC instance for an additional environment and the easiest way to accomplish this hacky goal is to
       # add the redirectUri for that env in all environments. Not ideal, but an easy way to make it happen...
       - $TransformScript -r "$NavexRealmJson" -i --client-id riskrate -p redirectUris -v "https://auth.rr.navexglobalpreview.com/auth/*" --append
+      - $TransformScript -r "$NavexRealmJson" -i --client-id riskrate -p attributes:backchannel.logout.url -v "${RiskRateAuthRedirectUrl}/PerformBackChannelLogout"
 
       # Set pita client related urls
       - $TransformScript -r "$NavexRealmJson" -i --client-id pita -p redirectUris -v "https://$PitaUrl/*" 
