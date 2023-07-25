@@ -3338,7 +3338,8 @@
         "pt_api",
         "read:cm_api",
         "read:compliance-type-list-service",
-        "read:machine-translation-service"
+        "read:machine-translation-service",
+        "read:authz_api"
       ],
       "protocol": "openid-connect",
       "protocolMappers": [
