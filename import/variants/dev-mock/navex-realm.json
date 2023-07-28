@@ -1525,7 +1525,7 @@
     "fullScopeAllowed" : true,
     "nodeReRegistrationTimeout" : -1,
     "defaultClientScopes" : [ "web-origins", "roles", "profile", "email", "doorman-mappings" ],
-    "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt", "read:authz_api" , "write:authz_api" ]
+    "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt", "read:authz_api" , "write:authz_api", "read:cm_api" ]
   }, {
     "id" : "05b253d3-0781-41d3-93a3-2444da72b4ac",
     "clientId" : "coi",
