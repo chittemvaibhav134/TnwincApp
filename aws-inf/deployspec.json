@@ -221,6 +221,7 @@
     "RotateSecretTopicArn",
     "MyTaskListApiClientSecretSSmArn",
     "NavexOneClientSecretSsmArn",
-    "NavexAdminClientSecretSsmArn"
+    "NavexAdminClientSecretSsmArn",
+    "AssessmentBackendSecretSsmArn"
   ]
 }
