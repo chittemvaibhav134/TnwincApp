@@ -2574,7 +2574,7 @@
       "notBefore": 0,
       "optionalClientScopes": [
         "read:cm_api",
-		"read:machine-translation-service"
+        "read:machine-translation-service"
       ],
       "protocol": "openid-connect",
       "protocolMappers": [
