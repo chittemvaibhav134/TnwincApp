@@ -270,6 +270,7 @@
       "cmd-backend" : [ ],
       "admin-cli" : [ ],
       "appshell-localhost" : [ ],
+      "authz-service": [],
       "coi" : [ ],
       "coi-backend": [],
       "foundation-service-client" : [ ],
@@ -1213,6 +1214,23 @@
     "groups" : [ ]
   },
   {
+    "createdTimestamp": 1691688643862,
+    "credentials": [],
+    "disableableCredentialTypes": [],
+    "emailVerified": false,
+    "enabled": true,
+    "groups": [],
+    "id": "fcbfcc17-6749-4385-92fe-0c86ed1e7d28",
+    "notBefore": 0,
+    "realmRoles": [
+      "default-roles-navex"
+    ],
+    "requiredActions": [],
+    "serviceAccountClientId": "authz-service",
+    "totp": false,
+    "username": "service-account-authz-service"
+  },
+  {
     "id": "4df44785-6d28-4004-a446-10fe79f2d008",
     "createdTimestamp": 1687987040026,
     "username": "service-account-riskrate-backend",
@@ -1580,6 +1598,104 @@
     "defaultClientScopes" : [ "email", "doorman-mappings" ],
     "optionalClientScopes" : [ ]
   }, {
+      "alwaysDisplayInConsole": false,
+      "attributes": {
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "backchannel.logout.session.required": "true",
+        "client_credentials.use_refresh_token": "false",
+        "display.on.consent.screen": "false",
+        "exclude.session.state.from.auth.response": "false",
+        "id.token.as.detached.signature": "false",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "oidc.ciba.grant.enabled": "false",
+        "require.pushed.authorization.requests": "false",
+        "saml.artifact.binding": "false",
+        "saml.assertion.signature": "false",
+        "saml.authnstatement": "false",
+        "saml.client.signature": "false",
+        "saml.encrypt": "false",
+        "saml.force.post.binding": "false",
+        "saml.multivalued.roles": "false",
+        "saml.onetimeuse.condition": "false",
+        "saml.server.signature": "false",
+        "saml.server.signature.keyinfo.ext": "false",
+        "saml_force_name_id_format": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "use.refresh.tokens": "true"
+      },
+    "authenticationFlowBindingOverrides": {},
+    "bearerOnly": false,
+    "clientAuthenticatorType": "client-secret",
+    "clientId": "authz-service",
+    "consentRequired": false,
+    "defaultClientScopes": [
+      "read:tenant_identity"
+    ],
+    "directAccessGrantsEnabled": false,
+    "enabled": true,
+    "frontchannelLogout": false,
+    "fullScopeAllowed": true,
+    "id": "fc4e45db-a7d5-416d-a8e4-d6d654e5a31b",
+    "implicitFlowEnabled": false,
+    "nodeReRegistrationTimeout": -1,
+    "notBefore": 0,
+    "optionalClientScopes": [
+      "read:cm_api"
+    ],
+    "protocol": "openid-connect",
+    "protocolMappers": [
+      {
+        "config": {
+          "access.token.claim": "true",
+          "claim.name": "clientAddress",
+          "id.token.claim": "true",
+          "jsonType.label": "String",
+          "user.session.note": "clientAddress"
+        },
+        "consentRequired": false,
+        "id": "2d05b8d9-9787-454d-94cd-0543301cf549",
+        "name": "Client IP Address",
+        "protocol": "openid-connect",
+        "protocolMapper": "oidc-usersessionmodel-note-mapper"
+      },
+      {
+        "config": {
+          "access.token.claim": "true",
+          "claim.name": "clientHost",
+          "id.token.claim": "true",
+          "jsonType.label": "String",
+          "user.session.note": "clientHost"
+        },
+        "consentRequired": false,
+        "id": "24137544-aab5-4a02-9cde-1e05e73d593b",
+        "name": "Client Host",
+        "protocol": "openid-connect",
+        "protocolMapper": "oidc-usersessionmodel-note-mapper"
+      },
+      {
+        "config": {
+          "access.token.claim": "true",
+          "claim.name": "clientId",
+          "id.token.claim": "true",
+          "jsonType.label": "String",
+          "user.session.note": "clientId"
+        },
+        "consentRequired": false,
+        "id": "bc107534-2ee0-419a-a600-318e7424456e",
+        "name": "Client ID",
+        "protocol": "openid-connect",
+        "protocolMapper": "oidc-usersessionmodel-note-mapper"
+      }
+    ],
+    "publicClient": false,
+    "redirectUris": [],
+    "secret": "ab004981-e8cd-4155-baab-071a4a1a1b61",
+    "serviceAccountsEnabled": true,
+    "standardFlowEnabled": false,
+    "surrogateAuthRequired": false,
+    "webOrigins": []
+  },
+    {
       "alwaysDisplayInConsole": false,
       "attributes": {
         "backchannel.logout.revoke.offline.tokens": "false",
