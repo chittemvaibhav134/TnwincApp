@@ -2573,7 +2573,8 @@
       "nodeReRegistrationTimeout": -1,
       "notBefore": 0,
       "optionalClientScopes": [
-        "read:cm_api"
+        "read:cm_api",
+        "read:machine-translation-service"
       ],
       "protocol": "openid-connect",
       "protocolMappers": [
