@@ -48,3 +48,8 @@ node_modules
 event.json
 policyDocument.json
 *.zip
+.vs/
+
+
+# Jetbrains IDEs
+.idea/**
