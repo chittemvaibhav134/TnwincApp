@@ -4502,7 +4502,7 @@
       "clientId": "asm-service-to-service",
       "consentRequired": false,
       "defaultClientScopes": [
-        "read:tenant_identity"
+        "read:cm_api"
       ],
       "directAccessGrantsEnabled": false,
       "enabled": true,
@@ -4513,10 +4513,7 @@
       "name": "ASM Service-to-Service",
       "nodeReRegistrationTimeout": -1,
       "notBefore": 0,
-      "optionalClientScopes": [
-        "pt_api",
-        "read:cm_api"
-      ],
+      "optionalClientScopes": [],
       "protocol": "openid-connect",
       "protocolMappers": [
         {
