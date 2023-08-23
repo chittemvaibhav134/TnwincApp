@@ -1579,7 +1579,8 @@
         "email",
         "profile",
         "roles",
-        "web-origins"
+        "web-origins",
+        "doorman-mappings"
       ],
       "directAccessGrantsEnabled": true,
       "enabled": true,
