@@ -1580,7 +1580,7 @@
         "profile",
         "roles",
         "web-origins",
-		"doorman-mappings"
+        "doorman-mappings"
       ],
       "directAccessGrantsEnabled": true,
       "enabled": true,
