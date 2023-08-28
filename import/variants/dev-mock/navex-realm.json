@@ -2483,8 +2483,7 @@
       "email",
       "profile",
       "roles",
-      "web-origins",
-      "pt_api"
+      "web-origins"
     ],
     "directAccessGrantsEnabled": false,
     "enabled": true,
@@ -2498,7 +2497,8 @@
       "address",
       "microprofile-jwt",
       "offline_access",
-      "phone"
+      "phone",
+      "pt_api"
     ],
     "protocol": "openid-connect",
     "protocolMappers": [
