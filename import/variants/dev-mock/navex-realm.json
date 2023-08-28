@@ -1431,7 +1431,7 @@
     "fullScopeAllowed" : true,
     "nodeReRegistrationTimeout" : -1,
     "defaultClientScopes" : [ "web-origins", "appshell_audience", "roles", "profile", "email", "doorman-mappings" ],
-    "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
+    "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt", "read:cm_api" ]
   }, {
     "id" : "8408f965-d004-42a2-a6e5-f21db46e3205",
     "clientId" : "appshell-localhost",
