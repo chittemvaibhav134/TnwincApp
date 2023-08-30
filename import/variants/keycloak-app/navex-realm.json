@@ -1713,7 +1713,8 @@
         "microprofile-jwt",
         "offline_access",
         "phone",
-        "read:cm_api"
+        "read:cm_api",
+        "read:tenant_identity"
       ],
       "protocol": "openid-connect",
       "protocolMappers": [
