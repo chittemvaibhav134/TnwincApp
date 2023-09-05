@@ -181,7 +181,7 @@
         }
       ]
     },
-		{
+    {
       "Project": "pita",
       "Artifacts": [
         {
@@ -224,6 +224,7 @@
     "NavexAdminClientSecretSsmArn",
     "AssessmentBackendSecretSsmArn",
     "AuthZServiceClientSecretSsmArn",
-    "ASMServiceToServiceSecretSsmArn"
+    "ASMServiceToServiceSecretSsmArn",
+    "OrganizationClientSecretSsmArn"
   ]
 }
