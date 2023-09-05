@@ -224,6 +224,7 @@
     "NavexAdminClientSecretSsmArn",
     "AssessmentBackendSecretSsmArn",
     "AuthZServiceClientSecretSsmArn",
+    "ASMServiceToServiceSecretSsmArn",
     "OrganizationClientSecretSsmArn"
   ]
 }
