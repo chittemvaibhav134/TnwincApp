@@ -4534,7 +4534,8 @@
         "email",
         "profile",
         "roles",
-        "web-origins"
+        "web-origins",
+				"read:cm_api"
       ],
       "directAccessGrantsEnabled": false,
       "enabled": true,
@@ -4556,8 +4557,8 @@
         "https://localhost:4343"
       ],
       "secret": "f653b8a8-1c70-4a86-b27a-c9e5f76645e0",
-      "serviceAccountsEnabled": false,
-      "standardFlowEnabled": true,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
       "surrogateAuthRequired": false,
       "webOrigins": []
     },
