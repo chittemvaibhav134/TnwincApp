@@ -226,6 +226,7 @@
     "AuthZServiceClientSecretSsmArn",
     "ASMServiceToServiceSecretSsmArn",
     "OrganizationClientSecretSsmArn",
-		"PitaClientSecretSsmArn"
+		"PitaClientSecretSsmArn",
+		"PitaBackendClientSecretSsmArn"
   ]
 }
