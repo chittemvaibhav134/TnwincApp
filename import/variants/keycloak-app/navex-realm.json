@@ -4558,7 +4558,7 @@
       ],
       "secret": "f653b8a8-1c70-4a86-b27a-c9e5f76645e0",
       "serviceAccountsEnabled": true,
-      "standardFlowEnabled": false,
+      "standardFlowEnabled": true,
       "surrogateAuthRequired": false,
       "webOrigins": []
     },
@@ -5982,6 +5982,23 @@
       "serviceAccountClientId": "asm-service-to-service",
       "totp": false,
       "username": "service-account-asm-service-to-service"
+    },
+		{
+      "createdTimestamp": 1694183045614,
+      "credentials": [],
+      "disableableCredentialTypes": [],
+      "emailVerified": false,
+      "enabled": true,
+      "groups": [],
+      "id": "197d99d0-98b6-497d-8019-cb6c33561bac",
+      "notBefore": 0,
+      "realmRoles": [
+        "default-roles-navex"
+      ],
+      "requiredActions": [],
+      "serviceAccountClientId": "pita",
+      "totp": false,
+      "username": "service-account-pita"
     }
   ],
   "verifyEmail": false,
