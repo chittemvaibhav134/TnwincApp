@@ -4534,8 +4534,7 @@
         "email",
         "profile",
         "roles",
-        "web-origins",
-				"read:cm_api"
+        "web-origins"
       ],
       "directAccessGrantsEnabled": false,
       "enabled": true,
@@ -6079,23 +6078,6 @@
       "serviceAccountClientId": "asm-service-to-service",
       "totp": false,
       "username": "service-account-asm-service-to-service"
-    },
-		{
-      "createdTimestamp": 1694183045614,
-      "credentials": [],
-      "disableableCredentialTypes": [],
-      "emailVerified": false,
-      "enabled": true,
-      "groups": [],
-      "id": "197d99d0-98b6-497d-8019-cb6c33561bac",
-      "notBefore": 0,
-      "realmRoles": [
-        "default-roles-navex"
-      ],
-      "requiredActions": [],
-      "serviceAccountClientId": "pita",
-      "totp": false,
-      "username": "service-account-pita"
     },
     {
       "id": "fbdbf14d-36bd-4d53-b0df-646f1055d6f5",

@@ -1280,38 +1280,21 @@
     "username": "service-account-asm-service-to-service"
   },
 	{
-		"createdTimestamp": 1694183045614,
-		"credentials": [],
-		"disableableCredentialTypes": [],
-		"emailVerified": false,
+		"id": "fbdbf14d-36bd-4d53-b0df-646f1055d6f5",
+		"createdTimestamp": 1694194079189,
+		"username": "service-account-pita-backend",
 		"enabled": true,
-		"groups": [],
-		"id": "197d99d0-98b6-497d-8019-cb6c33561bac",
-		"notBefore": 0,
+		"totp": false,
+		"emailVerified": false,
+		"serviceAccountClientId": "pita-backend",
+		"disableableCredentialTypes": [],
+		"requiredActions": [],
 		"realmRoles": [
 			"default-roles-navex"
 		],
-		"requiredActions": [],
-		"serviceAccountClientId": "pita",
-		"totp": false,
-		"username": "service-account-pita"
-	},
-    {
-      "id": "fbdbf14d-36bd-4d53-b0df-646f1055d6f5",
-      "createdTimestamp": 1694194079189,
-      "username": "service-account-pita-backend",
-      "enabled": true,
-      "totp": false,
-      "emailVerified": false,
-      "serviceAccountClientId": "pita-backend",
-      "disableableCredentialTypes": [],
-      "requiredActions": [],
-      "realmRoles": [
-        "default-roles-navex"
-      ],
-      "notBefore": 0,
-      "groups": []
-    }
+		"notBefore": 0,
+		"groups": []
+	}
 	],
   "scopeMappings" : [ {
     "clientScope" : "offline_access",
