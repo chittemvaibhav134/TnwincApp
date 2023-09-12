@@ -2534,7 +2534,9 @@
       "microprofile-jwt",
       "offline_access",
       "phone",
-      "pt_api"
+      "pt_api",
+      "read:org_api",
+      "write:org_api"
     ],
     "protocol": "openid-connect",
     "protocolMappers": [
