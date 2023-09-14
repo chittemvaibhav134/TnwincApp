@@ -2536,7 +2536,8 @@
       "phone",
       "pt_api",
       "read:org_api",
-      "write:org_api"
+      "write:org_api",
+      "read:cm_api"
     ],
     "protocol": "openid-connect",
     "protocolMappers": [
