@@ -4571,7 +4571,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "59875054-3ae7-44a4-89f6-a862e527861c",
       "redirectUris": [],
       "webOrigins": [],
       "notBefore": 0,
@@ -6084,6 +6084,7 @@
     },
     {
       "id": "fbdbf14d-36bd-4d53-b0df-646f1055d6f5",
+			"credentials": [],
       "createdTimestamp": 1694194079189,
       "username": "service-account-pita-backend",
       "enabled": true,
