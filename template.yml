@@ -1309,7 +1309,7 @@ Resources:
     Properties:
       Engine: aurora-postgresql
       DBClusterIdentifier:  !Ref DatabaseCluster
-      DBInstanceClass: db.r5.large
+      DBInstanceClass: db.r6g.large
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
       DBParameterGroupName: !Ref DatabaseInstanceParameterGroupPg11
       MonitoringInterval: 1
@@ -1333,7 +1333,7 @@ Resources:
     Properties:
       Engine: aurora-postgresql
       DBClusterIdentifier:  !Ref DatabaseCluster
-      DBInstanceClass: db.r5.large
+      DBInstanceClass: db.r6g.large
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
       DBParameterGroupName: !Ref DatabaseInstanceParameterGroupPg11
       MonitoringInterval: 1
@@ -1580,3 +1580,10 @@ Outputs:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/assessment-backend"
   AuthZServiceClientSecretSsmArn:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/authz-service"
+  ASMServiceToServiceSecretSsmArn:
+    Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/asm-service-to-service"
+  OrganizationClientSecretSsmArn:
+    Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/organization"
+  PitaBackendClientSecretSsmArn:
+    Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/pita-backend"
+
