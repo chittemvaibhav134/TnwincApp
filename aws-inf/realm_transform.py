@@ -97,7 +97,7 @@ def update_csp_header(realm_dict: dict, domains: List[str], prepend_wildcard: bo
 
 def disable_users(realm_dict: dict) -> None:
     for user in realm_dict['users']:
-        if user['credentials']:
+        if user.get('credentials',[]):
             print(f"Disabling user {user['username']}. FirstName '{user.get('firstName')}' LastName '{user.get('lastName')}'")
             user['enabled'] = False
 
