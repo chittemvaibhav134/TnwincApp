@@ -1226,7 +1226,6 @@ Resources:
     Condition:  NotDevelopment
     Properties:
       Description: !Sub "Aurora PG Cluster Parameter Group for ${AWS::StackName}"
-      # postgres 12 is supported in all regions supported by postgres
       Family: aurora-postgresql12
       Parameters:
         rds.force_ssl: 0
