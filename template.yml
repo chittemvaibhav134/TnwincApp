@@ -1221,22 +1221,21 @@ Resources:
         - !Ref KeyCloakDbSubnet1
         - !Ref KeyCloakDbSubnet2
 
-  DatabaseClusterParameterGroupPg11:
+  DatabaseClusterParameterGroupPg12:
     Type: AWS::RDS::DBClusterParameterGroup
     Condition:  NotDevelopment
     Properties:
       Description: !Sub "Aurora PG Cluster Parameter Group for ${AWS::StackName}"
-      # postgres 11 isn't in eu-central-1 yet apparently
-      Family: aurora-postgresql11
+      Family: aurora-postgresql12
       Parameters:
         rds.force_ssl: 0
 
-  DatabaseInstanceParameterGroupPg11:
+  DatabaseInstanceParameterGroupPg12:
     Type: AWS::RDS::DBParameterGroup
     Condition:  NotDevelopment
     Properties:
       Description: !Sub "Aurora PG DB Instance Parameter Group for ${AWS::StackName}"
-      Family: aurora-postgresql11
+      Family: aurora-postgresql12
       Parameters:
         shared_preload_libraries: auto_explain,pg_stat_statements,pg_hint_plan,pgaudit
         log_statement: "ddl"
@@ -1280,14 +1279,14 @@ Resources:
     UpdateReplacePolicy: Snapshot
     Properties:
       Engine: aurora-postgresql
-      EngineVersion: "11.16"
+      EngineVersion: "12.15"
       BackupRetentionPeriod: 35
       PreferredBackupWindow: 05:00-06:00
       PreferredMaintenanceWindow: mon:03:00-mon:04:00
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
       VpcSecurityGroupIds:
         - !Ref DbClusterSecurityGroup
-      DBClusterParameterGroupName: !Ref DatabaseClusterParameterGroupPg11
+      DBClusterParameterGroupName: !Ref DatabaseClusterParameterGroupPg12
       MasterUsername: !GetAtt DbUser.Name
       MasterUserPassword: !GetAtt DbPassword.Value
       StorageEncrypted: true
@@ -1311,7 +1310,7 @@ Resources:
       DBClusterIdentifier:  !Ref DatabaseCluster
       DBInstanceClass: db.r6g.large
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
-      DBParameterGroupName: !Ref DatabaseInstanceParameterGroupPg11
+      DBParameterGroupName: !Ref DatabaseInstanceParameterGroupPg12
       MonitoringInterval: 1
       MonitoringRoleArn: !GetAtt DatabaseMonitoringRole.Arn
       AutoMinorVersionUpgrade: false
@@ -1335,7 +1334,7 @@ Resources:
       DBClusterIdentifier:  !Ref DatabaseCluster
       DBInstanceClass: db.r6g.large
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
-      DBParameterGroupName: !Ref DatabaseInstanceParameterGroupPg11
+      DBParameterGroupName: !Ref DatabaseInstanceParameterGroupPg12
       MonitoringInterval: 1
       MonitoringRoleArn: !GetAtt DatabaseMonitoringRole.Arn
       AutoMinorVersionUpgrade: false
@@ -1354,7 +1353,7 @@ Resources:
         # Encryption at rest is supported on db.t2.small and larger i think
         # if we want to enable it for Dev stacks we need to up the instance class
         StorageEncrypted: false
-        EngineVersion: "11.16"
+        EngineVersion: "12.15"
         # if specifying a version explicitly apparently you should nuke the auto-upgrade
         # cause otherwise cfn can try to downgrade the db and blow up stack deployments
         AutoMinorVersionUpgrade: false
