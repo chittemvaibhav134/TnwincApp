@@ -5,7 +5,7 @@ module.exports.handler = async (event, context) => {
   let data
   try {
     data = await oidc.authenticateToken(event, undefined, [ 'openid' ], {
-      jwksUri: [ process.env.JWKS_URI, process.env.AUTH0_JWKS ],
+      jwksUri: [ process.env.JWKS_URI, process.env.AUTH0_JWKS, process.env.ASM_JWKS ],
       methodOrRouteArn: '*'
     })
   }

@@ -152,9 +152,11 @@ phases:
       - |
         jq --null-input \
           --arg Auth0Domain "$Auth0Domain" \
+          --arg SingleDomain "$SingleDomain" \
           '{
             "Parameters": {
-              "Auth0Domain": $Auth0Domain
+              "Auth0Domain": $Auth0Domain,
+              "SingleDomain": $SingleDomain
             }
           }' > \
           ./template-auth-configuration.json

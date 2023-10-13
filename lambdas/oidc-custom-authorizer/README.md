@@ -43,7 +43,11 @@ cp .env.sample .env
 Modify the `.env`:
 * `JWKS_URI`: This is the URL of the associated JWKS endpoint in keycloak. The sample file as an example.
 
-You can test the custom authorizer locally. You just need to obtain a valid JWT access token to perform the test. If you're using Auth0, see [these instructions](https://auth0.com/docs/tokens/access-token#how-to-get-an-access-token) on how to obtain one.
+You can test the custom authorizer locally. You just need to obtain a valid JWT access token to perform the test.
+
+If you're using direct Auth0, see [these instructions](https://auth0.com/docs/tokens/access-token#how-to-get-an-access-token) on how to obtain one.
+
+If you're using ASM Auth0, you can use [PITA](https://github.com/tnwinc/platform-pita/tree/develop) with [mockeverything](https://github.com/tnwinc/dev-integrations/tree/develop/devlocal-proxyauthstack) with the `AUTH0_CUTOVER` and `Auth0_ASM_Cutover` toggles on to obtain one.
 
 With a valid token, now you just need to create a local `event.json` file that contains it. Start by copying the sample file:
 
