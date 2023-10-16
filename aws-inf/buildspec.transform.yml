@@ -148,7 +148,7 @@ phases:
             }
           }' > \
           ./template-configuration.json
-      # Create artifact for the Auth0Domain
+      # Create artifact for the Auth0Domain and SingleDomain
       - |
         jq --null-input \
           --arg Auth0Domain "$Auth0Domain" \
