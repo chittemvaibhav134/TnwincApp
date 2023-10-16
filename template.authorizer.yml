@@ -45,7 +45,7 @@ Resources:
         Variables:
           JWKS_URI: !Sub https://${KCBaseUrl}/auth/realms/navex/protocol/openid-connect/certs
           AUTH0_JWKS: !Sub https://${Auth0Domain}/.well-known/jwks.json
-          ASM_JWKS: !Sub https://auth.${SingleDomain}/authorization/jwks
+          ASM_JWKS: !Sub https://*.${SingleDomain}/authorization/jwks
       MemorySize: 512
       Runtime: nodejs18.x
       Timeout: 30
