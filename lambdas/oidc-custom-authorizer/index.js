@@ -26,7 +26,7 @@ const getToken = (params) => {
   if (eventType === 'TOKEN') {
       const tokenString = params.authorizationToken;
       if (!tokenString) {
-          throw new Error('Expected "event.headers.Authorization" parameter to be set');
+          throw new Error('Expected "event.headers.Authorization", or for ASM, "event.headers.n1-authentication" parameter to be set');
       }
       return getRequestToken(tokenString);
   } else if (eventType === 'REQUEST') {
