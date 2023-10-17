@@ -5,7 +5,7 @@ module.exports.handler = async (event, context) => {
   let data
   try {
     data = await oidc.authenticateToken(event, undefined, [ 'openid' ], {
-      jwksUri: [ process.env.JWKS_URI, process.env.AUTH0_JWKS ],
+      jwksUri: [ process.env.JWKS_URI, process.env.AUTH0_JWKS, process.env.ASM_JWKS ],
       methodOrRouteArn: '*'
     })
   }
@@ -26,7 +26,7 @@ const getToken = (params) => {
   if (eventType === 'TOKEN') {
       const tokenString = params.authorizationToken;
       if (!tokenString) {
-          throw new Error('Expected "event.headers.Authorization" parameter to be set');
+          throw new Error('Expected "event.headers.Authorization", or for ASM, "event.headers.n1-authentication" parameter to be set');
       }
       return getRequestToken(tokenString);
   } else if (eventType === 'REQUEST') {
@@ -37,7 +37,7 @@ const getToken = (params) => {
       if (headers.Connection === "upgrade" && headers.Upgrade === "websocket") {
           return getWebSocketRequestToken(params);
       } else {
-          const tokenString = headers["authorization"];
+          const tokenString = headers["authorization"] ?? headers["n1-authentication"];
           return getRequestToken(tokenString);
       }
   } else {
