@@ -21,7 +21,7 @@ Parameters:
     Default: oidc-endpoint-authorizer-nodejs
   SingleDomain:
     Type: String
-    Default: "devlocal.navex-pe.com:4343"
+    Default: "envoy.navex-dev.com"
 
 Outputs:
   CustomOidcAuthorizerLambdaName:
