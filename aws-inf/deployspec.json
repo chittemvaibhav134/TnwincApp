@@ -227,6 +227,7 @@
     "ASMServiceToServiceSecretSsmArn",
     "OrganizationClientSecretSsmArn",
 		"PitaClientSecretSsmArn",
-		"PitaBackendClientSecretSsmArn"
+		"PitaBackendClientSecretSsmArn",
+		"UserstoreClientSecretSsmArn"
   ]
 }
