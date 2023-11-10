@@ -3487,7 +3487,8 @@
       "nodeReRegistrationTimeout": -1,
       "notBefore": 0,
       "optionalClientScopes": [
-        "read:userstore"
+        "read:userstore",
+        "read:authz_api"
       ],
       "protocol": "openid-connect",
       "protocolMappers": [

@@ -160,26 +160,26 @@ Resources:
       SecurityGroupIngress:
         - SourceSecurityGroupId: !Ref AlbSecurityGroup
           IpProtocol: "-1"
-        - CidrIp: !GetAtt Cidrs.KCAZ1
+        - CidrIp: !GetAtt AppCidrs.AZ1
           IpProtocol: "TCP"
           FromPort: 7600
           ToPort: 7600
-          Description: !Sub "KeyCloak AZ1 (${KeycloakSubnet1})"
-        - CidrIp: !GetAtt Cidrs.KCAZ1
+          Description: !Sub "KeyCloak AZ1 (${KeycloakAppSubnet1})"
+        - CidrIp: !GetAtt AppCidrs.AZ1
           IpProtocol: "TCP"
           FromPort: 57600
           ToPort: 57600
-          Description: !Sub "KeyCloak AZ1 (${KeycloakSubnet1})"
-        - CidrIp: !GetAtt Cidrs.KCAZ2
+          Description: !Sub "KeyCloak AZ1 (${KeycloakAppSubnet1})"
+        - CidrIp: !GetAtt AppCidrs.AZ2
           IpProtocol: "TCP"
           FromPort: 7600
           ToPort: 7600
-          Description: !Sub "KeyCloak AZ2 (${KeycloakSubnet2})"
-        - CidrIp: !GetAtt Cidrs.KCAZ2
+          Description: !Sub "KeyCloak AZ2 (${KeycloakAppSubnet2})"
+        - CidrIp: !GetAtt AppCidrs.AZ2
           IpProtocol: "TCP"
           FromPort: 57600
           ToPort: 57600
-          Description: !Sub "KeyCloak AZ2 (${KeycloakSubnet2})"
+          Description: !Sub "KeyCloak AZ2 (${KeycloakAppSubnet2})"
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
 
@@ -313,6 +313,22 @@ Resources:
         - 28
         - 28
 
+  KeycloakAppCidrs:
+    Type: Custom::KeycloakCidrFindr
+    # depends on is needed to avoid race conditions with cidr findr on new stacks
+    DependsOn:
+      - KeycloakSubnet1
+      - KeycloakSubnet2
+      - KeyCloakDbSubnet1
+      - KeyCloakDbSubnet2
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnCidrFindr
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
+      Sizes:
+        - 28
+        - 28
+
   Cidrs:
     Type: Custom::VariableHack
     Properties:
@@ -322,6 +338,14 @@ Resources:
       KCAZ2: !GetAtt KeycloakCidrs.CidrBlock2
       KCDBAZ1: !GetAtt KeycloakCidrs.CidrBlock3
       KCDBAZ2: !GetAtt KeycloakCidrs.CidrBlock4
+
+  AppCidrs:
+    Type: Custom::VariableHack
+    Properties:
+      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CfnVariableHack
+      AZ1: !GetAtt KeycloakAppCidrs.CidrBlock1
+      AZ2: !GetAtt KeycloakAppCidrs.CidrBlock2
+
 
   KeycloakSubnet1:
     Type: AWS::EC2::Subnet
@@ -348,6 +372,31 @@ Resources:
         - Key: Name
           Value: !Sub ${AWS::StackName} [KC] (Public)
 
+  KeycloakAppSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}-VpcId"
+      AvailabilityZone: !Select [0, !GetAZs ]
+      MapPublicIpOnLaunch: false
+      CidrBlock: !GetAtt AppCidrs.AZ1
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName} [KC] (Private)
+
+  KeycloakAppSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Fn::ImportValue:
+          !Sub "${InfrastructureStackName}-VpcId"
+      AvailabilityZone: !Select [ 1, !GetAZs ]
+      MapPublicIpOnLaunch: false
+      CidrBlock: !GetAtt AppCidrs.AZ2
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName} [KC] (Private)
+
   KeycloakSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -361,6 +410,20 @@ Resources:
       RouteTableId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}-PublicRouteTable"
       SubnetId: !Ref KeycloakSubnet2
+
+  KeycloakAppSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}-PrivateRouteTableAZ1"
+      SubnetId: !Ref KeycloakAppSubnet1
+
+  KeycloakAppSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Fn::ImportValue: !Sub "${InfrastructureStackName}-PrivateRouteTableAZ2"
+      SubnetId: !Ref KeycloakAppSubnet2
 
   LogGroup:
     Type: AWS::Logs::LogGroup
@@ -601,8 +664,8 @@ Resources:
           SecurityGroups:
             - !Ref AppSecurityGroup
           Subnets:
-            - !Ref KeycloakSubnet1
-            - !Ref KeycloakSubnet2
+            - !Ref KeycloakAppSubnet1
+            - !Ref KeycloakAppSubnet2
       LoadBalancers:
         - ContainerName: Navex-Keycloak
           ContainerPort: 8443
@@ -1585,4 +1648,7 @@ Outputs:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/organization"
   PitaBackendClientSecretSsmArn:
     Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/pita-backend"
+  UserstoreClientSecretSsmArn:
+    Value: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter${ClientSecretRotationConstants.SsmPrefix}/navex/userstore"
+
 

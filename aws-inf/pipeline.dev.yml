@@ -17,6 +17,7 @@ Metadata:
           - GitHubBranch
           - ImportConfigVariant
           - Auth0Domain
+          - SingleDomain
       - Label:
           default: "Moonwatch"
         Parameters:
@@ -90,6 +91,8 @@ Parameters:
       - "Yes"
       - "No"
   Auth0Domain:
+    Type: String
+  SingleDomain:
     Type: String
 
 Conditions:
@@ -382,6 +385,7 @@ Resources:
                       "Parameters": {
                         "KCBaseUrl": "CfnDeploy_Dev::stack-outputs.json:Domain",
                         "Auth0Domain": "${Auth0Domain}",
+                        "SingleDomain": "${SingleDomain}",
                         "LayerName": "${LayerName}-${AWS::StackName}"
                       }
                     },
