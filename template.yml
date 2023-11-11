@@ -923,7 +923,7 @@ Resources:
           Cluster: !GetAtt Cluster.Arn
           TaskDefinition: !Ref ImportConfigTaskDefinition
           #TaskFamily: !Sub ${AWS::StackName}-KCCONFIG
-          TaskSubnets: !Sub ${KeycloakSubnet1},${KeycloakSubnet2}
+          TaskSubnets: !Sub ${KeycloakAppSubnet1},${KeycloakAppSubnet2}
           SecurityGroupId: !GetAtt ConfigImporterSecurityGroup.GroupId
           ImportConfigContainerName: 'Navex-Keycloak-Config'
 
@@ -1241,6 +1241,16 @@ Resources:
     Properties:
       GroupDescription: !Sub ${AWS::StackName}-dbcluster
       SecurityGroupIngress:
+        - CidrIp: !GetAtt AppCidrs.AZ1
+          IpProtocol: "TCP"
+          FromPort: 5432
+          ToPort: 5432
+          Description: !Sub "KeyCloak AZ1 (${KeycloakAppSubnet1})"
+        - CidrIp: !GetAtt AppCidrs.AZ2
+          IpProtocol: "TCP"
+          FromPort: 5432
+          ToPort: 5432
+          Description: !Sub "KeyCloak AZ2 (${KeycloakAppSubnet2})"
         - CidrIp: !GetAtt Cidrs.KCDBAZ1
           IpProtocol: "TCP"
           FromPort: 5432
@@ -1251,16 +1261,6 @@ Resources:
           FromPort: 5432
           ToPort: 5432
           Description: !Sub "KeyCloak DB AZ2 (${KeyCloakDbSubnet2})"
-        - CidrIp: !GetAtt Cidrs.KCAZ1
-          IpProtocol: "TCP"
-          FromPort: 5432
-          ToPort: 5432
-          Description: !Sub "KeyCloak AZ1 (${KeycloakSubnet1})"
-        - CidrIp: !GetAtt Cidrs.KCAZ2
-          IpProtocol: "TCP"
-          FromPort: 5432
-          ToPort: 5432
-          Description: !Sub "KeyCloak AZ2 (${KeycloakSubnet2})"
       VpcId:
         Fn::ImportValue:
           !Sub "${InfrastructureStackName}-VpcId"
