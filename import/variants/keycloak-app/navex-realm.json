@@ -3488,7 +3488,9 @@
       "notBefore": 0,
       "optionalClientScopes": [
         "read:userstore",
-        "read:authz_api"
+        "read:authz_api",
+        "read:org_api",
+        "write:org_api"
       ],
       "protocol": "openid-connect",
       "protocolMappers": [
